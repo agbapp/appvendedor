@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sistema Comercial</title>
+
+<!-- PWA: acceso directo / instalación en pantalla de inicio -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5d3a5c">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cobranza">
+
 <style>
   :root{
     --plum:#5d3a5c;
@@ -276,7 +287,7 @@
         <button class="menu-btn" onclick="irACobranza()">
           <div class="ic">&#128179;</div>
           <div class="mb-txt">
-            <div class="mb-title">Carga de Cobranza</div>
+            <div class="mb-title">1 · Carga de Cobranza</div>
             <div class="mb-sub" id="menuSubCobranza">Planillas de cobranza</div>
           </div>
           <div class="mb-arrow">&#8250;</div>
@@ -284,7 +295,7 @@
         <button class="menu-btn" onclick="irAPedidos()">
           <div class="ic">&#128230;</div>
           <div class="mb-txt">
-            <div class="mb-title">Carga de Pedidos</div>
+            <div class="mb-title">2 · Carga de Pedidos</div>
             <div class="mb-sub" id="menuSubPedidos">Notas de pedido</div>
           </div>
           <div class="mb-arrow">&#8250;</div>
@@ -292,7 +303,7 @@
         <button class="menu-btn" onclick="irACatalogos()">
           <div class="ic">&#128218;</div>
           <div class="mb-txt">
-            <div class="mb-title">Catálogos Productos</div>
+            <div class="mb-title">3 · Catálogos Productos</div>
             <div class="mb-sub" id="menuSubCatalogos">Links, PDFs y fotos</div>
           </div>
           <div class="mb-arrow">&#8250;</div>
@@ -2154,6 +2165,14 @@ if(!vendedorCodigo){
 }
 renderMenu();
 renderImportCounts();
+
+// registra el service worker (solo tiene efecto publicado en GitHub Pages,
+// no al abrir el archivo directamente desde el celular/PC)
+if('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){ /* silencioso si falla */ });
+  });
+}
 </script>
 </body>
 </html>
