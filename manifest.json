@@ -2,7 +2,7 @@
   "name": "Sistema Comercial - Cobranza y Pedidos",
   "short_name": "App Vendedor",
   "description": "Carga de planillas de cobranza, notas de pedido y catálogos de productos.",
-  "start_url": "./PlanillaCobranza.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
