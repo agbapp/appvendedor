@@ -119,6 +119,8 @@
   .ac-item.freeform{color:var(--plum); font-style:italic;}
   .ac-selected{margin-top:6px; font-size:13px; color:var(--ink-soft);}
   .ac-selected b{color:var(--ink);}
+  .ac-selected-highlight:not(:empty){background:rgb(214,206,147); color:#3f3b1f; border-radius:8px; padding:8px 10px; font-weight:600;}
+  .ac-selected-highlight:not(:empty) b{color:#3f3b1f;}
 
   /* ---------- Grid de renglones ---------- */
   .section-title{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft); margin:20px 0 8px;}
@@ -222,17 +224,89 @@
     .ps-header h1{font-size:18px; margin:0 0 4px; color:#5d3a5c;}
     .ps-header .ps-meta{font-size:12px; line-height:1.6;}
     .ps-header .ps-meta b{display:inline-block; width:110px;}
+    .ps-empresa{font-size:10px; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;}
+    .ps-header-recibo{border-bottom:3px solid #5d3a5c; padding-bottom:10px; margin-bottom:14px;}
+    .ps-header-recibo-top{display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin-bottom:5px;}
+    .ps-empresa-title{font-size:15px; font-weight:800; color:#5d3a5c; letter-spacing:0.2px;}
+    .ps-recibo-title{font-size:12px; font-weight:700; color:#5d3a5c; text-align:right; white-space:nowrap;}
+    .ps-header-line-inline{display:flex; align-items:baseline; gap:22px; font-size:12.5px;}
+    .ps-header-line-inline b{margin-right:3px;}
+    .ps-header-cliente{font-size:12px; margin-top:4px;}
+    .ps-pagos-table{width:100%; border-collapse:collapse; margin:4px 0 6px;}
+    .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:9.5px; text-transform:uppercase;}
+    .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:11px;}
+    .ps-pagos-table th:first-child, .ps-pagos-table td:first-child{padding-right:3px;}
+    .ps-pagos-table th:nth-child(2), .ps-pagos-table td:nth-child(2){padding-left:3px;}
     table.ps-table{width:100%; border-collapse:collapse; margin-bottom:14px;}
     table.ps-table th{background:#5d3a5c; color:#fff; text-align:left; padding:6px 8px; font-size:11px; text-transform:uppercase;}
     table.ps-table td{padding:6px 8px; border-bottom:1px solid #ddd; font-size:11.5px;}
     table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
+    table.ps-pedido-table{margin-bottom:4px;}
+    table.ps-pedido-table th, table.ps-pedido-table td{padding-left:5px; padding-right:5px;}
     .ps-total{display:flex; justify-content:flex-end; margin-bottom:14px;}
     .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:14px;}
+    .ps-total-pedido{margin-bottom:6px;}
     .ps-tipos{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
     .ps-tipos div{background:#f7f5f2; border:1px solid #ddd; border-radius:6px; padding:6px 10px; font-size:11px;}
     .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:11.5px; min-height:40px;}
+    .ps-obs-pedido{padding:7px 10px; min-height:auto;}
     .ps-obs .lbl{font-weight:bold; color:#5d3a5c; display:block; margin-bottom:4px; font-size:10px; text-transform:uppercase;}
+    #printSheet.ps-size-chico{font-size:9.5px;}
+    #printSheet.ps-size-chico .ps-header h1{font-size:14px;}
+    #printSheet.ps-size-chico table.ps-table th{font-size:9px; padding:4px 5px;}
+    #printSheet.ps-size-chico table.ps-table td{font-size:9px; padding:4px 5px;}
+    #printSheet.ps-size-chico .ps-total .box{font-size:12px; padding:6px 12px;}
+
+    /* ticket angosto 5,5cm */
+    #printSheet.ps-ticket{font-family:'Courier New',Courier,monospace; font-size:10.5px; padding:0;}
+    #printSheet.ps-ticket .ps-block{page-break-after:always;}
+    #printSheet.ps-ticket .tk-center{text-align:center;}
+    #printSheet.ps-ticket .tk-bold{font-weight:bold;}
+    #printSheet.ps-ticket .tk-line{border-top:1px dashed #000; margin:5px 0;}
+    #printSheet.ps-ticket .tk-row{display:flex; justify-content:space-between; gap:6px;}
+
+    /* encabezado compacto de una sola línea (pedidos) */
+    .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:11.5px; white-space:nowrap;}
+    .ps-header-line b{color:#5d3a5c;}
+    #printSheet.ps-size-chico .ps-header-line{font-size:9px;}
   }
+
+  /* ---------- Cobranza: menu con 5 botones ---------- */
+  .menu-btn.light{background:var(--olive-light); box-shadow:none;}
+  .menu-btn.light .ic{background:var(--white);}
+  .menu-btn.light .mb-title{color:var(--plum);}
+  .menu-btn.secondary{opacity:0.9;}
+  .menu-btn.small{padding:14px 16px;}
+  .menu-btn.small .ic{width:38px; height:38px; font-size:18px;}
+  .menu-btn.small .mb-title{font-size:14.5px;}
+
+  /* ---------- Toggle switch (ajustes) ---------- */
+  .toggle-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px 0;}
+  .toggle-row .tr-txt{flex:1; font-size:13.5px; color:var(--ink);}
+  .switch{position:relative; width:46px; height:26px; flex-shrink:0;}
+  .switch input{opacity:0; width:0; height:0;}
+  .switch .slider{position:absolute; cursor:pointer; inset:0; background:#d8d2cf; border-radius:26px; transition:0.15s;}
+  .switch .slider::before{content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:var(--white); border-radius:50%; transition:0.15s;}
+  .switch input:checked + .slider{background:var(--olive);}
+  .switch input:checked + .slider::before{transform:translateX(20px);}
+
+  /* ---------- Ajustes: secciones colapsables ---------- */
+  .ajustes-section{margin-bottom:16px;}
+  .ajustes-section > summary{list-style:none; cursor:pointer; background:var(--white); border:1px solid var(--border); border-radius:14px; padding:16px 18px; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; font-weight:700; color:var(--plum-dark); font-size:15px;}
+  .ajustes-section > summary::-webkit-details-marker{display:none;}
+  .ajustes-section > summary::after{content:"\\203A"; font-size:20px; color:var(--ink-soft); transform:rotate(90deg); transition:0.15s;}
+  .ajustes-section[open] > summary::after{transform:rotate(270deg);}
+  .ajustes-section[open] > summary{border-radius:14px 14px 0 0; box-shadow:none; border-bottom:none;}
+  .ajustes-section-body{background:var(--white); border:1px solid var(--border); border-top:none; border-radius:0 0 14px 14px; padding:16px 18px 4px;}
+
+  /* ---------- Pedidos: resaltar agregar articulo ---------- */
+  .btn-agregar-articulo{background:rgb(214,206,147); color:#3f3b1f; font-size:15px; font-weight:800;}
+  .btn-agregar-articulo:active{background:rgb(190,182,123);}
+  .btn-agregar-pago{background:rgb(214,206,147); color:#3f3b1f; font-weight:800;}
+  .btn-agregar-pago:active{background:rgb(190,182,123);}
+  .totalbar.pedido-total{background:var(--olive-light); box-shadow:none;}
+  .totalbar.pedido-total .lbl{color:#8b8465; font-size:11px; opacity:1;}
+  .totalbar.pedido-total .val{color:#c3a6d6; font-size:12.5px; font-weight:700;}
 </style>
 </head>
 <body>
@@ -258,7 +332,7 @@
           <label>Vendedor</label>
           <input type="text" id="setup_vendedor_input" placeholder="Buscar código o nombre..." oninput="buscarVendedorSetup()" onfocus="buscarVendedorSetup()">
           <div class="ac-list" id="setupVendedorList"></div>
-          <div class="ac-selected" id="setupVendedorSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="setupVendedorSelected"></div>
         </div>
         <div class="import-note" id="setupVendedorNote" style="display:none;">
           Todavía no hay una tabla de vendedores importada, así que por ahora el código no se valida. Escribilo directamente en el campo de arriba; más adelante podés importar la tabla desde Ajustes para que quede validado.
@@ -286,7 +360,7 @@
         <button class="btn btn-amber" onclick="goImport()">Exportar ahora</button>
       </div>
       <div class="menu-grid">
-        <button class="menu-btn" onclick="irACobranza()">
+        <button class="menu-btn" onclick="irACobranzaMenu()">
           <div class="ic">&#128179;</div>
           <div class="mb-txt">
             <div class="mb-title">Carga de Cobranza</div>
@@ -314,12 +388,68 @@
     </div>
   </div>
 
-  <!-- ================= COBRANZA: HOME ================= -->
-  <div class="view" id="view-home">
+  <!-- ================= COBRANZA: MENU (5 botones) ================= -->
+  <div class="view" id="view-cobranza-menu">
     <div class="topbar">
       <button class="backbtn" onclick="showView('view-menu'); renderMenu();">&#8592;</button>
       <div style="flex:1; text-align:center;">
-        <h1 style="font-size:15px;">Cobranzas</h1>
+        <h1 style="font-size:15px;">Carga de Cobranza</h1>
+        <div class="sub" style="text-align:center;">Elegí una opción</div>
+      </div>
+      <button class="iconbtn" onclick="goImport()" title="Ajustes">&#9881;</button>
+    </div>
+    <div class="content narrow">
+      <div class="menu-grid">
+        <button class="menu-btn" onclick="irANuevoRecibo()">
+          <div class="ic">&#128221;</div>
+          <div class="mb-txt">
+            <div class="mb-title">Nuevo recibo</div>
+            <div class="mb-sub">Cargar un recibo de cobranza</div>
+          </div>
+          <div class="mb-arrow">&#8250;</div>
+        </button>
+        <button class="menu-btn light" onclick="irAConsultaRecibos()">
+          <div class="ic">&#128269;</div>
+          <div class="mb-txt">
+            <div class="mb-title">Consulta de recibos</div>
+            <div class="mb-sub" id="menuSubRecibos">0 recibos</div>
+          </div>
+          <div class="mb-arrow">&#8250;</div>
+        </button>
+        <button class="menu-btn" onclick="irAGenerarPlanilla()">
+          <div class="ic">&#128203;</div>
+          <div class="mb-txt">
+            <div class="mb-title">Generar planilla</div>
+            <div class="mb-sub">Armar planilla con recibos</div>
+          </div>
+          <div class="mb-arrow">&#8250;</div>
+        </button>
+        <button class="menu-btn light" onclick="irAConsultaPlanillasGeneradas()">
+          <div class="ic">&#128269;</div>
+          <div class="mb-txt">
+            <div class="mb-title">Consulta de planillas</div>
+            <div class="mb-sub" id="menuSubPlanillasGen">0 planillas</div>
+          </div>
+          <div class="mb-arrow">&#8250;</div>
+        </button>
+        <button class="menu-btn secondary small" id="btnPlanillaAnterior" onclick="irACobranza()">
+          <div class="ic">&#128196;</div>
+          <div class="mb-txt">
+            <div class="mb-title">+ Nueva planilla (formato anterior)</div>
+            <div class="mb-sub">Modo de carga clásico</div>
+          </div>
+          <div class="mb-arrow">&#8250;</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COBRANZA: HOME (formato anterior) ================= -->
+  <div class="view" id="view-home">
+    <div class="topbar">
+      <button class="backbtn" onclick="showView('view-cobranza-menu'); renderCobranzaMenu();">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;">Planillas (formato anterior)</h1>
         <div class="sub" id="homeSub" style="text-align:center;">0 planillas</div>
       </div>
       <button class="iconbtn" onclick="goImport()" title="Ajustes">&#9881;</button>
@@ -361,7 +491,7 @@
           <label>Transporte</label>
           <input type="text" id="p_transporte_input" placeholder="Buscar código o nombre..." oninput="buscarTransporte()" onfocus="buscarTransporte()">
           <div class="ac-list" id="transporteList"></div>
-          <div class="ac-selected" id="transporteSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="transporteSelected"></div>
         </div>
       </div>
 
@@ -390,13 +520,152 @@
     </div>
   </div>
 
+  <!-- ================= COBRANZA: CONSULTA DE RECIBOS ================= -->
+  <div class="view" id="view-recibos-home">
+    <div class="topbar">
+      <button class="backbtn" onclick="showView('view-cobranza-menu'); renderCobranzaMenu();">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;">Consulta de recibos</h1>
+        <div class="sub" id="recibosHomeSub" style="text-align:center;">0 recibos</div>
+      </div>
+      <button class="iconbtn" onclick="goImport()" title="Ajustes">&#9881;</button>
+    </div>
+    <div class="content narrow">
+      <div class="searchbar">
+        <input type="text" id="searchInputRecibos" placeholder="Buscar por número, cliente u observación..." oninput="renderRecibosHome()">
+      </div>
+      <div class="fab-row">
+        <button class="btn btn-primary btn-block btn-lg" onclick="nuevoRecibo()">+ Nuevo recibo</button>
+      </div>
+      <div id="recibosHomeList"></div>
+    </div>
+  </div>
+
+  <!-- ================= COBRANZA: RECIBO (alta / edición) ================= -->
+  <div class="view" id="view-recibo">
+    <div class="topbar">
+      <button class="backbtn" onclick="intentarVolver('recibo')">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;">Recibo</h1>
+      </div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="content narrow">
+
+      <div class="header-card">
+        <div class="row2">
+          <div class="field">
+            <label>Número</label>
+            <input type="text" id="rc_numero" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" id="rc_fecha">
+          </div>
+        </div>
+        <div class="field ac-wrap">
+          <label>Cliente</label>
+          <input type="text" id="rc_cliente_input" placeholder="Buscar código o nombre..." oninput="buscarClienteRecibo()" onfocus="buscarClienteRecibo()">
+          <div class="ac-list" id="rcClienteList"></div>
+          <div class="ac-selected ac-selected-highlight" id="rcClienteSelected"></div>
+        </div>
+        <div class="field ac-wrap">
+          <label>Transporte</label>
+          <input type="text" id="rc_transporte_input" placeholder="Buscar código o nombre..." oninput="buscarTransporteRecibo()" onfocus="buscarTransporteRecibo()">
+          <div class="ac-list" id="rcTransporteList"></div>
+          <div class="ac-selected ac-selected-highlight" id="rcTransporteSelected"></div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Comprobantes afectados</label>
+          <textarea id="rc_comprobantes" placeholder="Ej: F.A. 0002-00006429  30/04/2026  3.804.084,59"></textarea>
+        </div>
+      </div>
+
+      <div class="section-title">Pagos</div>
+      <div id="rcPagosList"></div>
+      <button class="btn btn-block btn-agregar-pago" onclick="abrirModalPago()">+ Agregar pago</button>
+
+      <div class="totalbar">
+        <div class="lbl">Total</div>
+        <div class="val" id="rcTotalVal">$ 0,00</div>
+      </div>
+
+      <div class="field">
+        <label>Observación</label>
+        <textarea id="rc_observacion" placeholder="Observaciones del recibo..."></textarea>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn btn-primary" onclick="grabarRecibo()">Grabar</button>
+        <button class="btn btn-olive" onclick="imprimirReciboTicket()">Imprimir ticket</button>
+        <button class="btn btn-olive" onclick="imprimirReciboPDF()">Recibo PDF</button>
+        <button class="btn btn-danger" onclick="eliminarRecibo()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COBRANZA: GENERAR PLANILLA ================= -->
+  <div class="view" id="view-generar-planilla">
+    <div class="topbar">
+      <button class="backbtn" onclick="showView('view-cobranza-menu'); renderCobranzaMenu();">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;">Generar planilla</h1>
+        <div class="sub" style="text-align:center;">Seleccioná los recibos a incluir</div>
+      </div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="content narrow">
+      <div id="genPlanillaList"></div>
+    </div>
+    <div class="selectbar" id="genPlanillaSelectbar" style="display:none;">
+      <span id="genPlanillaSelectCount">0 seleccionados</span>
+      <button class="btn btn-amber" onclick="generarPlanilla()">Generar planilla</button>
+    </div>
+  </div>
+
+  <!-- ================= COBRANZA: CONSULTA DE PLANILLAS GENERADAS ================= -->
+  <div class="view" id="view-planillas-generadas-home">
+    <div class="topbar">
+      <button class="backbtn" onclick="showView('view-cobranza-menu'); renderCobranzaMenu();">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;">Consulta de planillas</h1>
+        <div class="sub" id="planillasGenHomeSub" style="text-align:center;">0 planillas</div>
+      </div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="content narrow">
+      <div class="searchbar">
+        <input type="text" id="searchInputPlanillasGen" placeholder="Buscar por número..." oninput="renderPlanillasGeneradasHome()">
+      </div>
+      <div id="planillasGenHomeList"></div>
+    </div>
+  </div>
+
+  <!-- ================= COBRANZA: DETALLE PLANILLA GENERADA ================= -->
+  <div class="view" id="view-planilla-generada">
+    <div class="topbar">
+      <button class="backbtn" onclick="showView('view-planillas-generadas-home'); renderPlanillasGeneradasHome();">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;" id="planGenTitulo">Planilla</h1>
+      </div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="content narrow">
+      <div id="planGenDetalle"></div>
+      <div class="actions-row">
+        <button class="btn btn-olive" onclick="imprimirPlanillaGenerada()">Imprimir / PDF</button>
+        <button class="btn btn-danger" onclick="eliminarPlanillaGenerada()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= PEDIDOS: HOME ================= -->
   <div class="view" id="view-pedidos-home">
     <div class="topbar">
       <button class="backbtn" onclick="showView('view-menu'); renderMenu();">&#8592;</button>
-      <div style="flex:1; text-align:center;">
+      <div style="flex:1; text-align:left;">
         <h1 style="font-size:15px;">Pedidos</h1>
-        <div class="sub" id="pedidosHomeSub" style="text-align:center;">0 pedidos</div>
+        <div class="sub" id="pedidosHomeSub" style="text-align:left;">0 pedidos</div>
       </div>
       <button class="iconbtn" onclick="goImport()" title="Ajustes">&#9881;</button>
     </div>
@@ -422,7 +691,7 @@
   <div class="view" id="view-pedido">
     <div class="topbar">
       <button class="backbtn" onclick="intentarVolver('pedido')">&#8592;</button>
-      <div style="flex:1; text-align:center;">
+      <div style="flex:1; text-align:left;">
         <h1 style="font-size:15px;">Nota de Pedido</h1>
       </div>
       <div style="width:38px;"></div>
@@ -444,7 +713,7 @@
           <label>Cliente</label>
           <input type="text" id="ped_cliente_input" placeholder="Buscar código o nombre..." oninput="buscarClientePedido()" onfocus="buscarClientePedido()">
           <div class="ac-list" id="pedClienteList"></div>
-          <div class="ac-selected" id="pedClienteSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="pedClienteSelected"></div>
         </div>
         <div class="field">
           <label>Observación</label>
@@ -454,9 +723,9 @@
 
       <div class="section-title">Artículos</div>
       <div id="pedRenglonesList"></div>
-      <button class="btn btn-outline btn-block" onclick="abrirModalRenglonPedido()">+ Agregar artículo</button>
+      <button class="btn btn-block btn-lg btn-agregar-articulo" onclick="abrirModalRenglonPedido()">+ Agregar artículo</button>
 
-      <div class="totalbar">
+      <div class="totalbar pedido-total">
         <div class="lbl">Total artículos</div>
         <div class="val" id="pedTotalVal">0</div>
       </div>
@@ -480,102 +749,12 @@
     </div>
     <div class="content narrow">
       <div id="catalogosList"></div>
-    </div>
-  </div>
 
-  <!-- ================= AJUSTES / IMPORTAR ================= -->
-  <div class="view" id="view-import">
-    <div class="topbar">
-      <button class="backbtn" onclick="showView('view-menu'); renderMenu();">&#8592;</button>
-      <div style="flex:1; text-align:center;">
-        <h1 style="font-size:15px;">Ajustes</h1>
-      </div>
-      <div style="width:38px;"></div>
-    </div>
-    <div class="content narrow">
+      <button class="btn btn-outline btn-block" style="margin-top:6px;" onclick="toggleAgregarCatalogo()" id="btnToggleAgregarCatalogo">+ Agregar catálogo</button>
 
-      <div class="import-card">
-        <h3>Tabla de Vendedores</h3>
-        <p>Archivo CSV con columnas: código, nombre (una fila por vendedor). Se usa para validar el vendedor de esta tablet.</p>
-        <div class="count-pill" id="countVendedores">0 vendedores cargados</div>
-        <label class="filelabel">
-          Elegir archivo CSV de vendedores
-          <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'vendedores')">
-        </label>
-      </div>
-
-      <div class="import-card">
-        <h3>Vendedor de esta tablet</h3>
-        <p>Se usa para identificar todas las planillas y pedidos cargados acá.</p>
-        <div class="count-pill" id="vendedorActual">Código: -</div>
-        <div class="field ac-wrap" style="margin-top:12px;">
-          <label>Cambiar vendedor</label>
-          <input type="text" id="edit_vendedor_input" placeholder="Buscar código o nombre..." oninput="buscarVendedorEdit()" onfocus="buscarVendedorEdit()">
-          <div class="ac-list" id="editVendedorList"></div>
-          <div class="ac-selected" id="editVendedorSelected"></div>
-        </div>
-        <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="guardarVendedorEdit()">Guardar cambio de vendedor</button>
-      </div>
-
-      <div class="import-card">
-        <h3>Tabla de Clientes</h3>
-        <p>Archivo CSV con columnas: código, nombre (una fila por cliente).</p>
-        <div class="count-pill" id="countClientes">0 clientes cargados</div>
-        <label class="filelabel">
-          Elegir archivo CSV de clientes
-          <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'clientes')">
-        </label>
-      </div>
-
-      <div class="import-card">
-        <h3>Tabla de Transportes</h3>
-        <p>Archivo CSV con columnas: código, nombre (una fila por transporte).</p>
-        <div class="count-pill" id="countTransportes">0 transportes cargados</div>
-        <label class="filelabel">
-          Elegir archivo CSV de transportes
-          <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'transportes')">
-        </label>
-      </div>
-
-      <div class="import-card">
-        <h3>Tabla de Artículos</h3>
-        <p>Archivo CSV con columnas: código numérico, código alfanumérico (13), descripción — una fila por artículo. Se usa en Carga de Pedidos.</p>
-        <div class="count-pill" id="countArticulos">0 artículos cargados</div>
-        <label class="filelabel">
-          Elegir archivo CSV de artículos
-          <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'articulos')">
-        </label>
-      </div>
-
-      <div class="import-note">
-        Tip: copiá el archivo actualizado a la carpeta de Descargas de la tablet desde Drive, y despues elegilo acá. El formato debe ser un valor por columna separado por coma o punto y coma. Si el archivo tiene una fila de encabezado, se detecta y se ignora sola.
-      </div>
-
-      <div class="import-card" style="margin-top:22px;">
-        <h3>Exportar Cobranza</h3>
-        <p>Genera dos archivos CSV con la misma estructura de campos que PLANILLA.DBF y RENPLANI.DBF, para cuando haga falta volcar los datos al sistema central.</p>
-        <div class="count-pill" id="countPlanillasExport">0 planillas guardadas</div>
-        <button class="btn btn-olive btn-block" onclick="exportarCSV()">Exportar CSV (PLANILLA + RENPLANI)</button>
-        <div class="import-note" style="margin-top:12px;">
-          Se descargan dos archivos: <b>planillas_export.csv</b> (cabecera) y <b>renglones_export.csv</b> (detalle, vinculado por NUMERO). Los tipos de pago se exportan como código corto: EF, CH, TR, RE.
-        </div>
-      </div>
-
-      <div class="import-card">
-        <h3>Exportar Pedidos</h3>
-        <p>Genera dos archivos CSV (cabecera de nota de pedido y detalle de artículos), vinculados por NUMERO.</p>
-        <div class="count-pill" id="countPedidosExport">0 pedidos guardados</div>
-        <button class="btn btn-olive btn-block" onclick="exportarPedidosCSV()">Exportar CSV Pedidos</button>
-      </div>
-
-      <div class="import-card" id="cardUltimaExportacion">
-        <h3>Recordatorio de exportación</h3>
-        <p id="ultimaExportacionTxt">Todavía no exportaste ningún archivo CSV.</p>
-      </div>
-
-      <div class="import-card" style="margin-top:22px;">
-        <h3>Catálogos de productos</h3>
-        <p>Cargá links de páginas web, archivos PDF o fotos. Van a aparecer listados en "Catálogos Productos" para abrir con un toque. Recomendado: archivos livianos (menos de 3 MB), ya que se guardan en el dispositivo.</p>
+      <div class="import-card" id="agregarCatalogoForm" style="display:none; margin-top:14px;">
+        <h3>Nuevo catálogo</h3>
+        <p>Cargá links de páginas web, archivos PDF o fotos. Recomendado: archivos livianos (menos de 3 MB), ya que se guardan en el dispositivo.</p>
 
         <div class="field">
           <label>Nombre del catálogo</label>
@@ -601,10 +780,167 @@
 
         <div style="margin-top:16px;" id="catalogosAjustesList"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= AJUSTES / IMPORTAR ================= -->
+  <div class="view" id="view-import">
+    <div class="topbar">
+      <button class="backbtn" onclick="showView('view-menu'); renderMenu();">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;">Ajustes</h1>
+      </div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="content narrow">
+
+      <div class="import-card">
+        <h3>Vendedor de esta tablet</h3>
+        <p>Se usa para identificar todas las planillas y pedidos cargados acá.</p>
+        <div class="count-pill" id="vendedorActual">Código: -</div>
+        <div class="field ac-wrap" style="margin-top:12px;">
+          <label>Cambiar vendedor</label>
+          <input type="text" id="edit_vendedor_input" placeholder="Buscar código o nombre..." oninput="buscarVendedorEdit()" onfocus="buscarVendedorEdit()">
+          <div class="ac-list" id="editVendedorList"></div>
+          <div class="ac-selected ac-selected-highlight" id="editVendedorSelected"></div>
+        </div>
+        <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="guardarVendedorEdit()">Guardar cambio de vendedor</button>
+      </div>
+
+      <div class="import-card">
+        <h3>Punto de venta (recibos)</h3>
+        <p>Se usa como prefijo fijo de los recibos de cobranza generados en esta tablet, para que no se repitan números al enviarlos a la empresa.</p>
+        <div class="field" style="margin-bottom:0;">
+          <label>Punto de venta</label>
+          <input type="text" id="pv_punto_venta" placeholder="Ej: 0001" oninput="guardarPuntoVenta()">
+        </div>
+      </div>
+
+      <div class="import-card">
+        <h3>Nombre empresa</h3>
+        <p>Aparece en el encabezado de recibos, pedidos y listados (con letra chica).</p>
+        <div class="row2" style="margin-bottom:0;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Código</label>
+            <input type="text" id="pv_fabrica_codigo" placeholder="004" oninput="guardarFabrica()">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Nombre de la empresa</label>
+            <input type="text" id="pv_fabrica_nombre" placeholder="MILANO MARIANO" oninput="guardarFabrica()">
+          </div>
+        </div>
+      </div>
+
+      <div class="import-card">
+        <div class="toggle-row">
+          <div class="tr-txt"><b>Mostrar botón "+ Nueva planilla (formato anterior)"</b><br><span style="color:var(--ink-soft); font-size:12px;">Si lo desactivás, dejás de ver esa opción en el menú de Cobranza (los datos ya cargados no se pierden).</span></div>
+          <label class="switch">
+            <input type="checkbox" id="chkMostrarPlanillaAnterior" checked onchange="guardarMostrarPlanillaAnterior()">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <details class="ajustes-section">
+        <summary>Impresión</summary>
+        <div class="ajustes-section-body">
+          <div class="field">
+            <label>Tamaño de hoja</label>
+            <div class="segmented" id="printSizeSegmented">
+              <div class="seg-opt active" data-printsize="a4" onclick="setTamanoImpresion('a4')">A4</div>
+              <div class="seg-opt" data-printsize="carta" onclick="setTamanoImpresion('carta')">Carta</div>
+              <div class="seg-opt" data-printsize="chico" onclick="setTamanoImpresion('chico')">Chico / Ticket</div>
+            </div>
+          </div>
+          <div class="toggle-row" id="rowUnoPorHoja" style="display:none;">
+            <div class="tr-txt">Un pedido por hoja al imprimir varios</div>
+            <label class="switch">
+              <input type="checkbox" id="chkUnoPorHoja" onchange="guardarUnoPorHoja()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <details class="ajustes-section">
+        <summary>Actualizar datos</summary>
+        <div class="ajustes-section-body">
+          <div class="import-card">
+            <h3>Tabla de Vendedores</h3>
+            <p>Archivo CSV con columnas: código, nombre (una fila por vendedor). Se usa para validar el vendedor de esta tablet.</p>
+            <div class="count-pill" id="countVendedores">0 vendedores cargados</div>
+            <label class="filelabel">
+              Elegir archivo CSV de vendedores
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'vendedores')">
+            </label>
+          </div>
+
+          <div class="import-card">
+            <h3>Tabla de Clientes</h3>
+            <p>Archivo CSV con columnas: código, nombre (una fila por cliente).</p>
+            <div class="count-pill" id="countClientes">0 clientes cargados</div>
+            <label class="filelabel">
+              Elegir archivo CSV de clientes
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'clientes')">
+            </label>
+          </div>
+
+          <div class="import-card">
+            <h3>Tabla de Transportes</h3>
+            <p>Archivo CSV con columnas: código, nombre (una fila por transporte).</p>
+            <div class="count-pill" id="countTransportes">0 transportes cargados</div>
+            <label class="filelabel">
+              Elegir archivo CSV de transportes
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'transportes')">
+            </label>
+          </div>
+
+          <div class="import-card">
+            <h3>Tabla de Artículos</h3>
+            <p>Archivo CSV con columnas: código numérico, código alfanumérico (13), descripción — una fila por artículo. Se usa en Carga de Pedidos.</p>
+            <div class="count-pill" id="countArticulos">0 artículos cargados</div>
+            <label class="filelabel">
+              Elegir archivo CSV de artículos
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'articulos')">
+            </label>
+          </div>
+
+          <div class="import-note">
+            Tip: copiá el archivo actualizado a la carpeta de Descargas de la tablet desde Drive, y despues elegilo acá. El formato debe ser un valor por columna separado por coma o punto y coma. Si el archivo tiene una fila de encabezado, se detecta y se ignora sola.
+          </div>
+        </div>
+      </details>
+
+      <details class="ajustes-section">
+        <summary>Exportar / Importar</summary>
+        <div class="ajustes-section-body">
+          <div class="import-card">
+            <h3>Exportar Cobranza</h3>
+            <p>Genera dos archivos CSV con la misma estructura de campos que PLANILLA.DBF y RENPLANI.DBF, para cuando haga falta volcar los datos al sistema central.</p>
+            <div class="count-pill" id="countPlanillasExport">0 planillas guardadas</div>
+            <button class="btn btn-olive btn-block" onclick="exportarCSV()">Exportar CSV (PLANILLA + RENPLANI)</button>
+            <div class="import-note" style="margin-top:12px;">
+              Se descargan dos archivos: <b>planillas_export.csv</b> (cabecera) y <b>renglones_export.csv</b> (detalle, vinculado por NUMERO). Los tipos de pago se exportan como código corto: EF, CH, TR, RE.
+            </div>
+          </div>
+
+          <div class="import-card">
+            <h3>Exportar Pedidos</h3>
+            <p>Genera dos archivos CSV (cabecera de nota de pedido y detalle de artículos), vinculados por NUMERO.</p>
+            <div class="count-pill" id="countPedidosExport">0 pedidos guardados</div>
+            <button class="btn btn-olive btn-block" onclick="exportarPedidosCSV()">Exportar CSV Pedidos</button>
+          </div>
+
+          <div class="import-card" id="cardUltimaExportacion">
+            <h3>Recordatorio de exportación</h3>
+            <p id="ultimaExportacionTxt">Todavía no exportaste ningún archivo CSV.</p>
+          </div>
+        </div>
+      </details>
 
       <div class="import-card" style="margin-top:22px;">
         <h3>Respaldo y Restauración</h3>
-        <p>Todos los datos se guardan solo en este dispositivo (almacenamiento local). Descargá un respaldo periódicamente por seguridad. Si el almacenamiento se vacía o cambiás de tablet, restaurá el respaldo para recuperar todo (clientes, transportes, vendedores, artículos, planillas, pedidos y catálogos).</p>
+        <p>Todos los datos se guardan solo en este dispositivo (almacenamiento local). Descargá un respaldo periódicamente por seguridad. Si el almacenamiento se vacía o cambiás de tablet, restaurá el respaldo para recuperar todo (clientes, transportes, vendedores, artículos, planillas, recibos, pedidos y catálogos).</p>
         <div class="row2">
           <button class="btn btn-olive btn-block" onclick="descargarRespaldo()">Descargar respaldo</button>
           <label class="filelabel" style="padding:12px; font-size:14px;">
@@ -630,7 +966,7 @@
       <label>Cliente</label>
       <input type="text" id="r_cliente_input" placeholder="Buscar código o nombre..." oninput="buscarCliente()" onfocus="buscarCliente()">
       <div class="ac-list" id="clienteList"></div>
-      <div class="ac-selected" id="clienteSelected"></div>
+      <div class="ac-selected ac-selected-highlight" id="clienteSelected"></div>
     </div>
 
     <div class="row2">
@@ -668,6 +1004,40 @@
       <button class="btn btn-danger" id="btnEliminarRenglon" onclick="eliminarRenglon()" style="display:none;">Eliminar</button>
       <button class="btn btn-outline" onclick="cerrarModalRenglon()">Cancelar</button>
       <button class="btn btn-primary" onclick="aceptarRenglon()">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL PAGO (RECIBO) ================= -->
+<div class="modal-backdrop" id="modalPago">
+  <div class="modal">
+    <h2 id="modalPagoTitle">Agregar pago</h2>
+
+    <div class="field">
+      <label>Importe</label>
+      <input type="number" id="pg_importe" inputmode="decimal" step="0.01" placeholder="0.00">
+    </div>
+
+    <div class="field">
+      <label>Tipo de pago</label>
+      <div class="segmented" id="tipoPagoSegmented">
+        <div class="seg-opt" data-tipopago="Efectivo" onclick="setTipoPago('Efectivo')">Efectivo</div>
+        <div class="seg-opt" data-tipopago="Depósito" onclick="setTipoPago('Depósito')">Depósito</div>
+        <div class="seg-opt" data-tipopago="Cheque" onclick="setTipoPago('Cheque')">Cheque</div>
+        <div class="seg-opt" data-tipopago="Cheque Electrónico" onclick="setTipoPago('Cheque Electrónico')">Cheque Elec.</div>
+        <div class="seg-opt" data-tipopago="Retención" onclick="setTipoPago('Retención')">Retención</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Observación</label>
+      <textarea id="pg_observacion" placeholder="Ej: Interdepósito N°85466208"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="btnEliminarPago" onclick="eliminarPago()" style="display:none;">Eliminar</button>
+      <button class="btn btn-outline" onclick="cerrarModalPago()">Cancelar</button>
+      <button class="btn btn-primary" onclick="aceptarPago()">Aceptar</button>
     </div>
   </div>
 </div>
@@ -737,7 +1107,9 @@ const LS = {
   planillas: 'cobranzas_planillas',
   articulos: 'cobranzas_articulos',
   pedidos: 'cobranzas_pedidos',
-  catalogos: 'cobranzas_catalogos'
+  catalogos: 'cobranzas_catalogos',
+  recibos: 'cobranzas_recibos',
+  planillasGeneradas: 'cobranzas_planillas_generadas'
 };
 
 function loadJSON(key, fallback){
@@ -753,7 +1125,14 @@ function saveJSON(key, val){
 const LS_VENDEDOR = 'cobranzas_vendedor';
 const LS_VENDEDOR_NOMBRE = 'cobranzas_vendedor_nombre';
 const LS_LAST_EXPORT = 'cobranzas_last_export';
+const LS_PUNTO_VENTA = 'cobranzas_punto_venta';
+const LS_FABRICA_CODIGO = 'cobranzas_fabrica_codigo';
+const LS_FABRICA_NOMBRE = 'cobranzas_fabrica_nombre';
+const LS_MOSTRAR_PLANILLA_ANTERIOR = 'cobranzas_mostrar_planilla_anterior';
+const LS_PRINT_SIZE = 'cobranzas_print_size';
+const LS_PRINT_UNO_POR_HOJA = 'cobranzas_print_uno_por_hoja';
 const TIPO_CODES = {'Efectivo':'EF', 'Cheque':'CH', 'Transferencia':'TR', 'Retención':'RE'};
+const TIPO_PAGO_CODES = {'Efectivo':'EF', 'Depósito':'DE', 'Cheque':'CH', 'Cheque Electrónico':'CE', 'Retención':'RE'};
 
 let clientes = loadJSON(LS.clientes, []);
 let transportes = loadJSON(LS.transportes, []);
@@ -762,8 +1141,16 @@ let planillas = loadJSON(LS.planillas, []);
 let articulos = loadJSON(LS.articulos, []);
 let pedidos = loadJSON(LS.pedidos, []);
 let catalogos = loadJSON(LS.catalogos, []);
+let recibos = loadJSON(LS.recibos, []);
+let planillasGeneradas = loadJSON(LS.planillasGeneradas, []);
 let vendedorCodigo = localStorage.getItem(LS_VENDEDOR) || '';
 let vendedorNombre = localStorage.getItem(LS_VENDEDOR_NOMBRE) || '';
+let puntoVenta = localStorage.getItem(LS_PUNTO_VENTA) || '0001';
+let fabricaCodigo = localStorage.getItem(LS_FABRICA_CODIGO) || '';
+let fabricaNombre = localStorage.getItem(LS_FABRICA_NOMBRE) || '';
+let mostrarPlanillaAnterior = localStorage.getItem(LS_MOSTRAR_PLANILLA_ANTERIOR) !== '0';
+let printSize = localStorage.getItem(LS_PRINT_SIZE) || 'a4';
+let printUnoPorHoja = localStorage.getItem(LS_PRINT_UNO_POR_HOJA) === '1';
 
 let currentPlanillaId = null;   // id de la planilla abierta
 let editingRenglonId = null;    // id del renglón en edición dentro del modal
@@ -780,6 +1167,14 @@ let articuloSeleccionado = null;
 let catTipoActual = 'link';
 let pedidosSeleccionMode = false;
 let pedidosSeleccionados = new Set();
+
+let currentReciboId = null;
+let editingPagoId = null;
+let tipoPagoActual = 'Efectivo';
+let rcClienteSeleccionado = null;
+let rcTransporteSeleccionado = null;
+let genPlanillaSeleccionados = new Set();
+let currentPlanillaGeneradaId = null;
 
 // control de cambios sin grabar
 let dirtyFlag = false;
@@ -816,12 +1211,115 @@ function showView(id){
 function goImport(){
   showView('view-import');
   renderImportCounts();
-  renderCatalogosAjustes();
   renderUltimaExportacion();
+  renderAjustesConfig();
+}
+function renderAjustesConfig(){
+  const pv = document.getElementById('pv_punto_venta');
+  if(pv) pv.value = puntoVenta;
+  const fc = document.getElementById('pv_fabrica_codigo');
+  if(fc) fc.value = fabricaCodigo;
+  const fn = document.getElementById('pv_fabrica_nombre');
+  if(fn) fn.value = fabricaNombre;
+  const chkPlanAnt = document.getElementById('chkMostrarPlanillaAnterior');
+  if(chkPlanAnt) chkPlanAnt.checked = mostrarPlanillaAnterior;
+  document.querySelectorAll('#printSizeSegmented .seg-opt').forEach(el=>{
+    el.classList.toggle('active', el.dataset.printsize === printSize);
+  });
+  const rowUno = document.getElementById('rowUnoPorHoja');
+  if(rowUno) rowUno.style.display = (printSize === 'chico') ? 'flex' : 'none';
+  const chkUno = document.getElementById('chkUnoPorHoja');
+  if(chkUno) chkUno.checked = printUnoPorHoja;
+}
+function guardarPuntoVenta(){
+  puntoVenta = document.getElementById('pv_punto_venta').value.trim() || '0001';
+  localStorage.setItem(LS_PUNTO_VENTA, puntoVenta);
+}
+function guardarFabrica(){
+  fabricaCodigo = document.getElementById('pv_fabrica_codigo').value.trim();
+  fabricaNombre = document.getElementById('pv_fabrica_nombre').value.trim();
+  localStorage.setItem(LS_FABRICA_CODIGO, fabricaCodigo);
+  localStorage.setItem(LS_FABRICA_NOMBRE, fabricaNombre);
+}
+function guardarMostrarPlanillaAnterior(){
+  mostrarPlanillaAnterior = document.getElementById('chkMostrarPlanillaAnterior').checked;
+  localStorage.setItem(LS_MOSTRAR_PLANILLA_ANTERIOR, mostrarPlanillaAnterior ? '1' : '0');
+}
+function setTamanoImpresion(size){
+  printSize = size;
+  localStorage.setItem(LS_PRINT_SIZE, size);
+  document.querySelectorAll('#printSizeSegmented .seg-opt').forEach(el=>{
+    el.classList.toggle('active', el.dataset.printsize === size);
+  });
+  const rowUno = document.getElementById('rowUnoPorHoja');
+  if(rowUno) rowUno.style.display = (size === 'chico') ? 'flex' : 'none';
+}
+function guardarUnoPorHoja(){
+  printUnoPorHoja = document.getElementById('chkUnoPorHoja').checked;
+  localStorage.setItem(LS_PRINT_UNO_POR_HOJA, printUnoPorHoja ? '1' : '0');
+}
+function aplicarTamanoImpresion(overrideSizeCss, overrideMargin, esTicket){
+  let styleTag = document.getElementById('printPageStyle');
+  if(!styleTag){
+    styleTag = document.createElement('style');
+    styleTag.id = 'printPageStyle';
+    document.head.appendChild(styleTag);
+  }
+  const sizeCss = overrideSizeCss || (printSize === 'a4' ? 'A4' : printSize === 'carta' ? 'letter' : '80mm auto');
+  const margin = overrideMargin || (printSize === 'chico' ? '3mm' : '10mm');
+  styleTag.textContent = '@page{ size:'+sizeCss+'; margin:'+margin+'; }';
+  const sheet = document.getElementById('printSheet');
+  sheet.classList.toggle('ps-size-chico', !esTicket && printSize === 'chico');
+  sheet.classList.toggle('ps-ticket', !!esTicket);
+}
+/* Imprime el contenido armado y, de paso, vacía momentáneamente el título de la
+   página para que el renglón que agrega el navegador (fecha/hora/título) en el
+   encabezado/pie de impresión salga lo más limpio posible. El navegador puede
+   seguir agregando fecha y hora por su cuenta: para sacarlas del todo hay que
+   desactivar "Encabezados y pies de página" en el cuadro de diálogo de impresión. */
+function imprimirDocumento(html, sizeCss, margin, esTicket){
+  document.getElementById('printSheet').innerHTML = html;
+  aplicarTamanoImpresion(sizeCss, margin, esTicket);
+  const tituloOriginal = document.title;
+  document.title = ' ';
+  const restaurarTitulo = ()=>{
+    document.title = tituloOriginal;
+    window.removeEventListener('afterprint', restaurarTitulo);
+  };
+  window.addEventListener('afterprint', restaurarTitulo);
+  window.print();
+  // por si el navegador no dispara "afterprint" (pasa en algunos WebView de tablets)
+  setTimeout(restaurarTitulo, 1500);
 }
 function irACobranza(){
   showView('view-home');
   renderHome();
+}
+function irACobranzaMenu(){
+  showView('view-cobranza-menu');
+  renderCobranzaMenu();
+}
+function renderCobranzaMenu(){
+  document.getElementById('menuSubRecibos').textContent = recibos.length + (recibos.length===1?' recibo':' recibos');
+  document.getElementById('menuSubPlanillasGen').textContent = planillasGeneradas.length + (planillasGeneradas.length===1?' planilla':' planillas');
+  const btn = document.getElementById('btnPlanillaAnterior');
+  if(btn) btn.style.display = mostrarPlanillaAnterior ? 'flex' : 'none';
+}
+function irANuevoRecibo(){
+  nuevoRecibo();
+}
+function irAConsultaRecibos(){
+  showView('view-recibos-home');
+  renderRecibosHome();
+}
+function irAGenerarPlanilla(){
+  showView('view-generar-planilla');
+  genPlanillaSeleccionados.clear();
+  renderGenerarPlanillaList();
+}
+function irAConsultaPlanillasGeneradas(){
+  showView('view-planillas-generadas-home');
+  renderPlanillasGeneradasHome();
 }
 function irAPedidos(){
   showView('view-pedidos-home');
@@ -830,6 +1328,14 @@ function irAPedidos(){
 function irACatalogos(){
   showView('view-catalogos');
   renderCatalogosPublico();
+  renderCatalogosAjustes();
+}
+function toggleAgregarCatalogo(){
+  const form = document.getElementById('agregarCatalogoForm');
+  const btn = document.getElementById('btnToggleAgregarCatalogo');
+  const showing = form.style.display !== 'none';
+  form.style.display = showing ? 'none' : 'block';
+  btn.textContent = showing ? '+ Agregar catálogo' : 'Ocultar formulario';
 }
 
 /* control de "salida sin grabar" */
@@ -847,13 +1353,41 @@ function intentarVolver(context){
 function salirSinPreguntar(context){
   dirtyFlag = false;
   dirtyContext = null;
-  if(context === 'planilla'){ showView('view-home'); renderHome(); }
-  else if(context === 'pedido'){ showView('view-pedidos-home'); renderPedidosHome(); }
+  if(context === 'planilla'){ descartarPlanillaSiEsBorradorVacio(); showView('view-home'); renderHome(); }
+  else if(context === 'pedido'){ descartarPedidoSiEsBorradorVacio(); showView('view-pedidos-home'); renderPedidosHome(); }
+  else if(context === 'recibo'){ descartarReciboSiEsBorradorVacio(); showView('view-recibos-home'); renderRecibosHome(); }
+}
+/* si el registro que se está por abandonar nunca llegó a grabarse (sigue en estado
+   borrador), se elimina para no dejar registros fantasma al salir sin cargar datos */
+function descartarPlanillaSiEsBorradorVacio(){
+  const p = currentPlanilla();
+  if(p && p.draft){
+    planillas = planillas.filter(x=>x.id!==p.id);
+    saveJSON(LS.planillas, planillas);
+  }
+  currentPlanillaId = null;
+}
+function descartarReciboSiEsBorradorVacio(){
+  const r = currentRecibo();
+  if(r && r.draft){
+    recibos = recibos.filter(x=>x.id!==r.id);
+    saveJSON(LS.recibos, recibos);
+  }
+  currentReciboId = null;
+}
+function descartarPedidoSiEsBorradorVacio(){
+  const p = currentPedido();
+  if(p && p.draft){
+    pedidos = pedidos.filter(x=>x.id!==p.id);
+    saveJSON(LS.pedidos, pedidos);
+  }
+  currentPedidoId = null;
 }
 function confirmSalirGrabar(){
   document.getElementById('confirmSalirModal').classList.remove('show');
   if(dirtyContext === 'planilla') grabarPlanilla();
   else if(dirtyContext === 'pedido') grabarPedido();
+  else if(dirtyContext === 'recibo') grabarRecibo();
 }
 function confirmSalirDescartar(){
   document.getElementById('confirmSalirModal').classList.remove('show');
@@ -1364,12 +1898,554 @@ function eliminarRenglon(){
 // cerrar dropdowns al tocar afuera
 document.addEventListener('click', function(e){
   if(!e.target.closest('.ac-wrap')){
-    ['clienteList','transporteList','setupVendedorList','editVendedorList','pedClienteList','articuloList'].forEach(id=>{
+    ['clienteList','transporteList','setupVendedorList','editVendedorList','pedClienteList','articuloList','rcClienteList','rcTransporteList'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.classList.remove('show');
     });
   }
 });
+
+/* =========================================================
+   COBRANZA: RECIBOS (nuevo modelo)
+   ========================================================= */
+function fmtNumeroRecibo(r){
+  return puntoVenta + '-' + (r.numero || '');
+}
+function totalRecibo(r){
+  return (r.pagos||[]).reduce((s,pg)=> s + (Number(pg.importe)||0), 0);
+}
+function renderRecibosHome(){
+  const q = (document.getElementById('searchInputRecibos').value || '').toLowerCase().trim();
+  const list = document.getElementById('recibosHomeList');
+  const sorted = [...recibos].sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || (b.numero||'').localeCompare(a.numero||''));
+  const filtered = sorted.filter(r=>{
+    if(!q) return true;
+    return (r.numero||'').toLowerCase().includes(q) ||
+           (r.clienteNombre||'').toLowerCase().includes(q) ||
+           (r.observacion||'').toLowerCase().includes(q);
+  });
+  document.getElementById('recibosHomeSub').textContent = recibos.length + (recibos.length===1 ? ' recibo' : ' recibos');
+  if(filtered.length === 0){
+    list.innerHTML = `<div class="empty-state"><div class="big">&#128221;</div>${recibos.length===0 ? 'Todavía no cargaste ningún recibo.<br>Tocá "+ Nuevo recibo" para empezar.' : 'No se encontraron resultados.'}</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(r=>{
+    const total = totalRecibo(r);
+    return `<div class="planilla-card" onclick="abrirRecibo('${r.id}')">
+      <div class="pc-left">
+        <div class="pc-num">N° ${escapeHtml(fmtNumeroRecibo(r))} ${r.draft ? '<span class="draft-tag">BORRADOR</span>' : ''} ${r.planillaId ? '<span class="draft-tag" style="color:var(--olive); background:var(--olive-light);">EN PLANILLA</span>' : ''}</div>
+        <div class="pc-meta">${escapeHtml(r.fecha||'')} · ${escapeHtml(r.clienteNombre || 'Sin cliente')}</div>
+      </div>
+      <div class="pc-right">
+        <div class="pc-total">${fmtMoney(total)}</div>
+        <div class="pc-count">${(r.pagos||[]).length} pago(s)</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function nuevoRecibo(){
+  const r = {
+    id: uid(),
+    numero: nextNumero(recibos),
+    fecha: new Date().toISOString().slice(0,10),
+    clienteCodigo: '', clienteNombre: '',
+    transporteCodigo: '', transporteNombre: '',
+    comprobantes: '',
+    observacion: '',
+    pagos: [],
+    planillaId: null,
+    draft: true
+  };
+  recibos.push(r);
+  saveJSON(LS.recibos, recibos);
+  abrirRecibo(r.id);
+}
+function abrirRecibo(id){
+  currentReciboId = id;
+  const r = recibos.find(x=>x.id===id);
+  if(!r) return;
+  document.getElementById('rc_numero').value = r.numero || '';
+  document.getElementById('rc_fecha').value = r.fecha || '';
+  document.getElementById('rc_comprobantes').value = r.comprobantes || '';
+  document.getElementById('rc_observacion').value = r.observacion || '';
+  rcClienteSeleccionado = r.clienteCodigo ? {codigo:r.clienteCodigo, nombre:r.clienteNombre} : null;
+  rcTransporteSeleccionado = r.transporteCodigo ? {codigo:r.transporteCodigo, nombre:r.transporteNombre} : null;
+  document.getElementById('rc_cliente_input').value = '';
+  document.getElementById('rc_transporte_input').value = '';
+  document.getElementById('rcClienteList').classList.remove('show');
+  document.getElementById('rcTransporteList').classList.remove('show');
+  renderRcClienteSelected();
+  renderRcTransporteSelected();
+  renderPagos();
+  dirtyFlag = false;
+  showView('view-recibo');
+}
+function currentRecibo(){
+  return recibos.find(x=>x.id===currentReciboId);
+}
+function renderPagos(){
+  const r = currentRecibo();
+  if(!r) return;
+  const list = document.getElementById('rcPagosList');
+  if((r.pagos||[]).length===0){
+    list.innerHTML = `<div class="empty-state" style="padding:30px 10px;">Sin pagos cargados todavía.</div>`;
+  }else{
+    list.innerHTML = r.pagos.map(pg=>`
+      <div class="rowline" onclick="editarPago('${pg.id}')">
+        <div class="rl-left">
+          <div class="rl-cliente">${escapeHtml(pg.tipo)}</div>
+          <div class="rl-meta">${escapeHtml(pg.observacion||'')}</div>
+        </div>
+        <div class="rl-right">
+          <div class="rl-importe">${fmtMoney(pg.importe)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('rcTotalVal').textContent = fmtMoney(totalRecibo(r));
+}
+function persistCurrentReciboHeader(){
+  const r = currentRecibo();
+  if(!r) return;
+  r.numero = document.getElementById('rc_numero').value.trim();
+  r.fecha = document.getElementById('rc_fecha').value;
+  r.comprobantes = document.getElementById('rc_comprobantes').value;
+  r.observacion = document.getElementById('rc_observacion').value;
+  if(rcClienteSeleccionado){
+    r.clienteCodigo = rcClienteSeleccionado.codigo;
+    r.clienteNombre = rcClienteSeleccionado.nombre;
+  }
+  if(rcTransporteSeleccionado){
+    r.transporteCodigo = rcTransporteSeleccionado.codigo;
+    r.transporteNombre = rcTransporteSeleccionado.nombre;
+  }
+  saveJSON(LS.recibos, recibos);
+  marcarDirty('recibo');
+}
+function grabarRecibo(){
+  const r = currentRecibo();
+  if(!r) return;
+  if(!document.getElementById('rc_numero').value.trim()){
+    toast('Ingresá un número de recibo');
+    return;
+  }
+  persistCurrentReciboHeader();
+  r.draft = false;
+  saveJSON(LS.recibos, recibos);
+  dirtyFlag = false;
+  dirtyContext = null;
+  toast('Recibo guardado');
+  showView('view-recibos-home');
+  renderRecibosHome();
+}
+function eliminarRecibo(){
+  const r = currentRecibo();
+  if(!r) return;
+  if(r.planillaId){
+    toast('Este recibo pertenece a una planilla generada. Eliminá la planilla primero.');
+    return;
+  }
+  if(!confirm('¿Eliminar este recibo y todos sus pagos? Esta acción no se puede deshacer.')) return;
+  recibos = recibos.filter(x=>x.id!==r.id);
+  saveJSON(LS.recibos, recibos);
+  dirtyFlag = false;
+  dirtyContext = null;
+  toast('Recibo eliminado');
+  showView('view-recibos-home');
+  renderRecibosHome();
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  ['rc_numero','rc_fecha','rc_comprobantes','rc_observacion'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('change', persistCurrentReciboHeader);
+  });
+});
+
+/* autocomplete cliente / transporte del recibo */
+function buscarClienteRecibo(){
+  const q = document.getElementById('rc_cliente_input').value.toLowerCase().trim();
+  const box = document.getElementById('rcClienteList');
+  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const matches = clientes.filter(c=> c.codigo.toLowerCase().includes(q) || c.nombre.toLowerCase().includes(q)).slice(0,8);
+  box.innerHTML = matches.length
+    ? matches.map(c=>`<div class="ac-item" onclick="seleccionarClienteRecibo('${c.codigo}')"><span class="code">${escapeHtml(c.codigo)}</span>${escapeHtml(c.nombre)}</div>`).join('')
+    : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de clientes desde Ajustes.</div>`;
+  box.classList.add('show');
+}
+function seleccionarClienteRecibo(codigo){
+  const c = clientes.find(x=>x.codigo===codigo);
+  if(!c) return;
+  rcClienteSeleccionado = c;
+  document.getElementById('rcClienteList').classList.remove('show');
+  document.getElementById('rc_cliente_input').value = '';
+  renderRcClienteSelected();
+  persistCurrentReciboHeader();
+}
+function renderRcClienteSelected(){
+  const el = document.getElementById('rcClienteSelected');
+  el.innerHTML = rcClienteSeleccionado ? `Seleccionado: <b>${escapeHtml(rcClienteSeleccionado.codigo)} - ${escapeHtml(rcClienteSeleccionado.nombre)}</b>` : '';
+}
+function buscarTransporteRecibo(){
+  const q = document.getElementById('rc_transporte_input').value.toLowerCase().trim();
+  const box = document.getElementById('rcTransporteList');
+  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const matches = transportes.filter(t=> t.codigo.toLowerCase().includes(q) || t.nombre.toLowerCase().includes(q)).slice(0,8);
+  box.innerHTML = matches.length
+    ? matches.map(t=>`<div class="ac-item" onclick="seleccionarTransporteRecibo('${t.codigo}')"><span class="code">${escapeHtml(t.codigo)}</span>${escapeHtml(t.nombre)}</div>`).join('')
+    : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de transportes desde Ajustes.</div>`;
+  box.classList.add('show');
+}
+function seleccionarTransporteRecibo(codigo){
+  const t = transportes.find(x=>x.codigo===codigo);
+  if(!t) return;
+  rcTransporteSeleccionado = t;
+  document.getElementById('rcTransporteList').classList.remove('show');
+  document.getElementById('rc_transporte_input').value = '';
+  renderRcTransporteSelected();
+  persistCurrentReciboHeader();
+}
+function renderRcTransporteSelected(){
+  const el = document.getElementById('rcTransporteSelected');
+  el.innerHTML = rcTransporteSeleccionado ? `Seleccionado: <b>${escapeHtml(rcTransporteSeleccionado.codigo)} - ${escapeHtml(rcTransporteSeleccionado.nombre)}</b>` : '';
+}
+
+/* modal de pago */
+function abrirModalPago(){
+  editingPagoId = null;
+  document.getElementById('modalPagoTitle').textContent = 'Agregar pago';
+  document.getElementById('btnEliminarPago').style.display = 'none';
+  document.getElementById('pg_importe').value = '';
+  document.getElementById('pg_observacion').value = '';
+  setTipoPago('Efectivo');
+  document.getElementById('modalPago').classList.add('show');
+}
+function cerrarModalPago(){
+  document.getElementById('modalPago').classList.remove('show');
+}
+function setTipoPago(t){
+  tipoPagoActual = t;
+  document.querySelectorAll('#tipoPagoSegmented .seg-opt').forEach(el=>{
+    el.classList.toggle('active', el.dataset.tipopago === t);
+  });
+}
+function editarPago(id){
+  const r = currentRecibo();
+  const pg = (r.pagos||[]).find(x=>x.id===id);
+  if(!pg) return;
+  editingPagoId = id;
+  document.getElementById('modalPagoTitle').textContent = 'Editar pago';
+  document.getElementById('btnEliminarPago').style.display = 'inline-flex';
+  document.getElementById('pg_importe').value = pg.importe || '';
+  document.getElementById('pg_observacion').value = pg.observacion || '';
+  setTipoPago(pg.tipo || 'Efectivo');
+  document.getElementById('modalPago').classList.add('show');
+}
+function aceptarPago(){
+  const importe = parseFloat(document.getElementById('pg_importe').value);
+  if(isNaN(importe) || importe <= 0){
+    toast('Ingresá un importe válido');
+    return;
+  }
+  const r = currentRecibo();
+  const data = {
+    importe: importe,
+    tipo: tipoPagoActual,
+    observacion: document.getElementById('pg_observacion').value.trim()
+  };
+  if(editingPagoId){
+    const pg = r.pagos.find(x=>x.id===editingPagoId);
+    Object.assign(pg, data);
+  }else{
+    data.id = uid();
+    r.pagos.push(data);
+  }
+  saveJSON(LS.recibos, recibos);
+  marcarDirty('recibo');
+  cerrarModalPago();
+  renderPagos();
+}
+function eliminarPago(){
+  if(!confirm('¿Eliminar este pago?')) return;
+  const r = currentRecibo();
+  r.pagos = r.pagos.filter(x=>x.id!==editingPagoId);
+  saveJSON(LS.recibos, recibos);
+  marcarDirty('recibo');
+  cerrarModalPago();
+  renderPagos();
+}
+
+/* =========================================================
+   COBRANZA: GENERAR PLANILLA (a partir de recibos)
+   ========================================================= */
+function renderGenerarPlanillaList(){
+  const box = document.getElementById('genPlanillaList');
+  const disponibles = recibos.filter(r=> !r.planillaId && !r.draft)
+    .sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || (b.numero||'').localeCompare(a.numero||''));
+  if(disponibles.length === 0){
+    box.innerHTML = `<div class="empty-state"><div class="big">&#128203;</div>No hay recibos disponibles para incluir en una planilla.<br>Grabá recibos primero, o revisá si ya están todos en alguna planilla.</div>`;
+    document.getElementById('genPlanillaSelectbar').style.display = 'none';
+    return;
+  }
+  box.innerHTML = disponibles.map(r=>{
+    const total = totalRecibo(r);
+    const checked = genPlanillaSeleccionados.has(r.id) ? 'checked' : '';
+    return `<div class="planilla-card" onclick="toggleGenPlanillaSel('${r.id}')">
+      <input type="checkbox" class="pc-check" ${checked} onclick="event.stopPropagation(); toggleGenPlanillaSel('${r.id}')">
+      <div class="pc-left">
+        <div class="pc-num">N° ${escapeHtml(fmtNumeroRecibo(r))}</div>
+        <div class="pc-meta">${escapeHtml(r.fecha||'')} · ${escapeHtml(r.clienteNombre || 'Sin cliente')}</div>
+      </div>
+      <div class="pc-right">
+        <div class="pc-total">${fmtMoney(total)}</div>
+        <div class="pc-count">${(r.pagos||[]).length} pago(s)</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('genPlanillaSelectbar').style.display = genPlanillaSeleccionados.size ? 'flex' : 'none';
+  document.getElementById('genPlanillaSelectCount').textContent = genPlanillaSeleccionados.size + ' seleccionados';
+}
+function toggleGenPlanillaSel(id){
+  if(genPlanillaSeleccionados.has(id)) genPlanillaSeleccionados.delete(id);
+  else genPlanillaSeleccionados.add(id);
+  renderGenerarPlanillaList();
+}
+function generarPlanilla(){
+  if(genPlanillaSeleccionados.size === 0){
+    toast('Seleccioná al menos un recibo');
+    return;
+  }
+  const ids = Array.from(genPlanillaSeleccionados);
+  const pg = {
+    id: uid(),
+    numero: nextNumero(planillasGeneradas),
+    fecha: new Date().toISOString().slice(0,10),
+    fabricaCodigo, fabricaNombre,
+    reciboIds: ids
+  };
+  planillasGeneradas.push(pg);
+  ids.forEach(rid=>{
+    const r = recibos.find(x=>x.id===rid);
+    if(r) r.planillaId = pg.id;
+  });
+  saveJSON(LS.planillasGeneradas, planillasGeneradas);
+  saveJSON(LS.recibos, recibos);
+  genPlanillaSeleccionados.clear();
+  toast('Planilla generada');
+  abrirPlanillaGenerada(pg.id);
+}
+
+/* =========================================================
+   COBRANZA: CONSULTA DE PLANILLAS GENERADAS
+   ========================================================= */
+function renderPlanillasGeneradasHome(){
+  const q = (document.getElementById('searchInputPlanillasGen').value || '').toLowerCase().trim();
+  const list = document.getElementById('planillasGenHomeList');
+  const sorted = [...planillasGeneradas].sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || (b.numero||'').localeCompare(a.numero||''));
+  const filtered = sorted.filter(pg=> !q || (pg.numero||'').toLowerCase().includes(q));
+  document.getElementById('planillasGenHomeSub').textContent = planillasGeneradas.length + (planillasGeneradas.length===1?' planilla':' planillas');
+  if(filtered.length === 0){
+    list.innerHTML = `<div class="empty-state"><div class="big">&#128203;</div>${planillasGeneradas.length===0 ? 'Todavía no generaste ninguna planilla.' : 'No se encontraron resultados.'}</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(pg=>{
+    const total = (pg.reciboIds||[]).reduce((s,rid)=>{
+      const r = recibos.find(x=>x.id===rid);
+      return s + (r ? totalRecibo(r) : 0);
+    }, 0);
+    return `<div class="planilla-card" onclick="abrirPlanillaGenerada('${pg.id}')">
+      <div class="pc-left">
+        <div class="pc-num">N° ${escapeHtml(pg.numero)}</div>
+        <div class="pc-meta">${escapeHtml(pg.fecha||'')} · ${(pg.reciboIds||[]).length} recibo(s)</div>
+      </div>
+      <div class="pc-right">
+        <div class="pc-total">${fmtMoney(total)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function currentPlanillaGenerada(){
+  return planillasGeneradas.find(x=>x.id===currentPlanillaGeneradaId);
+}
+function abrirPlanillaGenerada(id){
+  currentPlanillaGeneradaId = id;
+  const pg = currentPlanillaGenerada();
+  if(!pg) return;
+  document.getElementById('planGenTitulo').textContent = 'Planilla N° ' + pg.numero;
+  renderPlanGenDetalle();
+  showView('view-planilla-generada');
+}
+function renderPlanGenDetalle(){
+  const pg = currentPlanillaGenerada();
+  if(!pg) return;
+  const box = document.getElementById('planGenDetalle');
+  const recibosIncl = (pg.reciboIds||[]).map(rid=> recibos.find(x=>x.id===rid)).filter(Boolean);
+  const total = recibosIncl.reduce((s,r)=> s + totalRecibo(r), 0);
+  box.innerHTML = `
+    <div class="header-card">
+      <div class="pc-meta">Fecha: ${escapeHtml(pg.fecha||'')}</div>
+      <div class="pc-meta">Empresa: ${escapeHtml(pg.fabricaCodigo||'')} ${escapeHtml(pg.fabricaNombre||'')}</div>
+    </div>
+    <div class="section-title">Recibos incluidos</div>
+  ` + recibosIncl.map(r=>`
+      <div class="rowline" onclick="abrirRecibo('${r.id}')">
+        <div class="rl-left">
+          <div class="rl-cliente">${escapeHtml(fmtNumeroRecibo(r))} · ${escapeHtml(r.clienteNombre)}</div>
+          <div class="rl-meta">${escapeHtml(r.fecha||'')}</div>
+        </div>
+        <div class="rl-right">
+          <div class="rl-importe">${fmtMoney(totalRecibo(r))}</div>
+        </div>
+      </div>
+    `).join('') + `
+    <div class="totalbar"><div class="lbl">Total</div><div class="val">${fmtMoney(total)}</div></div>
+  `;
+}
+function eliminarPlanillaGenerada(){
+  const pg = currentPlanillaGenerada();
+  if(!pg) return;
+  if(!confirm('¿Eliminar esta planilla? Los recibos que contenía vuelven a estar disponibles para incluirse en otra planilla.')) return;
+  (pg.reciboIds||[]).forEach(rid=>{
+    const r = recibos.find(x=>x.id===rid);
+    if(r) r.planillaId = null;
+  });
+  planillasGeneradas = planillasGeneradas.filter(x=>x.id!==pg.id);
+  saveJSON(LS.planillasGeneradas, planillasGeneradas);
+  saveJSON(LS.recibos, recibos);
+  toast('Planilla eliminada');
+  showView('view-planillas-generadas-home');
+  renderPlanillasGeneradasHome();
+}
+
+/* =========================================================
+   IMPRESION / PDF - RECIBOS Y PLANILLA GENERADA
+   ========================================================= */
+function buildPagosTableHTML(pagos){
+  if(!pagos || !pagos.length){
+    return '<div style="font-size:11px; color:#777;">Sin pagos cargados.</div>';
+  }
+  const filas = pagos.map(pg=>`
+    <tr>
+      <td>${escapeHtml(pg.tipo)}</td>
+      <td>${fmtMoney(pg.importe)}</td>
+      <td>${escapeHtml(pg.observacion||'')}</td>
+    </tr>
+  `).join('');
+  return `<table class="ps-pagos-table">
+      <colgroup><col style="width:24%"><col style="width:16%"><col style="width:60%"></colgroup>
+      <thead><tr><th>Tipo de pago</th><th>Importe</th><th>Observación</th></tr></thead>
+      <tbody>${filas}</tbody>
+    </table>`;
+}
+function buildReciboBlockHTML(r){
+  const comprobantesTexto = (r.comprobantes||'').split(/\n/).map(l=>l.trim()).filter(Boolean).join(', ') || '-';
+  return `
+    <div style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px dashed #ccc;">
+      <div style="font-weight:bold; font-size:13px; margin-bottom:4px;">Recibo N° ${escapeHtml(fmtNumeroRecibo(r))} — Fecha: ${escapeHtml(r.fecha||'')} — Cliente: ${escapeHtml(r.clienteCodigo||'')} ${escapeHtml(r.clienteNombre||'')}</div>
+      <div style="font-size:11px; color:#333; margin-top:8px;"><b>Comprobantes:</b> ${escapeHtml(comprobantesTexto)}</div>
+      <div style="font-size:11px; color:#333; margin-top:4px;"><b>Valores:</b></div>
+      ${buildPagosTableHTML(r.pagos)}
+      <div style="font-size:10px; margin-top:4px;"><b>Total Recibo:</b> ${fmtMoney(totalRecibo(r))}</div>
+    </div>
+  `;
+}
+function buildPlanillaGeneradaPrintHTML(pg){
+  const recibosIncl = (pg.reciboIds||[]).map(rid=> recibos.find(x=>x.id===rid)).filter(Boolean);
+  const bloques = recibosIncl.map(r=> buildReciboBlockHTML(r)).join('');
+
+  const totales = {'Efectivo':0, 'Depósito':0, 'Cheque':0, 'Cheque Electrónico':0, 'Retención':0};
+  recibosIncl.forEach(r=> (r.pagos||[]).forEach(pg2=>{
+    if(totales.hasOwnProperty(pg2.tipo)) totales[pg2.tipo] += Number(pg2.importe)||0;
+  }));
+  const totalGeneral = Object.values(totales).reduce((s,v)=>s+v,0);
+  const tiposHtml = `
+    <div><b>Total Efectivo:</b> ${fmtMoney(totales['Efectivo'])}</div>
+    <div><b>Total Depósitos:</b> ${fmtMoney(totales['Depósito'])}</div>
+    <div><b>Total Cheques:</b> ${fmtMoney(totales['Cheque'])}</div>
+    <div><b>Total Cheques Electrónicos:</b> ${fmtMoney(totales['Cheque Electrónico'])}</div>
+    <div><b>Total Retenciones:</b> ${fmtMoney(totales['Retención'])}</div>
+  `;
+
+  return `
+    <div class="ps-block">
+      <div class="ps-header">
+        <div>
+          <h1>Planilla de Cobranzas</h1>
+          <div class="ps-meta">
+            <div><b>N° Planilla:</b> ${escapeHtml(pg.numero)}</div>
+          </div>
+        </div>
+        <div class="ps-meta"><b>Fecha:</b> ${escapeHtml(pg.fecha||'')}</div>
+      </div>
+      ${bloques}
+      <div class="ps-total"><div class="box">Total general: ${fmtMoney(totalGeneral)}</div></div>
+      <div class="ps-tipos">${tiposHtml}</div>
+    </div>
+  `;
+}
+function imprimirPlanillaGenerada(){
+  const pg = currentPlanillaGenerada();
+  if(!pg) return;
+  imprimirDocumento(buildPlanillaGeneradaPrintHTML(pg));
+}
+function empresaLineHTML(){
+  return fabricaNombre ? `<div class="ps-empresa">${escapeHtml(fabricaNombre)}</div>` : '';
+}
+function buildReciboPrintHTML(r){
+  const comprobantesLines = (r.comprobantes||'').split(/\n/).map(l=>l.trim()).filter(Boolean);
+  const comprobantesHtml = comprobantesLines.length
+    ? comprobantesLines.map(l=>`<div>${escapeHtml(l)}</div>`).join('')
+    : '<div>-</div>';
+  return `<div class="ps-block">
+      <div class="ps-header-recibo">
+        <div class="ps-header-recibo-top">
+          <div class="ps-empresa-title">${escapeHtml(fabricaNombre||'')}</div>
+          <div class="ps-recibo-title">Recibo de Cobranza</div>
+        </div>
+        <div class="ps-header-line-inline">
+          <span><b>N°:</b> ${escapeHtml(fmtNumeroRecibo(r))}</span>
+          <span><b>Fecha:</b> ${escapeHtml(r.fecha||'')}</span>
+        </div>
+        <div class="ps-header-cliente"><b>Cliente:</b> ${escapeHtml(r.clienteCodigo||'')} ${escapeHtml(r.clienteNombre||'')}</div>
+      </div>
+      <div style="font-size:11px; color:#333;"><b>Comprobantes:</b> ${comprobantesHtml}</div>
+      <div style="font-size:11px; color:#333; margin-top:6px;"><b>Valores:</b></div>
+      ${buildPagosTableHTML(r.pagos)}
+      <div style="font-size:10px; margin-top:4px;"><b>Total Recibo:</b> ${fmtMoney(totalRecibo(r))}</div>
+      <div class="ps-obs" style="margin-top:12px;"><span class="lbl">Observación</span>${escapeHtml(r.observacion||'-')}</div>
+    </div>`;
+}
+function buildReciboTicketHTML(r){
+  const pagosHtml = (r.pagos||[]).map(pg=>`
+    <div class="tk-row"><span>${escapeHtml(pg.tipo)}${pg.observacion ? ' ('+escapeHtml(pg.observacion)+')' : ''}</span><span>${fmtMoney(pg.importe)}</span></div>
+  `).join('');
+  return `<div class="ps-block ps-ticket">
+    <div class="tk-center tk-bold">${fabricaNombre ? escapeHtml(fabricaNombre) : 'Recibo de Cobranza'}</div>
+    <div class="tk-center">Recibo N° ${escapeHtml(fmtNumeroRecibo(r))}</div>
+    <div class="tk-line"></div>
+    <div>Fecha: ${escapeHtml(r.fecha||'')}</div>
+    <div>Cliente: ${escapeHtml(r.clienteCodigo||'')} ${escapeHtml(r.clienteNombre||'')}</div>
+    ${r.comprobantes ? `<div>Comprob.: ${escapeHtml(r.comprobantes)}</div>` : ''}
+    <div class="tk-line"></div>
+    ${pagosHtml || '<div>Sin pagos cargados</div>'}
+    <div class="tk-line"></div>
+    <div class="tk-row tk-bold"><span>TOTAL</span><span>${fmtMoney(totalRecibo(r))}</span></div>
+    ${r.observacion ? `<div class="tk-line"></div><div>Obs: ${escapeHtml(r.observacion)}</div>` : ''}
+  </div>`;
+}
+/* Ticket angosto de 5,5 cm de ancho, pensado para impresoras portátiles pequeñas */
+function imprimirReciboTicket(){
+  const r = currentRecibo();
+  if(!r) return;
+  persistCurrentReciboHeader();
+  imprimirDocumento(buildReciboTicketHTML(r), '55mm auto', '2mm', true);
+}
+/* Recibo con formato prolijo, pensado para exportar/enviar como PDF por mail */
+function imprimirReciboPDF(){
+  const r = currentRecibo();
+  if(!r) return;
+  persistCurrentReciboHeader();
+  imprimirDocumento(buildReciboPrintHTML(r), 'A4', '10mm', false);
+}
 
 /* =========================================================
    PEDIDOS: HOME
@@ -1984,10 +3060,12 @@ function importarCSV(evt, tipo){
    ========================================================= */
 function descargarRespaldo(){
   const data = {
-    version: 2,
+    version: 3,
     fecha: new Date().toISOString(),
     clientes, transportes, vendedores, articulos, planillas, pedidos, catalogos,
-    vendedorCodigo, vendedorNombre
+    recibos, planillasGeneradas,
+    vendedorCodigo, vendedorNombre,
+    puntoVenta, fabricaCodigo, fabricaNombre, mostrarPlanillaAnterior, printSize, printUnoPorHoja
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -2019,6 +3097,8 @@ function restaurarRespaldo(evt){
       planillas = Array.isArray(data.planillas) ? data.planillas : [];
       pedidos = Array.isArray(data.pedidos) ? data.pedidos : [];
       catalogos = Array.isArray(data.catalogos) ? data.catalogos : [];
+      recibos = Array.isArray(data.recibos) ? data.recibos : [];
+      planillasGeneradas = Array.isArray(data.planillasGeneradas) ? data.planillasGeneradas : [];
       saveJSON(LS.clientes, clientes);
       saveJSON(LS.transportes, transportes);
       saveJSON(LS.vendedores, vendedores);
@@ -2026,13 +3106,20 @@ function restaurarRespaldo(evt){
       saveJSON(LS.planillas, planillas);
       saveJSON(LS.pedidos, pedidos);
       saveJSON(LS.catalogos, catalogos);
+      saveJSON(LS.recibos, recibos);
+      saveJSON(LS.planillasGeneradas, planillasGeneradas);
       if(data.vendedorCodigo){
         vendedorCodigo = data.vendedorCodigo;
         vendedorNombre = data.vendedorNombre || '';
         localStorage.setItem(LS_VENDEDOR, vendedorCodigo);
         localStorage.setItem(LS_VENDEDOR_NOMBRE, vendedorNombre);
       }
+      if(data.puntoVenta){ puntoVenta = data.puntoVenta; localStorage.setItem(LS_PUNTO_VENTA, puntoVenta); }
+      if(data.fabricaCodigo !== undefined){ fabricaCodigo = data.fabricaCodigo; localStorage.setItem(LS_FABRICA_CODIGO, fabricaCodigo); }
+      if(data.fabricaNombre !== undefined){ fabricaNombre = data.fabricaNombre; localStorage.setItem(LS_FABRICA_NOMBRE, fabricaNombre); }
+      if(data.printSize){ printSize = data.printSize; localStorage.setItem(LS_PRINT_SIZE, printSize); }
       renderImportCounts();
+      renderAjustesConfig();
       renderCatalogosAjustes();
       renderMenu();
       toast('Datos restaurados correctamente');
@@ -2066,6 +3153,7 @@ function buildPlanillaPrintHTML(p){
 
   return `
     <div class="ps-block">
+      ${empresaLineHTML()}
       <div class="ps-header">
         <div>
           <h1>Planilla de Cobranzas</h1>
@@ -2090,22 +3178,27 @@ function imprimirPlanilla(){
   const p = currentPlanilla();
   if(!p) return;
   persistCurrentHeader();
-  document.getElementById('printSheet').innerHTML = buildPlanillaPrintHTML(p);
-  window.print();
+  imprimirDocumento(buildPlanillaPrintHTML(p));
 }
 
 /* =========================================================
    IMPRESION / PDF - PEDIDOS
    ========================================================= */
+function fmtFechaCorta(fecha){
+  if(!fecha) return '';
+  const partes = String(fecha).split('-');
+  if(partes.length!==3) return fecha;
+  const [y,m,d] = partes;
+  return d+'/'+m+'/'+y.slice(2);
+}
 function buildPedidoPrintHTML(p, blockClass){
   blockClass = blockClass || 'ps-block';
   const totalUnidades = p.renglones.reduce((s,r)=> s + (Number(r.cantidad)||0), 0);
   const filas = p.renglones.map(r=>`
     <tr>
-      <td>${escapeHtml(r.artCodigo)}</td>
-      <td>${escapeHtml(r.artCodigoAlt||'')}</td>
-      <td>${escapeHtml(r.artDescripcion)}</td>
       <td>${escapeHtml(r.cantidad)}</td>
+      <td>${escapeHtml(r.artCodigo)}</td>
+      <td>${escapeHtml(r.artDescripcion)}</td>
       <td>${r.bonificacion ? escapeHtml(r.bonificacion)+'%' : '-'}</td>
       <td>${escapeHtml(r.observacion||'')}</td>
     </tr>
@@ -2113,22 +3206,21 @@ function buildPedidoPrintHTML(p, blockClass){
 
   return `
     <div class="${blockClass}">
-      <div class="ps-header">
-        <div>
-          <h1>Nota de Pedido</h1>
-          <div class="ps-meta">
-            <div><b>Número:</b> ${escapeHtml(p.numero)}</div>
-            <div><b>Cliente:</b> ${escapeHtml(p.clienteCodigo||'')} ${escapeHtml(p.clienteNombre||'')}</div>
-          </div>
-        </div>
-        <div class="ps-meta"><b>Fecha:</b> ${escapeHtml(p.fecha||'')}</div>
+      ${empresaLineHTML()}
+      <div class="ps-header-line">
+        <span><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)}</span>
+        <span><b>Cliente:</b> ${escapeHtml(p.clienteCodigo||'')} ${escapeHtml(p.clienteNombre||'')}</span>
+        <span><b>Fecha:</b> ${fmtFechaCorta(p.fecha)}</span>
       </div>
-      <table class="ps-table">
-        <thead><tr><th>Código</th><th>Código Alt.</th><th>Descripción</th><th>Cantidad</th><th>Bonif. %</th><th>Observación</th></tr></thead>
+      <table class="ps-table ps-pedido-table">
+        <colgroup>
+          <col style="width:8%"><col style="width:12%"><col style="width:30%"><col style="width:8%"><col style="width:42%">
+        </colgroup>
+        <thead><tr><th>Cant.</th><th>Código</th><th>Descripción</th><th>Bonif. %</th><th>Observación</th></tr></thead>
         <tbody>${filas}</tbody>
       </table>
-      <div class="ps-total"><div class="box">Total unidades: ${totalUnidades}</div></div>
-      <div class="ps-obs"><span class="lbl">Observación</span>${escapeHtml(p.observacion||'-')}</div>
+      <div class="ps-total ps-total-pedido"><div class="box">Total unidades: ${totalUnidades}</div></div>
+      <div class="ps-obs ps-obs-pedido"><span class="lbl">Observación</span>${escapeHtml(p.observacion||'-')}</div>
     </div>
   `;
 }
@@ -2136,8 +3228,7 @@ function imprimirPedido(){
   const p = currentPedido();
   if(!p) return;
   persistCurrentPedidoHeader();
-  document.getElementById('printSheet').innerHTML = buildPedidoPrintHTML(p);
-  window.print();
+  imprimirDocumento(buildPedidoPrintHTML(p));
 }
 function imprimirPedidosSeleccionados(){
   if(pedidosSeleccionados.size === 0){
@@ -2145,9 +3236,12 @@ function imprimirPedidosSeleccionados(){
     return;
   }
   const seleccionados = pedidos.filter(p=> pedidosSeleccionados.has(p.id));
-  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, 'ps-block-multi')).join('');
-  document.getElementById('printSheet').innerHTML = html;
-  window.print();
+  // en tamaño chico, si está activada la opción "un pedido por hoja" se usa
+  // un bloque con salto de página después de cada uno; si no, van seguidos.
+  const unoPorHoja = printSize === 'chico' ? printUnoPorHoja : true;
+  const blockClass = unoPorHoja ? 'ps-block' : 'ps-block-multi';
+  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass)).join('');
+  imprimirDocumento(html);
 }
 
 /* =========================================================
