@@ -243,6 +243,11 @@
     table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
     table.ps-pedido-table{margin-bottom:4px;}
     table.ps-pedido-table th, table.ps-pedido-table td{padding-left:5px; padding-right:5px;}
+    /* Cantidad: se deja espacio extra a la derecha para poder anotar los kilos a mano */
+    table.ps-pedido-table th:nth-child(1), table.ps-pedido-table td:nth-child(1){padding-right:26px;}
+    /* Código más pegado a Descripción */
+    table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:2px;}
+    table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:2px;}
     .ps-total{display:flex; justify-content:flex-end; margin-bottom:14px;}
     .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:14px;}
     .ps-total-pedido{margin-bottom:6px;}
@@ -852,7 +857,7 @@
               <div class="seg-opt" data-printsize="chico" onclick="setTamanoImpresion('chico')">Chico / Ticket</div>
             </div>
           </div>
-          <div class="toggle-row" id="rowUnoPorHoja" style="display:none;">
+          <div class="toggle-row" id="rowUnoPorHoja">
             <div class="tr-txt">Un pedido por hoja al imprimir varios</div>
             <label class="switch">
               <input type="checkbox" id="chkUnoPorHoja" onchange="guardarUnoPorHoja()">
@@ -1226,8 +1231,6 @@ function renderAjustesConfig(){
   document.querySelectorAll('#printSizeSegmented .seg-opt').forEach(el=>{
     el.classList.toggle('active', el.dataset.printsize === printSize);
   });
-  const rowUno = document.getElementById('rowUnoPorHoja');
-  if(rowUno) rowUno.style.display = (printSize === 'chico') ? 'flex' : 'none';
   const chkUno = document.getElementById('chkUnoPorHoja');
   if(chkUno) chkUno.checked = printUnoPorHoja;
 }
@@ -1251,8 +1254,6 @@ function setTamanoImpresion(size){
   document.querySelectorAll('#printSizeSegmented .seg-opt').forEach(el=>{
     el.classList.toggle('active', el.dataset.printsize === size);
   });
-  const rowUno = document.getElementById('rowUnoPorHoja');
-  if(rowUno) rowUno.style.display = (size === 'chico') ? 'flex' : 'none';
 }
 function guardarUnoPorHoja(){
   printUnoPorHoja = document.getElementById('chkUnoPorHoja').checked;
@@ -3214,7 +3215,7 @@ function buildPedidoPrintHTML(p, blockClass){
       </div>
       <table class="ps-table ps-pedido-table">
         <colgroup>
-          <col style="width:8%"><col style="width:12%"><col style="width:30%"><col style="width:8%"><col style="width:42%">
+          <col style="width:13%"><col style="width:9%"><col style="width:30%"><col style="width:8%"><col style="width:40%">
         </colgroup>
         <thead><tr><th>Cant.</th><th>Código</th><th>Descripción</th><th>Bonif. %</th><th>Observación</th></tr></thead>
         <tbody>${filas}</tbody>
@@ -3236,9 +3237,10 @@ function imprimirPedidosSeleccionados(){
     return;
   }
   const seleccionados = pedidos.filter(p=> pedidosSeleccionados.has(p.id));
-  // en tamaño chico, si está activada la opción "un pedido por hoja" se usa
-  // un bloque con salto de página después de cada uno; si no, van seguidos.
-  const unoPorHoja = printSize === 'chico' ? printUnoPorHoja : true;
+  // si está activada la opción "un pedido por hoja" se usa un bloque con
+  // salto de página después de cada uno (cualquier tamaño de hoja); si no,
+  // los pedidos van seguidos, uno debajo del otro.
+  const unoPorHoja = printUnoPorHoja;
   const blockClass = unoPorHoja ? 'ps-block' : 'ps-block-multi';
   const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass)).join('');
   imprimirDocumento(html);
