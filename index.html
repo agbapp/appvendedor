@@ -105,6 +105,9 @@
   .field textarea{resize:vertical; min-height:60px;}
   .row2{display:flex; gap:12px;}
   .row2 > *{flex:1;}
+  .row3{display:flex; gap:10px;}
+  .row3 > *{flex:1; min-width:0;}
+  .field input[readonly]{background:var(--olive-light); color:var(--ink-soft); font-weight:700;}
 
   .header-card{background:var(--white); border-radius:14px; padding:16px; box-shadow:var(--shadow); margin-bottom:16px; border:1px solid var(--border);}
 
@@ -163,6 +166,14 @@
   .modal p.modal-desc{font-size:13.5px; color:var(--ink-soft); margin:-10px 0 16px; line-height:1.5;}
   .modal-actions{display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;}
   .modal-actions .btn{flex:1; min-width:110px;}
+
+  /* ---------- Topbar quick-nav ---------- */
+  .topbar-right{display:flex; align-items:center; gap:8px;}
+  .quicknav-list{display:flex; flex-direction:column; gap:10px; margin-top:4px;}
+  .quicknav-item{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:var(--olive-light); border:none; border-radius:12px; padding:13px 14px; cursor:pointer;}
+  .quicknav-item:active{background:#e4e6d3;}
+  .quicknav-item .ic{width:36px; height:36px; border-radius:10px; background:var(--white); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
+  .quicknav-item .tt{font-weight:700; font-size:14.5px; color:var(--plum-dark);}
 
   /* ---------- Import view ---------- */
   .import-card{background:var(--white); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:16px; box-shadow:var(--shadow);}
@@ -902,7 +913,7 @@
 
           <div class="import-card">
             <h3>Tabla de Artículos</h3>
-            <p>Archivo CSV con columnas: código numérico, código alfanumérico (13), descripción — una fila por artículo. Se usa en Carga de Pedidos.</p>
+            <p>Archivo CSV con columnas: código numérico, código alfanumérico (13), descripción, precio — una fila por artículo. Se usa en Carga de Pedidos.</p>
             <div class="count-pill" id="countArticulos">0 artículos cargados</div>
             <label class="filelabel">
               Elegir archivo CSV de artículos
@@ -1059,7 +1070,7 @@
       <div class="ac-selected" id="articuloSelected"></div>
     </div>
 
-    <div class="row2">
+    <div class="row3">
       <div class="field">
         <label>Cantidad</label>
         <input type="number" id="rp_cantidad" inputmode="decimal" step="1" placeholder="0">
@@ -1067,6 +1078,10 @@
       <div class="field">
         <label>Bonificación %</label>
         <input type="number" id="rp_bonificacion" inputmode="decimal" step="0.01" min="0" max="100" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Precio</label>
+        <input type="text" id="rp_precio" readonly placeholder="-">
       </div>
     </div>
 
@@ -1092,6 +1107,34 @@
       <button class="btn btn-primary btn-block" onclick="confirmSalirGrabar()">Grabar y salir</button>
       <button class="btn btn-danger btn-block" onclick="confirmSalirDescartar()">Salir sin grabar</button>
       <button class="btn btn-outline btn-block" onclick="confirmSalirCancelar()">Seguir editando</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL MENU RAPIDO (ir a otra sección) ================= -->
+<div class="modal-backdrop" id="quickNavModal" onclick="if(event.target===this) cerrarQuickNav();">
+  <div class="modal">
+    <h2>Ir a...</h2>
+    <div class="quicknav-list">
+      <button class="quicknav-item" onclick="quickNavIr('cobranza')">
+        <div class="ic">&#128179;</div>
+        <div class="tt">Carga de Cobranza</div>
+      </button>
+      <button class="quicknav-item" onclick="quickNavIr('pedidos')">
+        <div class="ic">&#128230;</div>
+        <div class="tt">Carga de Pedidos</div>
+      </button>
+      <button class="quicknav-item" onclick="quickNavIr('catalogos')">
+        <div class="ic">&#128218;</div>
+        <div class="tt">Catálogos Productos</div>
+      </button>
+      <button class="quicknav-item" onclick="quickNavIr('menu')">
+        <div class="ic">&#8962;</div>
+        <div class="tt">Menú principal</div>
+      </button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-block" onclick="cerrarQuickNav()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1389,13 +1432,75 @@ function confirmSalirGrabar(){
   if(dirtyContext === 'planilla') grabarPlanilla();
   else if(dirtyContext === 'pedido') grabarPedido();
   else if(dirtyContext === 'recibo') grabarRecibo();
+  if(quickNavPending){ ejecutarQuickNav(quickNavPending); quickNavPending = null; }
 }
 function confirmSalirDescartar(){
   document.getElementById('confirmSalirModal').classList.remove('show');
   salirSinPreguntar(dirtyContext);
+  if(quickNavPending){ ejecutarQuickNav(quickNavPending); quickNavPending = null; }
 }
 function confirmSalirCancelar(){
   document.getElementById('confirmSalirModal').classList.remove('show');
+  quickNavPending = null;
+}
+
+/* =========================================================
+   MENU RAPIDO (acceso directo a Cobranza / Pedidos / Catálogos)
+   ========================================================= */
+let quickNavPending = null;
+function abrirQuickNav(){
+  document.getElementById('quickNavModal').classList.add('show');
+}
+function cerrarQuickNav(){
+  document.getElementById('quickNavModal').classList.remove('show');
+}
+function ejecutarQuickNav(target){
+  if(target === 'cobranza') irACobranzaMenu();
+  else if(target === 'pedidos') irAPedidos();
+  else if(target === 'catalogos') irACatalogos();
+  else if(target === 'menu'){ showView('view-menu'); renderMenu(); }
+}
+function quickNavIr(target){
+  cerrarQuickNav();
+  // si hay una planilla/pedido/recibo con cambios sin grabar, se pregunta antes de saltar de sección
+  if(dirtyFlag && (dirtyContext==='planilla' || dirtyContext==='pedido' || dirtyContext==='recibo')){
+    quickNavPending = target;
+    document.getElementById('confirmSalirModal').classList.add('show');
+    return;
+  }
+  ejecutarQuickNav(target);
+}
+function inicializarQuickNav(){
+  document.querySelectorAll('.view').forEach(view=>{
+    if(view.id === 'view-setup') return;
+    const tb = view.querySelector(':scope > .topbar');
+    if(!tb || tb.querySelector('.quicknav-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'iconbtn quicknav-btn';
+    btn.title = 'Ir a otra sección';
+    btn.innerHTML = '&#9776;';
+    btn.onclick = abrirQuickNav;
+
+    const children = Array.from(tb.children);
+    const gearBtn = children.find(c=> c.classList && c.classList.contains('iconbtn'));
+    const wrap = document.createElement('div');
+    wrap.className = 'topbar-right';
+    if(gearBtn){
+      gearBtn.parentNode.insertBefore(wrap, gearBtn);
+      wrap.appendChild(btn);
+      wrap.appendChild(gearBtn);
+    }else{
+      const last = children[children.length-1];
+      const isSpacer = last && last.tagName === 'DIV' && !last.className && last.getAttribute('style') && last.getAttribute('style').includes('width');
+      wrap.appendChild(btn);
+      if(isSpacer){
+        last.parentNode.replaceChild(wrap, last);
+      }else{
+        tb.appendChild(wrap);
+      }
+    }
+  });
 }
 
 /* =========================================================
@@ -2549,7 +2654,11 @@ function renderRenglonesPedido(){
   if(p.renglones.length===0){
     list.innerHTML = `<div class="empty-state" style="padding:30px 10px;">Sin artículos cargados todavía.</div>`;
   }else{
-    list.innerHTML = p.renglones.map(r=>`
+    list.innerHTML = p.renglones.map(r=>{
+      const artActual = articulos.find(x=>String(x.codigo)===String(r.artCodigo));
+      const precio = artActual ? artActual.precio : '';
+      const precioTxt = (precio!=='' && precio!=null) ? fmtMoney(precio) : '';
+      return `
       <div class="rowline" onclick="editarRenglonPedido('${r.id}')">
         <div class="rl-left">
           <div class="rl-cliente">${escapeHtml(r.artCodigo)} · ${escapeHtml(r.artDescripcion)}</div>
@@ -2557,9 +2666,11 @@ function renderRenglonesPedido(){
         </div>
         <div class="rl-right">
           <div class="rl-importe">${escapeHtml(r.cantidad)} un.</div>
+          ${precioTxt ? `<div class="rl-meta">${precioTxt}</div>` : ''}
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
   const totalUnidades = p.renglones.reduce((s,r)=> s + (Number(r.cantidad)||0), 0);
   document.getElementById('pedTotalVal').textContent = totalUnidades + ' un. en ' + p.renglones.length + ' artículo(s)';
@@ -2680,7 +2791,7 @@ function buscarArticulo(){
   ).slice(0,8);
   box.innerHTML = matches.length
     ? matches.map(a=>
-        `<div class="ac-item" onclick="seleccionarArticulo('${a.codigo}')"><span class="code">${escapeHtml(a.codigo)}</span>${escapeHtml(a.descripcion)} ${a.codigoAlt ? '<span style="color:var(--ink-soft);">('+escapeHtml(a.codigoAlt)+')</span>' : ''}</div>`
+        `<div class="ac-item" onclick="seleccionarArticulo('${a.codigo}')"><span class="code">${escapeHtml(a.codigo)}</span>${escapeHtml(a.descripcion)} ${a.codigoAlt ? '<span style="color:var(--ink-soft);">('+escapeHtml(a.codigoAlt)+')</span>' : ''} ${a.precio!=='' && a.precio!=null ? '<span style="color:var(--ink-soft); float:right;">'+fmtMoney(a.precio)+'</span>' : ''}</div>`
       ).join('')
     : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de artículos desde Ajustes.</div>`;
   box.classList.add('show');
@@ -2695,7 +2806,16 @@ function seleccionarArticulo(codigo){
 }
 function renderArticuloSelected(){
   const el = document.getElementById('articuloSelected');
-  el.innerHTML = articuloSeleccionado ? `Seleccionado: <b>${escapeHtml(articuloSeleccionado.codigo)} - ${escapeHtml(articuloSeleccionado.descripcion)}</b>` : '';
+  const precioInput = document.getElementById('rp_precio');
+  if(!articuloSeleccionado){
+    el.innerHTML='';
+    if(precioInput) precioInput.value = '';
+    return;
+  }
+  const tienePrecio = articuloSeleccionado.precio!=='' && articuloSeleccionado.precio!=null;
+  const precioTxt = tienePrecio ? ' <span style="color:var(--ink-soft);">· Precio: '+fmtMoney(articuloSeleccionado.precio)+'</span>' : '';
+  el.innerHTML = `Seleccionado: <b>${escapeHtml(articuloSeleccionado.codigo)} - ${escapeHtml(articuloSeleccionado.descripcion)}</b>${precioTxt}`;
+  if(precioInput) precioInput.value = tienePrecio ? fmtMoney(articuloSeleccionado.precio) : '-';
 }
 
 function editarRenglonPedido(id){
@@ -2706,6 +2826,8 @@ function editarRenglonPedido(id){
   document.getElementById('modalTitlePedido').textContent = 'Editar artículo';
   document.getElementById('btnEliminarRenglonPedido').style.display = 'inline-flex';
   articuloSeleccionado = {codigo:r.artCodigo, codigoAlt:r.artCodigoAlt, descripcion:r.artDescripcion};
+  const artActual = articulos.find(x=>String(x.codigo)===String(r.artCodigo));
+  if(artActual) articuloSeleccionado.precio = artActual.precio;
   document.getElementById('rp_articulo_input').value = '';
   document.getElementById('articuloList').classList.remove('show');
   renderArticuloSelected();
@@ -3009,7 +3131,8 @@ function parseArticulosCSV(text){
     const delim = line.includes(';') ? ';' : ',';
     const parts = line.split(delim).map(p=>p.replace(/^"|"$/g,'').trim());
     if(parts.length < 3) continue;
-    rows.push({codigo: parts[0], codigoAlt: parts[1], descripcion: parts[2]});
+    const precioNum = parts[3] !== undefined ? parseFloat(String(parts[3]).replace(',', '.')) : NaN;
+    rows.push({codigo: parts[0], codigoAlt: parts[1], descripcion: parts[2], precio: isNaN(precioNum) ? '' : precioNum});
   }
   if(rows.length && /^(codigo|código|cod)$/i.test(rows[0].codigo)){
     rows.shift();
@@ -3264,6 +3387,7 @@ if(!vendedorCodigo){
 }
 renderMenu();
 renderImportCounts();
+inicializarQuickNav();
 
 // registra el service worker (solo tiene efecto publicado en GitHub Pages,
 // no al abrir el archivo directamente desde el celular/PC)
