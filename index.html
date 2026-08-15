@@ -175,6 +175,13 @@
   .quicknav-item .ic{width:36px; height:36px; border-radius:10px; background:var(--white); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
   .quicknav-item .tt{font-weight:700; font-size:14.5px; color:var(--plum-dark);}
 
+  /* ---------- Horizontal nav bar (Inicio / Cobranza / Pedidos / Catalogos) ---------- */
+  .hnav{display:flex; background:var(--plum-dark); box-shadow:var(--shadow);}
+  .hnav-item{flex:1; display:flex; align-items:center; justify-content:center; background:none; border:none; padding:13px 4px; cursor:pointer; color:rgba(255,255,255,0.62); border-bottom:3px solid transparent;}
+  .hnav-item .hnav-lbl{font-size:13px; font-weight:700; letter-spacing:0.2px;}
+  .hnav-item.active{color:var(--white); border-bottom-color:var(--olive);}
+  .hnav-item:active{background:rgba(255,255,255,0.06);}
+
   /* ---------- Import view ---------- */
   .import-card{background:var(--white); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:16px; box-shadow:var(--shadow);}
   .import-card h3{margin:0 0 4px; font-size:15.5px; color:var(--plum-dark);}
@@ -310,7 +317,7 @@
   .ajustes-section{margin-bottom:16px;}
   .ajustes-section > summary{list-style:none; cursor:pointer; background:var(--white); border:1px solid var(--border); border-radius:14px; padding:16px 18px; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; font-weight:700; color:var(--plum-dark); font-size:15px;}
   .ajustes-section > summary::-webkit-details-marker{display:none;}
-  .ajustes-section > summary::after{content:"\\203A"; font-size:20px; color:var(--ink-soft); transform:rotate(90deg); transition:0.15s;}
+  .ajustes-section > summary::after{content:"\203A"; font-size:20px; color:var(--ink-soft); transform:rotate(90deg); transition:0.15s;}
   .ajustes-section[open] > summary::after{transform:rotate(270deg);}
   .ajustes-section[open] > summary{border-radius:14px 14px 0 0; box-shadow:none; border-bottom:none;}
   .ajustes-section-body{background:var(--white); border:1px solid var(--border); border-top:none; border-radius:0 0 14px 14px; padding:16px 18px 4px;}
@@ -679,9 +686,9 @@
   <div class="view" id="view-pedidos-home">
     <div class="topbar">
       <button class="backbtn" onclick="showView('view-menu'); renderMenu();">&#8592;</button>
-      <div style="flex:1; text-align:left;">
+      <div style="flex:1; text-align:center;">
         <h1 style="font-size:15px;">Pedidos</h1>
-        <div class="sub" id="pedidosHomeSub" style="text-align:left;">0 pedidos</div>
+        <div class="sub" id="pedidosHomeSub" style="text-align:center;">0 pedidos</div>
       </div>
       <button class="iconbtn" onclick="goImport()" title="Ajustes">&#9881;</button>
     </div>
@@ -810,52 +817,90 @@
     </div>
     <div class="content narrow">
 
-      <div class="import-card">
-        <h3>Vendedor de esta tablet</h3>
-        <p>Se usa para identificar todas las planillas y pedidos cargados acá.</p>
-        <div class="count-pill" id="vendedorActual">Código: -</div>
-        <div class="field ac-wrap" style="margin-top:12px;">
-          <label>Cambiar vendedor</label>
-          <input type="text" id="edit_vendedor_input" placeholder="Buscar código o nombre..." oninput="buscarVendedorEdit()" onfocus="buscarVendedorEdit()">
-          <div class="ac-list" id="editVendedorList"></div>
-          <div class="ac-selected ac-selected-highlight" id="editVendedorSelected"></div>
-        </div>
-        <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="guardarVendedorEdit()">Guardar cambio de vendedor</button>
-      </div>
-
-      <div class="import-card">
-        <h3>Punto de venta (recibos)</h3>
-        <p>Se usa como prefijo fijo de los recibos de cobranza generados en esta tablet, para que no se repitan números al enviarlos a la empresa.</p>
-        <div class="field" style="margin-bottom:0;">
-          <label>Punto de venta</label>
-          <input type="text" id="pv_punto_venta" placeholder="Ej: 0001" oninput="guardarPuntoVenta()">
-        </div>
-      </div>
-
-      <div class="import-card">
-        <h3>Nombre empresa</h3>
-        <p>Aparece en el encabezado de recibos, pedidos y listados (con letra chica).</p>
-        <div class="row2" style="margin-bottom:0;">
-          <div class="field" style="margin-bottom:0;">
-            <label>Código</label>
-            <input type="text" id="pv_fabrica_codigo" placeholder="004" oninput="guardarFabrica()">
+      <details class="ajustes-section" open>
+        <summary>Actualizar datos</summary>
+        <div class="ajustes-section-body">
+          <div class="import-card">
+            <h3>Tabla de Vendedores</h3>
+            <p>Archivo CSV con columnas: código, nombre (una fila por vendedor). Se usa para validar el vendedor de esta tablet.</p>
+            <div class="count-pill" id="countVendedores">Sin archivo importado</div>
+            <label class="filelabel">
+              Elegir archivo CSV de vendedores
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'vendedores')">
+            </label>
           </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Nombre de la empresa</label>
-            <input type="text" id="pv_fabrica_nombre" placeholder="MILANO MARIANO" oninput="guardarFabrica()">
+
+          <div class="import-card">
+            <h3>Tabla de Clientes</h3>
+            <p>Archivo CSV con columnas: código, nombre (una fila por cliente).</p>
+            <div class="count-pill" id="countClientes">Sin archivo importado</div>
+            <label class="filelabel">
+              Elegir archivo CSV de clientes
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'clientes')">
+            </label>
+          </div>
+
+          <div class="import-card">
+            <h3>Tabla de Transportes</h3>
+            <p>Archivo CSV con columnas: código, nombre (una fila por transporte).</p>
+            <div class="count-pill" id="countTransportes">Sin archivo importado</div>
+            <label class="filelabel">
+              Elegir archivo CSV de transportes
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'transportes')">
+            </label>
+          </div>
+
+          <div class="import-card">
+            <h3>Tabla de Artículos</h3>
+            <p>Archivo CSV con columnas: código numérico, código alfanumérico (13), descripción, precio — una fila por artículo. Se usa en Carga de Pedidos.</p>
+            <div class="count-pill" id="countArticulos">Sin archivo importado</div>
+            <label class="filelabel">
+              Elegir archivo CSV de artículos
+              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'articulos')">
+            </label>
+          </div>
+
+          <div class="import-note">
+            Tip: copiá el archivo actualizado a la carpeta de Descargas de la tablet desde Drive, y despues elegilo acá. El formato debe ser un valor por columna separado por coma o punto y coma. Si el archivo tiene una fila de encabezado, se detecta y se ignora sola. La fecha que se muestra en cada tabla es la del propio archivo, no la del momento en que lo importaste; si elegís uno más viejo que el ya cargado, te avisa antes de reemplazarlo.
           </div>
         </div>
-      </div>
+      </details>
 
-      <div class="import-card">
-        <div class="toggle-row">
-          <div class="tr-txt"><b>Mostrar botón "+ Nueva planilla (formato anterior)"</b><br><span style="color:var(--ink-soft); font-size:12px;">Si lo desactivás, dejás de ver esa opción en el menú de Cobranza (los datos ya cargados no se pierden).</span></div>
-          <label class="switch">
-            <input type="checkbox" id="chkMostrarPlanillaAnterior" checked onchange="guardarMostrarPlanillaAnterior()">
-            <span class="slider"></span>
-          </label>
+      <details class="ajustes-section">
+        <summary>Configurar Empresa – Vendedor</summary>
+        <div class="ajustes-section-body">
+          <div class="import-card">
+            <h3>Nombre empresa</h3>
+            <p>Aparece en el encabezado de recibos, pedidos y listados (con letra chica).</p>
+            <div class="field" style="margin-bottom:0;">
+              <label>Nombre de la empresa</label>
+              <input type="text" id="pv_fabrica_nombre" placeholder="Empresa ejemplo" oninput="guardarFabrica()">
+            </div>
+          </div>
+
+          <div class="import-card">
+            <h3>Punto de venta (recibos)</h3>
+            <p>Se usa como prefijo fijo de los recibos de cobranza generados en esta tablet, para que no se repitan números al enviarlos a la empresa.</p>
+            <div class="field" style="margin-bottom:0;">
+              <label>Punto de venta</label>
+              <input type="text" id="pv_punto_venta" placeholder="Ej: 0001" oninput="guardarPuntoVenta()">
+            </div>
+          </div>
+
+          <div class="import-card">
+            <h3>Vendedor de esta tablet</h3>
+            <p>Se usa para identificar todas las planillas y pedidos cargados acá.</p>
+            <div class="count-pill" id="vendedorActual">Código: -</div>
+            <div class="field ac-wrap" style="margin-top:12px;">
+              <label>Cambiar vendedor</label>
+              <input type="text" id="edit_vendedor_input" placeholder="Buscar código o nombre..." oninput="buscarVendedorEdit()" onfocus="buscarVendedorEdit()">
+              <div class="ac-list" id="editVendedorList"></div>
+              <div class="ac-selected ac-selected-highlight" id="editVendedorSelected"></div>
+            </div>
+            <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="guardarVendedorEdit()">Guardar cambio de vendedor</button>
+          </div>
         </div>
-      </div>
+      </details>
 
       <details class="ajustes-section">
         <summary>Impresión</summary>
@@ -874,55 +919,6 @@
               <input type="checkbox" id="chkUnoPorHoja" onchange="guardarUnoPorHoja()">
               <span class="slider"></span>
             </label>
-          </div>
-        </div>
-      </details>
-
-      <details class="ajustes-section">
-        <summary>Actualizar datos</summary>
-        <div class="ajustes-section-body">
-          <div class="import-card">
-            <h3>Tabla de Vendedores</h3>
-            <p>Archivo CSV con columnas: código, nombre (una fila por vendedor). Se usa para validar el vendedor de esta tablet.</p>
-            <div class="count-pill" id="countVendedores">0 vendedores cargados</div>
-            <label class="filelabel">
-              Elegir archivo CSV de vendedores
-              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'vendedores')">
-            </label>
-          </div>
-
-          <div class="import-card">
-            <h3>Tabla de Clientes</h3>
-            <p>Archivo CSV con columnas: código, nombre (una fila por cliente).</p>
-            <div class="count-pill" id="countClientes">0 clientes cargados</div>
-            <label class="filelabel">
-              Elegir archivo CSV de clientes
-              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'clientes')">
-            </label>
-          </div>
-
-          <div class="import-card">
-            <h3>Tabla de Transportes</h3>
-            <p>Archivo CSV con columnas: código, nombre (una fila por transporte).</p>
-            <div class="count-pill" id="countTransportes">0 transportes cargados</div>
-            <label class="filelabel">
-              Elegir archivo CSV de transportes
-              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'transportes')">
-            </label>
-          </div>
-
-          <div class="import-card">
-            <h3>Tabla de Artículos</h3>
-            <p>Archivo CSV con columnas: código numérico, código alfanumérico (13), descripción, precio — una fila por artículo. Se usa en Carga de Pedidos.</p>
-            <div class="count-pill" id="countArticulos">0 artículos cargados</div>
-            <label class="filelabel">
-              Elegir archivo CSV de artículos
-              <input type="file" accept=".csv,.txt" onchange="importarCSV(event,'articulos')">
-            </label>
-          </div>
-
-          <div class="import-note">
-            Tip: copiá el archivo actualizado a la carpeta de Descargas de la tablet desde Drive, y despues elegilo acá. El formato debe ser un valor por columna separado por coma o punto y coma. Si el archivo tiene una fila de encabezado, se detecta y se ignora sola.
           </div>
         </div>
       </details>
@@ -950,6 +946,23 @@
           <div class="import-card" id="cardUltimaExportacion">
             <h3>Recordatorio de exportación</h3>
             <p id="ultimaExportacionTxt">Todavía no exportaste ningún archivo CSV.</p>
+            <div class="toggle-row" style="margin-top:10px;">
+              <div class="tr-txt">Desactivar aviso de exportación pendiente</div>
+              <label class="switch">
+                <input type="checkbox" id="chkExportAvisoOff" onchange="guardarExportAviso()">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="import-card">
+            <div class="toggle-row">
+              <div class="tr-txt"><b>Mostrar botón "+ Nueva planilla (formato anterior)"</b><br><span style="color:var(--ink-soft); font-size:12px;">Si lo desactivás, dejás de ver esa opción en el menú de Cobranza (los datos ya cargados no se pierden).</span></div>
+              <label class="switch">
+                <input type="checkbox" id="chkMostrarPlanillaAnterior" checked onchange="guardarMostrarPlanillaAnterior()">
+                <span class="slider"></span>
+              </label>
+            </div>
           </div>
         </div>
       </details>
@@ -1179,6 +1192,8 @@ const LS_FABRICA_NOMBRE = 'cobranzas_fabrica_nombre';
 const LS_MOSTRAR_PLANILLA_ANTERIOR = 'cobranzas_mostrar_planilla_anterior';
 const LS_PRINT_SIZE = 'cobranzas_print_size';
 const LS_PRINT_UNO_POR_HOJA = 'cobranzas_print_uno_por_hoja';
+const LS_EXPORT_AVISO_OFF = 'cobranzas_export_aviso_off';
+const LS_FECHAS_IMPORTACION = 'cobranzas_fechas_importacion';
 const TIPO_CODES = {'Efectivo':'EF', 'Cheque':'CH', 'Transferencia':'TR', 'Retención':'RE'};
 const TIPO_PAGO_CODES = {'Efectivo':'EF', 'Depósito':'DE', 'Cheque':'CH', 'Cheque Electrónico':'CE', 'Retención':'RE'};
 
@@ -1195,10 +1210,15 @@ let vendedorCodigo = localStorage.getItem(LS_VENDEDOR) || '';
 let vendedorNombre = localStorage.getItem(LS_VENDEDOR_NOMBRE) || '';
 let puntoVenta = localStorage.getItem(LS_PUNTO_VENTA) || '0001';
 let fabricaCodigo = localStorage.getItem(LS_FABRICA_CODIGO) || '';
-let fabricaNombre = localStorage.getItem(LS_FABRICA_NOMBRE) || '';
+let fabricaNombre = localStorage.getItem(LS_FABRICA_NOMBRE) || 'Empresa ejemplo';
 let mostrarPlanillaAnterior = localStorage.getItem(LS_MOSTRAR_PLANILLA_ANTERIOR) !== '0';
 let printSize = localStorage.getItem(LS_PRINT_SIZE) || 'a4';
 let printUnoPorHoja = localStorage.getItem(LS_PRINT_UNO_POR_HOJA) === '1';
+let exportAvisoDesactivado = localStorage.getItem(LS_EXPORT_AVISO_OFF) === '1';
+let fechasImportacion = (function(){
+  try{ return JSON.parse(localStorage.getItem(LS_FECHAS_IMPORTACION) || '{}'); }
+  catch(e){ return {}; }
+})();
 
 let currentPlanillaId = null;   // id de la planilla abierta
 let editingRenglonId = null;    // id del renglón en edición dentro del modal
@@ -1265,8 +1285,6 @@ function goImport(){
 function renderAjustesConfig(){
   const pv = document.getElementById('pv_punto_venta');
   if(pv) pv.value = puntoVenta;
-  const fc = document.getElementById('pv_fabrica_codigo');
-  if(fc) fc.value = fabricaCodigo;
   const fn = document.getElementById('pv_fabrica_nombre');
   if(fn) fn.value = fabricaNombre;
   const chkPlanAnt = document.getElementById('chkMostrarPlanillaAnterior');
@@ -1276,15 +1294,15 @@ function renderAjustesConfig(){
   });
   const chkUno = document.getElementById('chkUnoPorHoja');
   if(chkUno) chkUno.checked = printUnoPorHoja;
+  const chkAviso = document.getElementById('chkExportAvisoOff');
+  if(chkAviso) chkAviso.checked = exportAvisoDesactivado;
 }
 function guardarPuntoVenta(){
   puntoVenta = document.getElementById('pv_punto_venta').value.trim() || '0001';
   localStorage.setItem(LS_PUNTO_VENTA, puntoVenta);
 }
 function guardarFabrica(){
-  fabricaCodigo = document.getElementById('pv_fabrica_codigo').value.trim();
   fabricaNombre = document.getElementById('pv_fabrica_nombre').value.trim();
-  localStorage.setItem(LS_FABRICA_CODIGO, fabricaCodigo);
   localStorage.setItem(LS_FABRICA_NOMBRE, fabricaNombre);
 }
 function guardarMostrarPlanillaAnterior(){
@@ -1316,16 +1334,24 @@ function aplicarTamanoImpresion(overrideSizeCss, overrideMargin, esTicket){
   sheet.classList.toggle('ps-size-chico', !esTicket && printSize === 'chico');
   sheet.classList.toggle('ps-ticket', !!esTicket);
 }
-/* Imprime el contenido armado y, de paso, vacía momentáneamente el título de la
-   página para que el renglón que agrega el navegador (fecha/hora/título) en el
-   encabezado/pie de impresión salga lo más limpio posible. El navegador puede
-   seguir agregando fecha y hora por su cuenta: para sacarlas del todo hay que
-   desactivar "Encabezados y pies de página" en el cuadro de diálogo de impresión. */
-function imprimirDocumento(html, sizeCss, margin, esTicket){
+/* Sanitiza un texto para usarlo como nombre de archivo sugerido al "Guardar como PDF":
+   saca caracteres inválidos y espacios. */
+function sanitizeNombreArchivo(s){
+  return String(s||'documento')
+    .replace(/[\\/:*?"<>|]/g,'')
+    .replace(/\s+/g,'_')
+    .trim() || 'documento';
+}
+/* Imprime el contenido armado. Si se pasa nombreArchivo, se usa como título de la
+   página mientras dura la impresión: la mayoría de los navegadores lo usan como
+   nombre sugerido al elegir "Guardar como PDF". El navegador puede seguir agregando
+   fecha/hora/título en encabezado o pie de página física: para sacarlos del todo hay
+   que desactivar "Encabezados y pies de página" en el cuadro de diálogo de impresión. */
+function imprimirDocumento(html, sizeCss, margin, esTicket, nombreArchivo){
   document.getElementById('printSheet').innerHTML = html;
   aplicarTamanoImpresion(sizeCss, margin, esTicket);
   const tituloOriginal = document.title;
-  document.title = ' ';
+  document.title = nombreArchivo ? sanitizeNombreArchivo(nombreArchivo) : ' ';
   const restaurarTitulo = ()=>{
     document.title = tituloOriginal;
     window.removeEventListener('afterprint', restaurarTitulo);
@@ -1470,6 +1496,33 @@ function quickNavIr(target){
   }
   ejecutarQuickNav(target);
 }
+/* =========================================================
+   BARRA HORIZONTAL (Inicio / Cobranza / Pedidos / Catálogos)
+   Se muestra solo en las 4 pantallas "home" de cada sección;
+   reutiliza quickNavIr() para respetar el aviso de cambios sin grabar.
+   ========================================================= */
+const HNAV_ITEMS = [
+  {target:'menu', label:'Inicio', view:'view-menu'},
+  {target:'cobranza', label:'Cobranza', view:'view-cobranza-menu'},
+  {target:'pedidos', label:'Pedidos', view:'view-pedidos-home'},
+  {target:'catalogos', label:'Catálogos', view:'view-catalogos'}
+];
+function inicializarHNav(){
+  HNAV_ITEMS.forEach(activo=>{
+    const view = document.getElementById(activo.view);
+    if(!view || view.querySelector(':scope > .hnav')) return;
+    const tb = view.querySelector(':scope > .topbar');
+    if(!tb) return;
+    const bar = document.createElement('div');
+    bar.className = 'hnav';
+    bar.innerHTML = HNAV_ITEMS.map(it=>
+      `<button type="button" class="hnav-item ${it.target===activo.target?'active':''}" onclick="quickNavIr('${it.target}')">
+        <span class="hnav-lbl">${it.label}</span>
+      </button>`
+    ).join('');
+    tb.insertAdjacentElement('afterend', bar);
+  });
+}
 function inicializarQuickNav(){
   document.querySelectorAll('.view').forEach(view=>{
     if(view.id === 'view-setup') return;
@@ -1515,6 +1568,7 @@ function renderMenu(){
 function renderExportBanner(){
   const banner = document.getElementById('exportBanner');
   const txt = document.getElementById('exportBannerTxt');
+  if(exportAvisoDesactivado){ banner.style.display = 'none'; return; }
   const hayDatos = planillas.length > 0 || pedidos.length > 0;
   if(!hayDatos){ banner.style.display = 'none'; return; }
   const last = localStorage.getItem(LS_LAST_EXPORT);
@@ -1530,6 +1584,11 @@ function renderExportBanner(){
   }else{
     banner.style.display = 'none';
   }
+}
+function guardarExportAviso(){
+  exportAvisoDesactivado = document.getElementById('chkExportAvisoOff').checked;
+  localStorage.setItem(LS_EXPORT_AVISO_OFF, exportAvisoDesactivado ? '1' : '0');
+  renderExportBanner();
 }
 function marcarUltimaExportacion(){
   localStorage.setItem(LS_LAST_EXPORT, String(Date.now()));
@@ -2389,7 +2448,7 @@ function renderPlanGenDetalle(){
   box.innerHTML = `
     <div class="header-card">
       <div class="pc-meta">Fecha: ${escapeHtml(pg.fecha||'')}</div>
-      <div class="pc-meta">Empresa: ${escapeHtml(pg.fabricaCodigo||'')} ${escapeHtml(pg.fabricaNombre||'')}</div>
+      <div class="pc-meta">Empresa: ${escapeHtml(pg.fabricaNombre||'')}</div>
     </div>
     <div class="section-title">Recibos incluidos</div>
   ` + recibosIncl.map(r=>`
@@ -2491,7 +2550,7 @@ function buildPlanillaGeneradaPrintHTML(pg){
 function imprimirPlanillaGenerada(){
   const pg = currentPlanillaGenerada();
   if(!pg) return;
-  imprimirDocumento(buildPlanillaGeneradaPrintHTML(pg));
+  imprimirDocumento(buildPlanillaGeneradaPrintHTML(pg), null, null, false, 'PLA'+puntoVenta+pg.numero);
 }
 function empresaLineHTML(){
   return fabricaNombre ? `<div class="ps-empresa">${escapeHtml(fabricaNombre)}</div>` : '';
@@ -2543,14 +2602,14 @@ function imprimirReciboTicket(){
   const r = currentRecibo();
   if(!r) return;
   persistCurrentReciboHeader();
-  imprimirDocumento(buildReciboTicketHTML(r), '55mm auto', '2mm', true);
+  imprimirDocumento(buildReciboTicketHTML(r), '55mm auto', '2mm', true, 'Rec'+puntoVenta+r.numero);
 }
 /* Recibo con formato prolijo, pensado para exportar/enviar como PDF por mail */
 function imprimirReciboPDF(){
   const r = currentRecibo();
   if(!r) return;
   persistCurrentReciboHeader();
-  imprimirDocumento(buildReciboPrintHTML(r), 'A4', '10mm', false);
+  imprimirDocumento(buildReciboPrintHTML(r), 'A4', '10mm', false, 'Rec'+puntoVenta+r.numero);
 }
 
 /* =========================================================
@@ -2985,11 +3044,24 @@ function renderCatalogosPublico(){
 /* =========================================================
    IMPORT CSV
    ========================================================= */
+function fmtFechaImport(tipo, cantidad, singular, plural){
+  const cantidadTxt = cantidad + ' ' + (cantidad===1 ? singular : plural);
+  const ts = fechasImportacion[tipo];
+  if(!ts) return cantidadTxt + ' — sin archivo importado';
+  const d = new Date(ts);
+  return cantidadTxt + ' — Archivo del ' + d.toLocaleDateString('es-AR') + ' ' + d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+}
+function marcarFechaImportacion(tipo, fechaArchivo){
+  // guarda la fecha de modificación del propio archivo CSV subido (no la fecha en que
+  // se lo importó), para poder detectar si se está por subir un archivo viejo.
+  fechasImportacion[tipo] = fechaArchivo || Date.now();
+  localStorage.setItem(LS_FECHAS_IMPORTACION, JSON.stringify(fechasImportacion));
+}
 function renderImportCounts(){
-  document.getElementById('countClientes').textContent = clientes.length + ' clientes cargados';
-  document.getElementById('countTransportes').textContent = transportes.length + ' transportes cargados';
-  document.getElementById('countVendedores').textContent = vendedores.length + ' vendedores cargados';
-  document.getElementById('countArticulos').textContent = articulos.length + ' artículos cargados';
+  document.getElementById('countClientes').textContent = fmtFechaImport('clientes', clientes.length, 'cliente', 'clientes');
+  document.getElementById('countTransportes').textContent = fmtFechaImport('transportes', transportes.length, 'transporte', 'transportes');
+  document.getElementById('countVendedores').textContent = fmtFechaImport('vendedores', vendedores.length, 'vendedor', 'vendedores');
+  document.getElementById('countArticulos').textContent = fmtFechaImport('articulos', articulos.length, 'artículo', 'artículos');
   document.getElementById('vendedorActual').textContent = 'Código: ' + (vendedorCodigo || '-') + (vendedorNombre ? ' - ' + vendedorNombre : '');
   document.getElementById('countPlanillasExport').textContent = planillas.length + ' planillas guardadas';
   document.getElementById('countPedidosExport').textContent = pedidos.length + ' pedidos guardados';
@@ -3142,6 +3214,16 @@ function parseArticulosCSV(text){
 function importarCSV(evt, tipo){
   const file = evt.target.files[0];
   if(!file) return;
+  const fechaArchivo = file.lastModified || Date.now();
+  const fechaPrevia = fechasImportacion[tipo];
+  if(fechaPrevia && fechaArchivo < fechaPrevia){
+    const dPrevia = new Date(fechaPrevia);
+    const dNueva = new Date(fechaArchivo);
+    const fmtP = dPrevia.toLocaleDateString('es-AR') + ' ' + dPrevia.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    const fmtN = dNueva.toLocaleDateString('es-AR') + ' ' + dNueva.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    const continuar = confirm('⚠️ El archivo que elegiste es del ' + fmtN + ', más viejo que el que ya tenés cargado (' + fmtP + '). ¿Importarlo igual?');
+    if(!continuar){ evt.target.value = ''; return; }
+  }
   const reader = new FileReader();
   reader.onload = function(e){
     if(tipo === 'articulos'){
@@ -3152,6 +3234,7 @@ function importarCSV(evt, tipo){
       }
       articulos = rows;
       saveJSON(LS.articulos, articulos);
+      marcarFechaImportacion('articulos', fechaArchivo);
       renderImportCounts();
       toast(rows.length + ' artículos importados');
       evt.target.value = '';
@@ -3172,6 +3255,7 @@ function importarCSV(evt, tipo){
       vendedores = rows;
       saveJSON(LS.vendedores, vendedores);
     }
+    marcarFechaImportacion(tipo, fechaArchivo);
     renderImportCounts();
     toast(rows.length + ' registros importados');
   };
@@ -3189,7 +3273,9 @@ function descargarRespaldo(){
     clientes, transportes, vendedores, articulos, planillas, pedidos, catalogos,
     recibos, planillasGeneradas,
     vendedorCodigo, vendedorNombre,
-    puntoVenta, fabricaCodigo, fabricaNombre, mostrarPlanillaAnterior, printSize, printUnoPorHoja
+    puntoVenta, fabricaCodigo, fabricaNombre, mostrarPlanillaAnterior, printSize, printUnoPorHoja,
+    exportAvisoDesactivado,
+    fechasImportacion
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -3242,6 +3328,14 @@ function restaurarRespaldo(evt){
       if(data.fabricaCodigo !== undefined){ fabricaCodigo = data.fabricaCodigo; localStorage.setItem(LS_FABRICA_CODIGO, fabricaCodigo); }
       if(data.fabricaNombre !== undefined){ fabricaNombre = data.fabricaNombre; localStorage.setItem(LS_FABRICA_NOMBRE, fabricaNombre); }
       if(data.printSize){ printSize = data.printSize; localStorage.setItem(LS_PRINT_SIZE, printSize); }
+      if(data.exportAvisoDesactivado !== undefined){
+        exportAvisoDesactivado = !!data.exportAvisoDesactivado;
+        localStorage.setItem(LS_EXPORT_AVISO_OFF, exportAvisoDesactivado ? '1' : '0');
+      }
+      if(data.fechasImportacion && typeof data.fechasImportacion === 'object'){
+        fechasImportacion = data.fechasImportacion;
+        localStorage.setItem(LS_FECHAS_IMPORTACION, JSON.stringify(fechasImportacion));
+      }
       renderImportCounts();
       renderAjustesConfig();
       renderCatalogosAjustes();
@@ -3302,7 +3396,7 @@ function imprimirPlanilla(){
   const p = currentPlanilla();
   if(!p) return;
   persistCurrentHeader();
-  imprimirDocumento(buildPlanillaPrintHTML(p));
+  imprimirDocumento(buildPlanillaPrintHTML(p), null, null, false, 'PLA'+puntoVenta+p.numero);
 }
 
 /* =========================================================
@@ -3352,7 +3446,7 @@ function imprimirPedido(){
   const p = currentPedido();
   if(!p) return;
   persistCurrentPedidoHeader();
-  imprimirDocumento(buildPedidoPrintHTML(p));
+  imprimirDocumento(buildPedidoPrintHTML(p), null, null, false, 'Ped'+puntoVenta+p.numero);
 }
 function imprimirPedidosSeleccionados(){
   if(pedidosSeleccionados.size === 0){
@@ -3366,7 +3460,12 @@ function imprimirPedidosSeleccionados(){
   const unoPorHoja = printUnoPorHoja;
   const blockClass = unoPorHoja ? 'ps-block' : 'ps-block-multi';
   const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass)).join('');
-  imprimirDocumento(html);
+  const ahora = new Date();
+  const dd = String(ahora.getDate()).padStart(2,'0');
+  const mm = String(ahora.getMonth()+1).padStart(2,'0');
+  const hh = String(ahora.getHours()).padStart(2,'0');
+  const mi = String(ahora.getMinutes()).padStart(2,'0');
+  imprimirDocumento(html, null, null, false, 'P'+dd+mm+hh+mi);
 }
 
 /* =========================================================
@@ -3388,6 +3487,7 @@ if(!vendedorCodigo){
 renderMenu();
 renderImportCounts();
 inicializarQuickNav();
+inicializarHNav();
 
 // registra el service worker (solo tiene efecto publicado en GitHub Pages,
 // no al abrir el archivo directamente desde el celular/PC)
