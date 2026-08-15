@@ -122,8 +122,30 @@
   .ac-item.freeform{color:var(--plum); font-style:italic;}
   .ac-selected{margin-top:6px; font-size:13px; color:var(--ink-soft);}
   .ac-selected b{color:var(--ink);}
-  .ac-selected-highlight:not(:empty){background:rgb(214,206,147); color:#3f3b1f; border-radius:8px; padding:8px 10px; font-weight:600;}
-  .ac-selected-highlight:not(:empty) b{color:#3f3b1f;}
+  .ac-selected-highlight{background:rgb(214,206,147); color:#3f3b1f; border-radius:8px; padding:8px 10px; font-weight:600; min-height:16px;}
+  .ac-selected-highlight.vacio{color:#7a7550; font-weight:500; font-style:italic;}
+
+  /* boton buscar (abre pantalla completa) */
+  .field-buscar-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .field-buscar-row label{margin:0;}
+  .btn-buscar-campo{flex-shrink:0; background:var(--olive-light); border:1.5px solid var(--border); border-radius:8px; padding:6px 14px; font-size:13.5px; font-weight:700; color:var(--olive); font-family:inherit; cursor:pointer;}
+  .btn-buscar-campo:active{background:var(--olive);color:var(--white);}
+
+  /* pantalla completa de busqueda (estilo sistema de PC) */
+  .fullscreen-search{position:fixed; inset:0; background:var(--white); z-index:200; display:none; flex-direction:column;}
+  .fullscreen-search.show{display:flex;}
+  .fs-search-header{display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1.5px solid var(--border); background:var(--white); flex-shrink:0;}
+  .fs-search-back{background:none; border:none; font-size:15px; font-weight:700; color:var(--olive); cursor:pointer; padding:6px 4px; font-family:inherit;}
+  .fs-search-title{font-size:16px; font-weight:800; color:var(--ink);}
+  .fs-search-input-wrap{padding:12px 16px; border-bottom:1px solid var(--border); flex-shrink:0;}
+  .fs-search-input-wrap input{width:100%; padding:12px 13px; border:1.5px solid var(--border); border-radius:10px; font-size:15px; font-family:inherit;}
+  .fs-search-results{flex:1; overflow-y:auto; padding:4px 0;}
+  .fs-search-item{padding:13px 16px; font-size:14.5px; border-bottom:1px solid var(--border); cursor:pointer;}
+  .fs-search-item:active{background:var(--olive-light);}
+  .fs-search-item .code{color:var(--olive); font-weight:700; margin-right:8px;}
+  .fs-search-item.freeform{color:var(--plum); font-style:italic;}
+  .fs-search-empty{padding:30px 16px; text-align:center; color:var(--ink-soft); font-size:14px;}
+  .ac-selected-highlight b{color:#3f3b1f;}
 
   /* ---------- Grid de renglones ---------- */
   .section-title{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft); margin:20px 0 8px;}
@@ -154,13 +176,11 @@
   .seg-opt.active{background:var(--olive); border-color:var(--olive); color:var(--white);}
 
   /* ---------- Modal ---------- */
-  .modal-backdrop{position:fixed; inset:0; background:rgba(43,37,48,0.5); display:none; align-items:flex-end; justify-content:center; z-index:100;}
+  /* Anclados arriba (no abajo) para que, al escribir en un campo, el teclado
+     del celular no termine tapando el modal ni los campos de mas abajo. */
+  .modal-backdrop{position:fixed; inset:0; background:rgba(43,37,48,0.5); display:none; align-items:flex-start; justify-content:center; z-index:100; overflow-y:auto; padding:5vh 0 16px;}
   .modal-backdrop.show{display:flex;}
-  .modal{background:var(--white); width:100%; max-width:520px; border-radius:18px 18px 0 0; padding:20px; max-height:92vh; overflow-y:auto; animation:slideUp 0.18s ease-out;}
-  @media (min-width:600px){
-    .modal-backdrop{align-items:center;}
-    .modal{border-radius:18px;}
-  }
+  .modal{background:var(--white); width:100%; max-width:520px; border-radius:18px; padding:20px; max-height:88vh; overflow-y:auto; animation:slideUp 0.18s ease-out; margin:0 12px;}
   @keyframes slideUp{from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
   .modal h2{margin:0 0 16px; font-size:18px; color:var(--plum-dark);}
   .modal p.modal-desc{font-size:13.5px; color:var(--ink-soft); margin:-10px 0 16px; line-height:1.5;}
@@ -261,6 +281,8 @@
     table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
     table.ps-pedido-table{margin-bottom:4px;}
     table.ps-pedido-table th, table.ps-pedido-table td{padding-left:5px; padding-right:5px;}
+    /* Encabezado de columnas mas chico y sin salto de linea (para que "Bonif %" entre en una sola linea) */
+    table.ps-pedido-table th{font-size:9px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
     /* Cantidad: se deja espacio extra a la derecha para poder anotar los kilos a mano */
     table.ps-pedido-table th:nth-child(1), table.ps-pedido-table td:nth-child(1){padding-right:26px;}
     /* Código más pegado a Descripción */
@@ -322,6 +344,11 @@
   .ajustes-section[open] > summary{border-radius:14px 14px 0 0; box-shadow:none; border-bottom:none;}
   .ajustes-section-body{background:var(--white); border:1px solid var(--border); border-top:none; border-radius:0 0 14px 14px; padding:16px 18px 4px;}
 
+  /* config de impresion por tipo de documento */
+  .print-config-block{padding-bottom:14px; margin-bottom:14px; border-bottom:1px solid var(--border);}
+  .print-config-block:last-child{border-bottom:none; margin-bottom:0;}
+  .print-config-block .section-subtitle{margin-top:0;}
+
   /* ---------- Pedidos: resaltar agregar articulo ---------- */
   .btn-agregar-articulo{background:rgb(214,206,147); color:#3f3b1f; font-size:15px; font-weight:800;}
   .btn-agregar-articulo:active{background:rgb(190,182,123);}
@@ -351,10 +378,11 @@
         <p style="margin:0 0 16px; font-size:14px; color:var(--ink-soft); line-height:1.5;">
           Antes de empezar, elegí el vendedor que va a usar esta tablet. Se guarda una sola vez y se aplica automáticamente a todas las planillas y pedidos.
         </p>
-        <div class="field ac-wrap">
-          <label>Vendedor</label>
-          <input type="text" id="setup_vendedor_input" placeholder="Buscar código o nombre..." oninput="buscarVendedorSetup()" onfocus="buscarVendedorSetup()">
-          <div class="ac-list" id="setupVendedorList"></div>
+        <div class="field">
+          <div class="field-buscar-row">
+            <label>Vendedor</label>
+            <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('vendedor', seleccionarVendedorSetup, {freeform:{onUse:usarVendedorSetupLibre, label:function(t){return '+ Usar código &quot;'+t+'&quot;';}}})">Buscar</button>
+          </div>
           <div class="ac-selected ac-selected-highlight" id="setupVendedorSelected"></div>
         </div>
         <div class="import-note" id="setupVendedorNote" style="display:none;">
@@ -510,10 +538,11 @@
             <input type="date" id="p_fecha">
           </div>
         </div>
-        <div class="field ac-wrap">
-          <label>Transporte</label>
-          <input type="text" id="p_transporte_input" placeholder="Buscar código o nombre..." oninput="buscarTransporte()" onfocus="buscarTransporte()">
-          <div class="ac-list" id="transporteList"></div>
+        <div class="field">
+          <div class="field-buscar-row">
+            <label>Transporte</label>
+            <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporte)">Buscar</button>
+          </div>
           <div class="ac-selected ac-selected-highlight" id="transporteSelected"></div>
         </div>
       </div>
@@ -586,16 +615,18 @@
             <input type="date" id="rc_fecha">
           </div>
         </div>
-        <div class="field ac-wrap">
-          <label>Cliente</label>
-          <input type="text" id="rc_cliente_input" placeholder="Buscar código o nombre..." oninput="buscarClienteRecibo()" onfocus="buscarClienteRecibo()">
-          <div class="ac-list" id="rcClienteList"></div>
+        <div class="field">
+          <div class="field-buscar-row">
+            <label>Cliente</label>
+            <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClienteRecibo)">Buscar</button>
+          </div>
           <div class="ac-selected ac-selected-highlight" id="rcClienteSelected"></div>
         </div>
-        <div class="field ac-wrap">
-          <label>Transporte</label>
-          <input type="text" id="rc_transporte_input" placeholder="Buscar código o nombre..." oninput="buscarTransporteRecibo()" onfocus="buscarTransporteRecibo()">
-          <div class="ac-list" id="rcTransporteList"></div>
+        <div class="field">
+          <div class="field-buscar-row">
+            <label>Transporte</label>
+            <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporteRecibo)">Buscar</button>
+          </div>
           <div class="ac-selected ac-selected-highlight" id="rcTransporteSelected"></div>
         </div>
         <div class="field" style="margin-bottom:0;">
@@ -732,10 +763,11 @@
             <input type="date" id="ped_fecha">
           </div>
         </div>
-        <div class="field ac-wrap">
-          <label>Cliente</label>
-          <input type="text" id="ped_cliente_input" placeholder="Buscar código o nombre..." oninput="buscarClientePedido()" onfocus="buscarClientePedido()">
-          <div class="ac-list" id="pedClienteList"></div>
+        <div class="field">
+          <div class="field-buscar-row">
+            <label>Cliente</label>
+            <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClientePedido)">Buscar</button>
+          </div>
           <div class="ac-selected ac-selected-highlight" id="pedClienteSelected"></div>
         </div>
         <div class="field">
@@ -891,10 +923,11 @@
             <h3>Vendedor de esta tablet</h3>
             <p>Se usa para identificar todas las planillas y pedidos cargados acá.</p>
             <div class="count-pill" id="vendedorActual">Código: -</div>
-            <div class="field ac-wrap" style="margin-top:12px;">
-              <label>Cambiar vendedor</label>
-              <input type="text" id="edit_vendedor_input" placeholder="Buscar código o nombre..." oninput="buscarVendedorEdit()" onfocus="buscarVendedorEdit()">
-              <div class="ac-list" id="editVendedorList"></div>
+            <div class="field" style="margin-top:12px;">
+              <div class="field-buscar-row">
+                <label>Cambiar vendedor</label>
+                <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('vendedor', seleccionarVendedorEdit, {freeform:{onUse:usarVendedorEditLibre, label:function(t){return '+ Usar código &quot;'+t+'&quot;';}}})">Buscar</button>
+              </div>
               <div class="ac-selected ac-selected-highlight" id="editVendedorSelected"></div>
             </div>
             <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="guardarVendedorEdit()">Guardar cambio de vendedor</button>
@@ -905,26 +938,110 @@
       <details class="ajustes-section">
         <summary>Impresión</summary>
         <div class="ajustes-section-body">
-          <div class="field">
-            <label>Tamaño de hoja</label>
-            <div class="segmented" id="printSizeSegmented">
-              <div class="seg-opt active" data-printsize="a4" onclick="setTamanoImpresion('a4')">A4</div>
-              <div class="seg-opt" data-printsize="carta" onclick="setTamanoImpresion('carta')">Carta</div>
-              <div class="seg-opt" data-printsize="chico" onclick="setTamanoImpresion('chico')">Chico / Ticket</div>
+
+          <div class="print-config-block">
+            <div class="section-title">Recibos (PDF)</div>
+            <div class="field">
+              <label>Tamaño de hoja</label>
+              <div class="segmented" id="printSizeSeg_recibos">
+                <div class="seg-opt" data-size="a4" onclick="setTamanoImpresionTipo('recibos','a4')">A4</div>
+                <div class="seg-opt" data-size="carta" onclick="setTamanoImpresionTipo('recibos','carta')">Carta</div>
+                <div class="seg-opt" data-size="chico" onclick="setTamanoImpresionTipo('recibos','chico')">Chico</div>
+                <div class="seg-opt" data-size="personalizado" onclick="setTamanoImpresionTipo('recibos','personalizado')">Personalizado</div>
+              </div>
+            </div>
+            <div class="row2" id="printPersonalizado_recibos" style="display:none;">
+              <div class="field">
+                <label>Ancho (mm)</label>
+                <input type="number" id="printAncho_recibos" inputmode="numeric" placeholder="Ej: 210" oninput="guardarPersonalizadoImpresion('recibos')">
+              </div>
+              <div class="field">
+                <label>Alto (mm, vacío = auto)</label>
+                <input type="number" id="printAlto_recibos" inputmode="numeric" placeholder="Automático" oninput="guardarPersonalizadoImpresion('recibos')">
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Margen</label>
+              <div class="segmented" id="printMargenSeg_recibos">
+                <div class="seg-opt" data-margen="normal" onclick="setMargenImpresionTipo('recibos','normal')">Normal</div>
+                <div class="seg-opt" data-margen="estrecho" onclick="setMargenImpresionTipo('recibos','estrecho')">Estrecho</div>
+              </div>
             </div>
           </div>
-          <div class="toggle-row" id="rowUnoPorHoja">
-            <div class="tr-txt">Un pedido por hoja al imprimir varios</div>
-            <label class="switch">
-              <input type="checkbox" id="chkUnoPorHoja" onchange="guardarUnoPorHoja()">
-              <span class="slider"></span>
-            </label>
+
+          <div class="print-config-block">
+            <div class="section-title">Pedidos</div>
+            <div class="field">
+              <label>Tamaño de hoja</label>
+              <div class="segmented" id="printSizeSeg_pedidos">
+                <div class="seg-opt" data-size="a4" onclick="setTamanoImpresionTipo('pedidos','a4')">A4</div>
+                <div class="seg-opt" data-size="carta" onclick="setTamanoImpresionTipo('pedidos','carta')">Carta</div>
+                <div class="seg-opt" data-size="chico" onclick="setTamanoImpresionTipo('pedidos','chico')">Chico</div>
+                <div class="seg-opt" data-size="personalizado" onclick="setTamanoImpresionTipo('pedidos','personalizado')">Personalizado</div>
+              </div>
+            </div>
+            <div class="row2" id="printPersonalizado_pedidos" style="display:none;">
+              <div class="field">
+                <label>Ancho (mm)</label>
+                <input type="number" id="printAncho_pedidos" inputmode="numeric" placeholder="Ej: 210" oninput="guardarPersonalizadoImpresion('pedidos')">
+              </div>
+              <div class="field">
+                <label>Alto (mm, vacío = auto)</label>
+                <input type="number" id="printAlto_pedidos" inputmode="numeric" placeholder="Automático" oninput="guardarPersonalizadoImpresion('pedidos')">
+              </div>
+            </div>
+            <div class="field">
+              <label>Margen</label>
+              <div class="segmented" id="printMargenSeg_pedidos">
+                <div class="seg-opt" data-margen="normal" onclick="setMargenImpresionTipo('pedidos','normal')">Normal</div>
+                <div class="seg-opt" data-margen="estrecho" onclick="setMargenImpresionTipo('pedidos','estrecho')">Estrecho</div>
+              </div>
+            </div>
+            <div class="toggle-row" id="rowUnoPorHoja" style="margin-top:6px;">
+              <div class="tr-txt">Un pedido por hoja al imprimir varios</div>
+              <label class="switch">
+                <input type="checkbox" id="chkUnoPorHoja" onchange="guardarUnoPorHoja()">
+                <span class="slider"></span>
+              </label>
+            </div>
           </div>
+
+          <div class="print-config-block">
+            <div class="section-title">Planillas</div>
+            <div class="field">
+              <label>Tamaño de hoja</label>
+              <div class="segmented" id="printSizeSeg_planillas">
+                <div class="seg-opt" data-size="a4" onclick="setTamanoImpresionTipo('planillas','a4')">A4</div>
+                <div class="seg-opt" data-size="carta" onclick="setTamanoImpresionTipo('planillas','carta')">Carta</div>
+                <div class="seg-opt" data-size="chico" onclick="setTamanoImpresionTipo('planillas','chico')">Chico</div>
+                <div class="seg-opt" data-size="personalizado" onclick="setTamanoImpresionTipo('planillas','personalizado')">Personalizado</div>
+              </div>
+            </div>
+            <div class="row2" id="printPersonalizado_planillas" style="display:none;">
+              <div class="field">
+                <label>Ancho (mm)</label>
+                <input type="number" id="printAncho_planillas" inputmode="numeric" placeholder="Ej: 210" oninput="guardarPersonalizadoImpresion('planillas')">
+              </div>
+              <div class="field">
+                <label>Alto (mm, vacío = auto)</label>
+                <input type="number" id="printAlto_planillas" inputmode="numeric" placeholder="Automático" oninput="guardarPersonalizadoImpresion('planillas')">
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Margen</label>
+              <div class="segmented" id="printMargenSeg_planillas">
+                <div class="seg-opt" data-margen="normal" onclick="setMargenImpresionTipo('planillas','normal')">Normal</div>
+                <div class="seg-opt" data-margen="estrecho" onclick="setMargenImpresionTipo('planillas','estrecho')">Estrecho</div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </details>
 
       <details class="ajustes-section">
         <summary>Exportar / Importar</summary>
+
         <div class="ajustes-section-body">
           <div class="import-card">
             <h3>Exportar Cobranza</h3>
@@ -991,10 +1108,11 @@
   <div class="modal">
     <h2 id="modalTitle">Carga de conceptos</h2>
 
-    <div class="field ac-wrap">
-      <label>Cliente</label>
-      <input type="text" id="r_cliente_input" placeholder="Buscar código o nombre..." oninput="buscarCliente()" onfocus="buscarCliente()">
-      <div class="ac-list" id="clienteList"></div>
+    <div class="field">
+      <div class="field-buscar-row">
+        <label>Cliente</label>
+        <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarCliente, {freeform:{onUse:usarClienteLibre, label:function(t){return '+ Usar &quot;'+t+'&quot; como cliente varios (000000)';}}})">Buscar</button>
+      </div>
       <div class="ac-selected ac-selected-highlight" id="clienteSelected"></div>
     </div>
 
@@ -1076,11 +1194,12 @@
   <div class="modal">
     <h2 id="modalTitlePedido">Agregar artículo</h2>
 
-    <div class="field ac-wrap">
-      <label>Artículo</label>
-      <input type="text" id="rp_articulo_input" placeholder="Buscar por código o descripción..." oninput="buscarArticulo()" onfocus="buscarArticulo()">
-      <div class="ac-list" id="articuloList"></div>
-      <div class="ac-selected" id="articuloSelected"></div>
+    <div class="field">
+      <div class="field-buscar-row">
+        <label>Artículo</label>
+        <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('articulo', seleccionarArticulo)">Buscar</button>
+      </div>
+      <div class="ac-selected ac-selected-highlight" id="articuloSelected"></div>
     </div>
 
     <div class="row3">
@@ -1154,6 +1273,18 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ================= PANTALLA COMPLETA DE BUSQUEDA ================= -->
+<div class="fullscreen-search" id="fsBusqueda">
+  <div class="fs-search-header">
+    <button type="button" class="fs-search-back" onclick="cerrarBusquedaPantallaCompleta()">‹ Volver</button>
+    <div class="fs-search-title" id="fsBusquedaTitulo">Buscar</div>
+  </div>
+  <div class="fs-search-input-wrap">
+    <input type="text" id="fsBusquedaInput" placeholder="Escribí para buscar..." oninput="filtrarBusquedaPantallaCompleta()">
+  </div>
+  <div class="fs-search-results" id="fsBusquedaResultados"></div>
+</div>
+
 <!-- ================= PRINT SHEET ================= -->
 <div id="printSheet"></div>
 
@@ -1192,6 +1323,7 @@ const LS_FABRICA_NOMBRE = 'cobranzas_fabrica_nombre';
 const LS_MOSTRAR_PLANILLA_ANTERIOR = 'cobranzas_mostrar_planilla_anterior';
 const LS_PRINT_SIZE = 'cobranzas_print_size';
 const LS_PRINT_UNO_POR_HOJA = 'cobranzas_print_uno_por_hoja';
+const LS_PRINT_CONFIG = 'cobranzas_print_config';
 const LS_EXPORT_AVISO_OFF = 'cobranzas_export_aviso_off';
 const LS_FECHAS_IMPORTACION = 'cobranzas_fechas_importacion';
 const TIPO_CODES = {'Efectivo':'EF', 'Cheque':'CH', 'Transferencia':'TR', 'Retención':'RE'};
@@ -1214,6 +1346,27 @@ let fabricaNombre = localStorage.getItem(LS_FABRICA_NOMBRE) || 'Empresa ejemplo'
 let mostrarPlanillaAnterior = localStorage.getItem(LS_MOSTRAR_PLANILLA_ANTERIOR) !== '0';
 let printSize = localStorage.getItem(LS_PRINT_SIZE) || 'a4';
 let printUnoPorHoja = localStorage.getItem(LS_PRINT_UNO_POR_HOJA) === '1';
+/* Configuracion de impresion separada por tipo de documento (recibos/pedidos/planillas).
+   Si el usuario ya tenia un tamaño global configurado (versiones anteriores), se usa
+   como valor inicial para los tres tipos la primera vez. */
+function crearPrintConfigPorDefecto(){
+  const base = {tamano: printSize || 'a4', margen: (printSize === 'chico') ? 'estrecho' : 'normal', anchoPersonalizado:'', altoPersonalizado:''};
+  return {
+    recibos: Object.assign({}, base),
+    pedidos: Object.assign({}, base),
+    planillas: Object.assign({}, base)
+  };
+}
+let printConfig = (function(){
+  try{
+    const guardado = JSON.parse(localStorage.getItem(LS_PRINT_CONFIG) || 'null');
+    if(guardado && guardado.recibos && guardado.pedidos && guardado.planillas) return guardado;
+  }catch(e){}
+  return crearPrintConfigPorDefecto();
+})();
+function guardarPrintConfig(){
+  localStorage.setItem(LS_PRINT_CONFIG, JSON.stringify(printConfig));
+}
 let exportAvisoDesactivado = localStorage.getItem(LS_EXPORT_AVISO_OFF) === '1';
 let fechasImportacion = (function(){
   try{ return JSON.parse(localStorage.getItem(LS_FECHAS_IMPORTACION) || '{}'); }
@@ -1276,6 +1429,115 @@ function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+/* Pinta el recuadro de "seleccionado" de cliente/vendedor/transporte/articulo.
+   El fondo resaltado queda visible siempre (antes y despues de elegir), mostrando
+   un texto tenue de "Sin seleccionar" hasta que haya un valor. */
+function renderSeleccionBox(elId, htmlSeleccionado){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  if(htmlSeleccionado){
+    el.innerHTML = htmlSeleccionado;
+    el.classList.remove('vacio');
+  }else{
+    el.innerHTML = 'Sin seleccionar';
+    el.classList.add('vacio');
+  }
+}
+
+/* =========================================================
+   PANTALLA COMPLETA DE BUSQUEDA (estilo sistema de PC)
+   Reemplaza los buscadores inline de cliente/vendedor/transporte/articulo.
+   Uso: abrirBusquedaPantallaCompleta('cliente', seleccionarCliente, opts)
+   - tipo: 'cliente' | 'vendedor' | 'transporte' | 'articulo'
+   - onSelect: funcion que recibe el codigo elegido (las funciones
+     seleccionarCliente, seleccionarVendedor, etc. ya existentes)
+   - opts.freeform: {onUse(texto)} opcional, para permitir usar texto libre
+     cuando no hay coincidencia exacta (ej: "cliente varios")
+   ========================================================= */
+let fsBusquedaEstado = null;
+const FS_BUSQUEDA_TITULOS = {cliente:'Cliente', vendedor:'Vendedor', transporte:'Transporte', articulo:'Artículo'};
+
+function fsBusquedaDatos(tipo){
+  if(tipo === 'cliente') return clientes;
+  if(tipo === 'vendedor') return vendedores;
+  if(tipo === 'transporte') return transportes;
+  if(tipo === 'articulo') return articulos;
+  return [];
+}
+function abrirBusquedaPantallaCompleta(tipo, onSelect, opts){
+  fsBusquedaEstado = {tipo, onSelect, opts: opts || null};
+  document.getElementById('fsBusquedaTitulo').textContent = 'Buscar ' + (FS_BUSQUEDA_TITULOS[tipo] || '');
+  const input = document.getElementById('fsBusquedaInput');
+  input.value = '';
+  fsRenderResultadosBusqueda('');
+  window.scrollTo(0, 0);
+  document.getElementById('fsBusqueda').classList.add('show');
+  setTimeout(()=>input.focus(), 50);
+}
+function cerrarBusquedaPantallaCompleta(){
+  document.getElementById('fsBusqueda').classList.remove('show');
+  fsBusquedaEstado = null;
+}
+function filtrarBusquedaPantallaCompleta(){
+  fsRenderResultadosBusqueda(document.getElementById('fsBusquedaInput').value);
+}
+function fsRenderResultadosBusqueda(q){
+  if(!fsBusquedaEstado) return;
+  const cont = document.getElementById('fsBusquedaResultados');
+  const qNorm = (q || '').toLowerCase().trim();
+  const tipo = fsBusquedaEstado.tipo;
+  const datos = fsBusquedaDatos(tipo);
+  let matches;
+  if(tipo === 'articulo'){
+    matches = datos.filter(a=>
+      !qNorm ||
+      String(a.codigo).toLowerCase().includes(qNorm) ||
+      String(a.codigoAlt).toLowerCase().includes(qNorm) ||
+      String(a.descripcion).toLowerCase().includes(qNorm)
+    );
+  }else{
+    matches = datos.filter(x=>
+      !qNorm ||
+      String(x.codigo).toLowerCase().includes(qNorm) ||
+      String(x.nombre).toLowerCase().includes(qNorm)
+    );
+  }
+  matches = matches.slice(0, 300);
+  fsBusquedaEstado.matchesActuales = matches;
+  let html = '';
+  const freeform = fsBusquedaEstado.opts && fsBusquedaEstado.opts.freeform;
+  if(freeform && qNorm){
+    html += `<div class="fs-search-item freeform" onclick="fsUsarLibreBusqueda()">${freeform.label ? escapeHtml(freeform.label(document.getElementById('fsBusquedaInput').value)) : '+ Usar "'+escapeHtml(document.getElementById('fsBusquedaInput').value)+'"'}</div>`;
+  }
+  if(matches.length === 0){
+    html += `<div class="fs-search-empty">Sin resultados</div>`;
+  }else if(tipo === 'articulo'){
+    html += matches.map((a,i)=>
+      `<div class="fs-search-item" onclick="fsSeleccionarResultado(${i})"><span class="code">${escapeHtml(a.codigo)}</span>${escapeHtml(a.descripcion)}${a.codigoAlt ? ' <span style="color:var(--ink-soft);">('+escapeHtml(a.codigoAlt)+')</span>' : ''}${a.precio!=='' && a.precio!=null ? ' <span style="color:var(--ink-soft); float:right;">'+fmtMoney(a.precio)+'</span>' : ''}</div>`
+    ).join('');
+  }else{
+    html += matches.map((x,i)=>
+      `<div class="fs-search-item" onclick="fsSeleccionarResultado(${i})"><span class="code">${escapeHtml(x.codigo)}</span>${escapeHtml(x.nombre)}</div>`
+    ).join('');
+  }
+  cont.innerHTML = html;
+}
+function fsSeleccionarResultado(i){
+  if(!fsBusquedaEstado || !fsBusquedaEstado.matchesActuales) return;
+  const item = fsBusquedaEstado.matchesActuales[i];
+  if(!item) return;
+  const onSelect = fsBusquedaEstado.onSelect;
+  cerrarBusquedaPantallaCompleta();
+  if(onSelect) onSelect(item.codigo);
+}
+function fsUsarLibreBusqueda(){
+  if(!fsBusquedaEstado || !fsBusquedaEstado.opts || !fsBusquedaEstado.opts.freeform) return;
+  const texto = document.getElementById('fsBusquedaInput').value.trim();
+  if(!texto) return;
+  const onUse = fsBusquedaEstado.opts.freeform.onUse;
+  cerrarBusquedaPantallaCompleta();
+  if(onUse) onUse(texto);
+}
 function goImport(){
   showView('view-import');
   renderImportCounts();
@@ -1289,13 +1551,33 @@ function renderAjustesConfig(){
   if(fn) fn.value = fabricaNombre;
   const chkPlanAnt = document.getElementById('chkMostrarPlanillaAnterior');
   if(chkPlanAnt) chkPlanAnt.checked = mostrarPlanillaAnterior;
-  document.querySelectorAll('#printSizeSegmented .seg-opt').forEach(el=>{
-    el.classList.toggle('active', el.dataset.printsize === printSize);
-  });
+  ['recibos','pedidos','planillas'].forEach(renderPrintConfigTipo);
   const chkUno = document.getElementById('chkUnoPorHoja');
   if(chkUno) chkUno.checked = printUnoPorHoja;
   const chkAviso = document.getElementById('chkExportAvisoOff');
   if(chkAviso) chkAviso.checked = exportAvisoDesactivado;
+}
+function renderPrintConfigTipo(tipo){
+  const cfg = printConfig[tipo];
+  if(!cfg) return;
+  const segTamano = document.getElementById('printSizeSeg_'+tipo);
+  if(segTamano){
+    segTamano.querySelectorAll('.seg-opt').forEach(el=>{
+      el.classList.toggle('active', el.dataset.size === cfg.tamano);
+    });
+  }
+  const segMargen = document.getElementById('printMargenSeg_'+tipo);
+  if(segMargen){
+    segMargen.querySelectorAll('.seg-opt').forEach(el=>{
+      el.classList.toggle('active', el.dataset.margen === cfg.margen);
+    });
+  }
+  const bloquePersonalizado = document.getElementById('printPersonalizado_'+tipo);
+  if(bloquePersonalizado) bloquePersonalizado.style.display = (cfg.tamano === 'personalizado') ? 'flex' : 'none';
+  const inAncho = document.getElementById('printAncho_'+tipo);
+  if(inAncho) inAncho.value = cfg.anchoPersonalizado || '';
+  const inAlto = document.getElementById('printAlto_'+tipo);
+  if(inAlto) inAlto.value = cfg.altoPersonalizado || '';
 }
 function guardarPuntoVenta(){
   puntoVenta = document.getElementById('pv_punto_venta').value.trim() || '0001';
@@ -1309,29 +1591,66 @@ function guardarMostrarPlanillaAnterior(){
   mostrarPlanillaAnterior = document.getElementById('chkMostrarPlanillaAnterior').checked;
   localStorage.setItem(LS_MOSTRAR_PLANILLA_ANTERIOR, mostrarPlanillaAnterior ? '1' : '0');
 }
-function setTamanoImpresion(size){
-  printSize = size;
-  localStorage.setItem(LS_PRINT_SIZE, size);
-  document.querySelectorAll('#printSizeSegmented .seg-opt').forEach(el=>{
-    el.classList.toggle('active', el.dataset.printsize === size);
-  });
+function setTamanoImpresionTipo(tipo, size){
+  if(!printConfig[tipo]) return;
+  printConfig[tipo].tamano = size;
+  guardarPrintConfig();
+  renderPrintConfigTipo(tipo);
+}
+function setMargenImpresionTipo(tipo, margen){
+  if(!printConfig[tipo]) return;
+  printConfig[tipo].margen = margen;
+  guardarPrintConfig();
+  renderPrintConfigTipo(tipo);
+}
+function guardarPersonalizadoImpresion(tipo){
+  if(!printConfig[tipo]) return;
+  const inAncho = document.getElementById('printAncho_'+tipo);
+  const inAlto = document.getElementById('printAlto_'+tipo);
+  printConfig[tipo].anchoPersonalizado = inAncho ? inAncho.value.trim() : '';
+  printConfig[tipo].altoPersonalizado = inAlto ? inAlto.value.trim() : '';
+  guardarPrintConfig();
 }
 function guardarUnoPorHoja(){
   printUnoPorHoja = document.getElementById('chkUnoPorHoja').checked;
   localStorage.setItem(LS_PRINT_UNO_POR_HOJA, printUnoPorHoja ? '1' : '0');
 }
-function aplicarTamanoImpresion(overrideSizeCss, overrideMargin, esTicket){
+/* Calcula sizeCss/margin/clase-chico a partir de la config de impresion de un tipo
+   de documento ('recibos'|'pedidos'|'planillas'). Devuelve tambien esTicket=false
+   siempre, ya que el ticket angosto de recibo es un formato aparte con su propio boton. */
+function calcularImpresionTipo(tipo){
+  const cfg = printConfig[tipo] || {tamano:'a4', margen:'normal'};
+  let sizeCss;
+  let esChico = false;
+  if(cfg.tamano === 'a4'){
+    sizeCss = 'A4';
+  }else if(cfg.tamano === 'carta'){
+    sizeCss = 'letter';
+  }else if(cfg.tamano === 'chico'){
+    sizeCss = '80mm auto';
+    esChico = true;
+  }else if(cfg.tamano === 'personalizado'){
+    const ancho = (cfg.anchoPersonalizado && Number(cfg.anchoPersonalizado) > 0) ? cfg.anchoPersonalizado+'mm' : '80mm';
+    const alto = (cfg.altoPersonalizado && Number(cfg.altoPersonalizado) > 0) ? cfg.altoPersonalizado+'mm' : 'auto';
+    sizeCss = ancho+' '+alto;
+  }else{
+    sizeCss = 'A4';
+  }
+  const margin = cfg.margen === 'estrecho' ? '3mm' : '10mm';
+  return {sizeCss, margin, esChico};
+}
+function aplicarTamanoImpresion(overrideSizeCss, overrideMargin, esTicket, claseChico){
   let styleTag = document.getElementById('printPageStyle');
   if(!styleTag){
     styleTag = document.createElement('style');
     styleTag.id = 'printPageStyle';
     document.head.appendChild(styleTag);
   }
-  const sizeCss = overrideSizeCss || (printSize === 'a4' ? 'A4' : printSize === 'carta' ? 'letter' : '80mm auto');
-  const margin = overrideMargin || (printSize === 'chico' ? '3mm' : '10mm');
+  const sizeCss = overrideSizeCss || 'A4';
+  const margin = overrideMargin || '10mm';
   styleTag.textContent = '@page{ size:'+sizeCss+'; margin:'+margin+'; }';
   const sheet = document.getElementById('printSheet');
-  sheet.classList.toggle('ps-size-chico', !esTicket && printSize === 'chico');
+  sheet.classList.toggle('ps-size-chico', !esTicket && !!claseChico);
   sheet.classList.toggle('ps-ticket', !!esTicket);
 }
 /* Sanitiza un texto para usarlo como nombre de archivo sugerido al "Guardar como PDF":
@@ -1347,9 +1666,9 @@ function sanitizeNombreArchivo(s){
    nombre sugerido al elegir "Guardar como PDF". El navegador puede seguir agregando
    fecha/hora/título en encabezado o pie de página física: para sacarlos del todo hay
    que desactivar "Encabezados y pies de página" en el cuadro de diálogo de impresión. */
-function imprimirDocumento(html, sizeCss, margin, esTicket, nombreArchivo){
+function imprimirDocumento(html, sizeCss, margin, esTicket, nombreArchivo, claseChico){
   document.getElementById('printSheet').innerHTML = html;
-  aplicarTamanoImpresion(sizeCss, margin, esTicket);
+  aplicarTamanoImpresion(sizeCss, margin, esTicket, claseChico);
   const tituloOriginal = document.title;
   document.title = nombreArchivo ? sanitizeNombreArchivo(nombreArchivo) : ' ';
   const restaurarTitulo = ()=>{
@@ -1614,95 +1933,55 @@ function prepararSetupVendedor(){
   vendedorSeleccionado = null;
   const input = document.getElementById('setup_vendedor_input');
   if(input) input.value = '';
-  const sel = document.getElementById('setupVendedorSelected');
-  if(sel) sel.innerHTML = '';
+  renderSeleccionBox('setupVendedorSelected', '');
 }
 
-function buscarVendedorSetup(){
-  const q = document.getElementById('setup_vendedor_input').value.toLowerCase().trim();
-  const box = document.getElementById('setupVendedorList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = vendedores.filter(v=>
-    v.codigo.toLowerCase().includes(q) || v.nombre.toLowerCase().includes(q)
-  ).slice(0,8);
-  box.innerHTML = matches.length
-    ? matches.map(v=>`<div class="ac-item" onclick="seleccionarVendedorSetup('${v.codigo}')"><span class="code">${escapeHtml(v.codigo)}</span>${escapeHtml(v.nombre)}</div>`).join('')
-    : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados.</div>`;
-  box.classList.add('show');
-}
 function seleccionarVendedorSetup(codigo){
   const v = vendedores.find(x=>x.codigo===codigo);
   if(!v) return;
   vendedorSeleccionado = v;
-  document.getElementById('setupVendedorList').classList.remove('show');
-  document.getElementById('setup_vendedor_input').value = '';
-  document.getElementById('setupVendedorSelected').innerHTML = `Seleccionado: <b>${escapeHtml(v.codigo)} - ${escapeHtml(v.nombre)}</b>`;
+  renderSeleccionBox('setupVendedorSelected', `Seleccionado: <b>${escapeHtml(v.codigo)} - ${escapeHtml(v.nombre)}</b>`);
+}
+function usarVendedorSetupLibre(codigoTexto){
+  if(!codigoTexto) return;
+  vendedorSeleccionado = {codigo: codigoTexto, nombre: ''};
+  renderSeleccionBox('setupVendedorSelected', `Seleccionado: <b>${escapeHtml(codigoTexto)}</b>`);
 }
 function guardarVendedor(){
-  let codigo, nombre;
-  if(vendedores.length > 0){
-    if(!vendedorSeleccionado){
-      toast('Elegí un vendedor de la lista');
-      return;
-    }
-    codigo = vendedorSeleccionado.codigo;
-    nombre = vendedorSeleccionado.nombre;
-  }else{
-    const v = document.getElementById('setup_vendedor_input').value.trim();
-    if(!v){ toast('Ingresá un código de vendedor'); return; }
-    codigo = v;
-    nombre = '';
+  if(!vendedorSeleccionado){
+    toast(vendedores.length > 0 ? 'Elegí un vendedor de la lista' : 'Ingresá un código de vendedor');
+    return;
   }
-  vendedorCodigo = codigo;
-  vendedorNombre = nombre;
-  localStorage.setItem(LS_VENDEDOR, codigo);
-  localStorage.setItem(LS_VENDEDOR_NOMBRE, nombre);
+  vendedorCodigo = vendedorSeleccionado.codigo;
+  vendedorNombre = vendedorSeleccionado.nombre || '';
+  localStorage.setItem(LS_VENDEDOR, vendedorCodigo);
+  localStorage.setItem(LS_VENDEDOR_NOMBRE, vendedorNombre);
   showView('view-menu');
   renderMenu();
 }
 
-function buscarVendedorEdit(){
-  const q = document.getElementById('edit_vendedor_input').value.toLowerCase().trim();
-  const box = document.getElementById('editVendedorList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = vendedores.filter(v=>
-    v.codigo.toLowerCase().includes(q) || v.nombre.toLowerCase().includes(q)
-  ).slice(0,8);
-  box.innerHTML = matches.length
-    ? matches.map(v=>`<div class="ac-item" onclick="seleccionarVendedorEdit('${v.codigo}')"><span class="code">${escapeHtml(v.codigo)}</span>${escapeHtml(v.nombre)}</div>`).join('')
-    : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de vendedores arriba.</div>`;
-  box.classList.add('show');
-}
 function seleccionarVendedorEdit(codigo){
   const v = vendedores.find(x=>x.codigo===codigo);
   if(!v) return;
   vendedorSeleccionadoEdit = v;
-  document.getElementById('editVendedorList').classList.remove('show');
-  document.getElementById('edit_vendedor_input').value = '';
-  document.getElementById('editVendedorSelected').innerHTML = `Seleccionado: <b>${escapeHtml(v.codigo)} - ${escapeHtml(v.nombre)}</b>`;
+  renderSeleccionBox('editVendedorSelected', `Seleccionado: <b>${escapeHtml(v.codigo)} - ${escapeHtml(v.nombre)}</b>`);
+}
+function usarVendedorEditLibre(codigoTexto){
+  if(!codigoTexto) return;
+  vendedorSeleccionadoEdit = {codigo: codigoTexto, nombre: ''};
+  renderSeleccionBox('editVendedorSelected', `Seleccionado: <b>${escapeHtml(codigoTexto)}</b>`);
 }
 function guardarVendedorEdit(){
-  let codigo, nombre;
-  if(vendedores.length > 0){
-    if(!vendedorSeleccionadoEdit){
-      toast('Elegí un vendedor de la lista');
-      return;
-    }
-    codigo = vendedorSeleccionadoEdit.codigo;
-    nombre = vendedorSeleccionadoEdit.nombre;
-  }else{
-    const v = document.getElementById('edit_vendedor_input').value.trim();
-    if(!v){ toast('Ingresá un código de vendedor'); return; }
-    codigo = v;
-    nombre = '';
+  if(!vendedorSeleccionadoEdit){
+    toast(vendedores.length > 0 ? 'Elegí un vendedor de la lista' : 'Ingresá un código de vendedor');
+    return;
   }
-  vendedorCodigo = codigo;
-  vendedorNombre = nombre;
-  localStorage.setItem(LS_VENDEDOR, codigo);
-  localStorage.setItem(LS_VENDEDOR_NOMBRE, nombre);
+  vendedorCodigo = vendedorSeleccionadoEdit.codigo;
+  vendedorNombre = vendedorSeleccionadoEdit.nombre || '';
+  localStorage.setItem(LS_VENDEDOR, vendedorCodigo);
+  localStorage.setItem(LS_VENDEDOR_NOMBRE, vendedorNombre);
   vendedorSeleccionadoEdit = null;
-  document.getElementById('edit_vendedor_input').value = '';
-  document.getElementById('editVendedorSelected').innerHTML = '';
+  renderSeleccionBox('editVendedorSelected', '');
   renderImportCounts();
   toast('Vendedor actualizado');
 }
@@ -1804,10 +2083,8 @@ function abrirPlanilla(id){
   document.getElementById('p_numero').value = p.numero || '';
   document.getElementById('p_fecha').value = p.fecha || '';
   document.getElementById('p_observacion').value = p.observacion || '';
-  document.getElementById('p_transporte_input').value = '';
   transporteSeleccionado = p.transporteCodigo ? {codigo:p.transporteCodigo, nombre:p.transporteNombre} : null;
   renderTransporteSelected();
-  document.getElementById('transporteList').classList.remove('show');
   renderRenglones();
   if(dirtyContext==='planilla') dirtyFlag = false; // se abre limpio salvo que ya estuviera dirty en otro registro
   dirtyFlag = false;
@@ -1896,34 +2173,15 @@ function eliminarPlanilla(){
 /* =========================================================
    AUTOCOMPLETE TRANSPORTE
    ========================================================= */
-function buscarTransporte(){
-  const q = document.getElementById('p_transporte_input').value.toLowerCase().trim();
-  const box = document.getElementById('transporteList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = transportes.filter(t=>
-    t.codigo.toLowerCase().includes(q) || t.nombre.toLowerCase().includes(q)
-  ).slice(0,8);
-  if(matches.length===0){
-    box.innerHTML = `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de transportes desde Ajustes.</div>`;
-  }else{
-    box.innerHTML = matches.map(t=>
-      `<div class="ac-item" onclick="seleccionarTransporte('${t.codigo}')"><span class="code">${escapeHtml(t.codigo)}</span>${escapeHtml(t.nombre)}</div>`
-    ).join('');
-  }
-  box.classList.add('show');
-}
 function seleccionarTransporte(codigo){
   const t = transportes.find(x=>x.codigo===codigo);
   if(!t) return;
   transporteSeleccionado = t;
-  document.getElementById('transporteList').classList.remove('show');
-  document.getElementById('p_transporte_input').value = '';
   renderTransporteSelected();
   persistCurrentHeader();
 }
 function renderTransporteSelected(){
-  const el = document.getElementById('transporteSelected');
-  el.innerHTML = transporteSeleccionado ? `Seleccionado: <b>${escapeHtml(transporteSeleccionado.codigo)} - ${escapeHtml(transporteSeleccionado.nombre)}</b>` : '';
+  renderSeleccionBox('transporteSelected', transporteSeleccionado ? `Seleccionado: <b>${escapeHtml(transporteSeleccionado.codigo)} - ${escapeHtml(transporteSeleccionado.nombre)}</b>` : '');
 }
 
 /* =========================================================
@@ -1933,8 +2191,6 @@ function abrirModalRenglon(){
   editingRenglonId = null;
   document.getElementById('modalTitle').textContent = 'Carga de conceptos';
   document.getElementById('btnEliminarRenglon').style.display = 'none';
-  document.getElementById('r_cliente_input').value = '';
-  document.getElementById('clienteList').classList.remove('show');
   clienteSeleccionado = null;
   renderClienteSelected();
   document.getElementById('r_recibo').value = '';
@@ -1954,39 +2210,19 @@ function setTipo(t){
   });
 }
 
-function buscarCliente(){
-  const q = document.getElementById('r_cliente_input').value.toLowerCase().trim();
-  const box = document.getElementById('clienteList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = clientes.filter(c=>
-    c.codigo.toLowerCase().includes(q) || c.nombre.toLowerCase().includes(q)
-  ).slice(0,8);
-  let html = matches.map(c=>
-    `<div class="ac-item" onclick="seleccionarCliente('${c.codigo}')"><span class="code">${escapeHtml(c.codigo)}</span>${escapeHtml(c.nombre)}</div>`
-  ).join('');
-  html += `<div class="ac-item freeform" onclick="usarClienteLibre()">+ Usar "${escapeHtml(document.getElementById('r_cliente_input').value)}" como cliente varios (000000)</div>`;
-  box.innerHTML = html;
-  box.classList.add('show');
-}
 function seleccionarCliente(codigo){
   const c = clientes.find(x=>x.codigo===codigo);
   if(!c) return;
   clienteSeleccionado = c;
-  document.getElementById('clienteList').classList.remove('show');
-  document.getElementById('r_cliente_input').value = '';
   renderClienteSelected();
 }
-function usarClienteLibre(){
-  const nombre = document.getElementById('r_cliente_input').value.trim();
+function usarClienteLibre(nombre){
   if(!nombre) return;
   clienteSeleccionado = {codigo:'000000', nombre: nombre};
-  document.getElementById('clienteList').classList.remove('show');
-  document.getElementById('r_cliente_input').value = '';
   renderClienteSelected();
 }
 function renderClienteSelected(){
-  const el = document.getElementById('clienteSelected');
-  el.innerHTML = clienteSeleccionado ? `Seleccionado: <b>${escapeHtml(clienteSeleccionado.codigo)} - ${escapeHtml(clienteSeleccionado.nombre)}</b>` : '';
+  renderSeleccionBox('clienteSelected', clienteSeleccionado ? `Seleccionado: <b>${escapeHtml(clienteSeleccionado.codigo)} - ${escapeHtml(clienteSeleccionado.nombre)}</b>` : '');
 }
 
 function editarRenglon(id){
@@ -1997,8 +2233,6 @@ function editarRenglon(id){
   document.getElementById('modalTitle').textContent = 'Editar concepto';
   document.getElementById('btnEliminarRenglon').style.display = 'inline-flex';
   clienteSeleccionado = {codigo:r.clienteCodigo, nombre:r.clienteNombre};
-  document.getElementById('r_cliente_input').value = '';
-  document.getElementById('clienteList').classList.remove('show');
   renderClienteSelected();
   document.getElementById('r_recibo').value = r.nroRecibo || '';
   document.getElementById('r_importe').value = r.importe || '';
@@ -2135,10 +2369,6 @@ function abrirRecibo(id){
   document.getElementById('rc_observacion').value = r.observacion || '';
   rcClienteSeleccionado = r.clienteCodigo ? {codigo:r.clienteCodigo, nombre:r.clienteNombre} : null;
   rcTransporteSeleccionado = r.transporteCodigo ? {codigo:r.transporteCodigo, nombre:r.transporteNombre} : null;
-  document.getElementById('rc_cliente_input').value = '';
-  document.getElementById('rc_transporte_input').value = '';
-  document.getElementById('rcClienteList').classList.remove('show');
-  document.getElementById('rcTransporteList').classList.remove('show');
   renderRcClienteSelected();
   renderRcTransporteSelected();
   renderPagos();
@@ -2226,52 +2456,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 });
 
-/* autocomplete cliente / transporte del recibo */
-function buscarClienteRecibo(){
-  const q = document.getElementById('rc_cliente_input').value.toLowerCase().trim();
-  const box = document.getElementById('rcClienteList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = clientes.filter(c=> c.codigo.toLowerCase().includes(q) || c.nombre.toLowerCase().includes(q)).slice(0,8);
-  box.innerHTML = matches.length
-    ? matches.map(c=>`<div class="ac-item" onclick="seleccionarClienteRecibo('${c.codigo}')"><span class="code">${escapeHtml(c.codigo)}</span>${escapeHtml(c.nombre)}</div>`).join('')
-    : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de clientes desde Ajustes.</div>`;
-  box.classList.add('show');
-}
+/* seleccion cliente / transporte del recibo */
 function seleccionarClienteRecibo(codigo){
   const c = clientes.find(x=>x.codigo===codigo);
   if(!c) return;
   rcClienteSeleccionado = c;
-  document.getElementById('rcClienteList').classList.remove('show');
-  document.getElementById('rc_cliente_input').value = '';
   renderRcClienteSelected();
   persistCurrentReciboHeader();
 }
 function renderRcClienteSelected(){
-  const el = document.getElementById('rcClienteSelected');
-  el.innerHTML = rcClienteSeleccionado ? `Seleccionado: <b>${escapeHtml(rcClienteSeleccionado.codigo)} - ${escapeHtml(rcClienteSeleccionado.nombre)}</b>` : '';
-}
-function buscarTransporteRecibo(){
-  const q = document.getElementById('rc_transporte_input').value.toLowerCase().trim();
-  const box = document.getElementById('rcTransporteList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = transportes.filter(t=> t.codigo.toLowerCase().includes(q) || t.nombre.toLowerCase().includes(q)).slice(0,8);
-  box.innerHTML = matches.length
-    ? matches.map(t=>`<div class="ac-item" onclick="seleccionarTransporteRecibo('${t.codigo}')"><span class="code">${escapeHtml(t.codigo)}</span>${escapeHtml(t.nombre)}</div>`).join('')
-    : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de transportes desde Ajustes.</div>`;
-  box.classList.add('show');
+  renderSeleccionBox('rcClienteSelected', rcClienteSeleccionado ? `Seleccionado: <b>${escapeHtml(rcClienteSeleccionado.codigo)} - ${escapeHtml(rcClienteSeleccionado.nombre)}</b>` : '');
 }
 function seleccionarTransporteRecibo(codigo){
   const t = transportes.find(x=>x.codigo===codigo);
   if(!t) return;
   rcTransporteSeleccionado = t;
-  document.getElementById('rcTransporteList').classList.remove('show');
-  document.getElementById('rc_transporte_input').value = '';
   renderRcTransporteSelected();
   persistCurrentReciboHeader();
 }
 function renderRcTransporteSelected(){
-  const el = document.getElementById('rcTransporteSelected');
-  el.innerHTML = rcTransporteSeleccionado ? `Seleccionado: <b>${escapeHtml(rcTransporteSeleccionado.codigo)} - ${escapeHtml(rcTransporteSeleccionado.nombre)}</b>` : '';
+  renderSeleccionBox('rcTransporteSelected', rcTransporteSeleccionado ? `Seleccionado: <b>${escapeHtml(rcTransporteSeleccionado.codigo)} - ${escapeHtml(rcTransporteSeleccionado.nombre)}</b>` : '');
 }
 
 /* modal de pago */
@@ -2550,7 +2754,8 @@ function buildPlanillaGeneradaPrintHTML(pg){
 function imprimirPlanillaGenerada(){
   const pg = currentPlanillaGenerada();
   if(!pg) return;
-  imprimirDocumento(buildPlanillaGeneradaPrintHTML(pg), null, null, false, 'PLA'+puntoVenta+pg.numero);
+  const cfg = calcularImpresionTipo('planillas');
+  imprimirDocumento(buildPlanillaGeneradaPrintHTML(pg), cfg.sizeCss, cfg.margin, false, 'PLA'+puntoVenta+pg.numero, cfg.esChico);
 }
 function empresaLineHTML(){
   return fabricaNombre ? `<div class="ps-empresa">${escapeHtml(fabricaNombre)}</div>` : '';
@@ -2609,7 +2814,8 @@ function imprimirReciboPDF(){
   const r = currentRecibo();
   if(!r) return;
   persistCurrentReciboHeader();
-  imprimirDocumento(buildReciboPrintHTML(r), 'A4', '10mm', false, 'Rec'+puntoVenta+r.numero);
+  const cfg = calcularImpresionTipo('recibos');
+  imprimirDocumento(buildReciboPrintHTML(r), cfg.sizeCss, cfg.margin, false, 'Rec'+puntoVenta+r.numero, cfg.esChico);
 }
 
 /* =========================================================
@@ -2693,10 +2899,8 @@ function abrirPedido(id){
   document.getElementById('ped_numero').value = p.numero || '';
   document.getElementById('ped_fecha').value = p.fecha || '';
   document.getElementById('ped_observacion').value = p.observacion || '';
-  document.getElementById('ped_cliente_input').value = '';
   pedClienteSeleccionado = p.clienteCodigo ? {codigo:p.clienteCodigo, nombre:p.clienteNombre} : null;
   renderPedClienteSelected();
-  document.getElementById('pedClienteList').classList.remove('show');
   renderRenglonesPedido();
   dirtyFlag = false;
   showView('view-pedido');
@@ -2789,34 +2993,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
 /* =========================================================
    AUTOCOMPLETE CLIENTE (pedido)
    ========================================================= */
-function buscarClientePedido(){
-  const q = document.getElementById('ped_cliente_input').value.toLowerCase().trim();
-  const box = document.getElementById('pedClienteList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = clientes.filter(c=>
-    c.codigo.toLowerCase().includes(q) || c.nombre.toLowerCase().includes(q)
-  ).slice(0,8);
-  let html = matches.map(c=>
-    `<div class="ac-item" onclick="seleccionarClientePedido('${c.codigo}')"><span class="code">${escapeHtml(c.codigo)}</span>${escapeHtml(c.nombre)}</div>`
-  ).join('');
-  if(matches.length===0){
-    html = `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de clientes desde Ajustes.</div>`;
-  }
-  box.innerHTML = html;
-  box.classList.add('show');
-}
 function seleccionarClientePedido(codigo){
   const c = clientes.find(x=>x.codigo===codigo);
   if(!c) return;
   pedClienteSeleccionado = c;
-  document.getElementById('pedClienteList').classList.remove('show');
-  document.getElementById('ped_cliente_input').value = '';
   renderPedClienteSelected();
   persistCurrentPedidoHeader();
 }
 function renderPedClienteSelected(){
-  const el = document.getElementById('pedClienteSelected');
-  el.innerHTML = pedClienteSeleccionado ? `Seleccionado: <b>${escapeHtml(pedClienteSeleccionado.codigo)} - ${escapeHtml(pedClienteSeleccionado.nombre)}</b>` : '';
+  renderSeleccionBox('pedClienteSelected', pedClienteSeleccionado ? `Seleccionado: <b>${escapeHtml(pedClienteSeleccionado.codigo)} - ${escapeHtml(pedClienteSeleccionado.nombre)}</b>` : '');
 }
 
 /* =========================================================
@@ -2826,8 +3011,6 @@ function abrirModalRenglonPedido(){
   editingRenglonPedidoId = null;
   document.getElementById('modalTitlePedido').textContent = 'Agregar artículo';
   document.getElementById('btnEliminarRenglonPedido').style.display = 'none';
-  document.getElementById('rp_articulo_input').value = '';
-  document.getElementById('articuloList').classList.remove('show');
   articuloSeleccionado = null;
   renderArticuloSelected();
   document.getElementById('rp_cantidad').value = '';
@@ -2839,41 +3022,21 @@ function cerrarModalRenglonPedido(){
   document.getElementById('modalRenglonPedido').classList.remove('show');
 }
 
-function buscarArticulo(){
-  const q = document.getElementById('rp_articulo_input').value.toLowerCase().trim();
-  const box = document.getElementById('articuloList');
-  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const matches = articulos.filter(a=>
-    String(a.codigo).toLowerCase().includes(q) ||
-    String(a.codigoAlt).toLowerCase().includes(q) ||
-    String(a.descripcion).toLowerCase().includes(q)
-  ).slice(0,8);
-  box.innerHTML = matches.length
-    ? matches.map(a=>
-        `<div class="ac-item" onclick="seleccionarArticulo('${a.codigo}')"><span class="code">${escapeHtml(a.codigo)}</span>${escapeHtml(a.descripcion)} ${a.codigoAlt ? '<span style="color:var(--ink-soft);">('+escapeHtml(a.codigoAlt)+')</span>' : ''} ${a.precio!=='' && a.precio!=null ? '<span style="color:var(--ink-soft); float:right;">'+fmtMoney(a.precio)+'</span>' : ''}</div>`
-      ).join('')
-    : `<div class="ac-item" style="color:var(--ink-soft);">Sin resultados. Importá la tabla de artículos desde Ajustes.</div>`;
-  box.classList.add('show');
-}
 function seleccionarArticulo(codigo){
   const a = articulos.find(x=>String(x.codigo)===String(codigo));
   if(!a) return;
   articuloSeleccionado = a;
-  document.getElementById('articuloList').classList.remove('show');
-  document.getElementById('rp_articulo_input').value = '';
   renderArticuloSelected();
 }
 function renderArticuloSelected(){
-  const el = document.getElementById('articuloSelected');
   const precioInput = document.getElementById('rp_precio');
   if(!articuloSeleccionado){
-    el.innerHTML='';
+    renderSeleccionBox('articuloSelected', '');
     if(precioInput) precioInput.value = '';
     return;
   }
   const tienePrecio = articuloSeleccionado.precio!=='' && articuloSeleccionado.precio!=null;
-  const precioTxt = tienePrecio ? ' <span style="color:var(--ink-soft);">· Precio: '+fmtMoney(articuloSeleccionado.precio)+'</span>' : '';
-  el.innerHTML = `Seleccionado: <b>${escapeHtml(articuloSeleccionado.codigo)} - ${escapeHtml(articuloSeleccionado.descripcion)}</b>${precioTxt}`;
+  renderSeleccionBox('articuloSelected', `Seleccionado: <b>${escapeHtml(articuloSeleccionado.codigo)} - ${escapeHtml(articuloSeleccionado.descripcion)}</b>`);
   if(precioInput) precioInput.value = tienePrecio ? fmtMoney(articuloSeleccionado.precio) : '-';
 }
 
@@ -2887,8 +3050,6 @@ function editarRenglonPedido(id){
   articuloSeleccionado = {codigo:r.artCodigo, codigoAlt:r.artCodigoAlt, descripcion:r.artDescripcion};
   const artActual = articulos.find(x=>String(x.codigo)===String(r.artCodigo));
   if(artActual) articuloSeleccionado.precio = artActual.precio;
-  document.getElementById('rp_articulo_input').value = '';
-  document.getElementById('articuloList').classList.remove('show');
   renderArticuloSelected();
   document.getElementById('rp_cantidad').value = r.cantidad || '';
   document.getElementById('rp_bonificacion').value = r.bonificacion || '';
@@ -3211,6 +3372,23 @@ function parseArticulosCSV(text){
   }
   return rows;
 }
+function decodificarTextoArchivo(arrayBuffer){
+  // Intenta UTF-8 estricto primero; si el archivo no es UTF-8 valido
+  // (tipico de CSV exportados como Windows-1252/ANSI, causa de "muÃ±oz" o "mu?oz"),
+  // reintenta como Windows-1252 para que ñ y tildes se lean bien.
+  try{
+    const decoderUTF8 = new TextDecoder('utf-8', {fatal:true});
+    return decoderUTF8.decode(arrayBuffer);
+  }catch(errUTF8){
+    try{
+      const decoderAnsi = new TextDecoder('windows-1252');
+      return decoderAnsi.decode(arrayBuffer);
+    }catch(errAnsi){
+      // Ultimo recurso: decodificacion permisiva en UTF-8
+      return new TextDecoder('utf-8').decode(arrayBuffer);
+    }
+  }
+}
 function importarCSV(evt, tipo){
   const file = evt.target.files[0];
   if(!file) return;
@@ -3226,8 +3404,9 @@ function importarCSV(evt, tipo){
   }
   const reader = new FileReader();
   reader.onload = function(e){
+    const textoDecodificado = decodificarTextoArchivo(e.target.result);
     if(tipo === 'articulos'){
-      const rows = parseArticulosCSV(e.target.result);
+      const rows = parseArticulosCSV(textoDecodificado);
       if(rows.length === 0){
         toast('No se encontraron filas válidas en el archivo');
         return;
@@ -3240,7 +3419,7 @@ function importarCSV(evt, tipo){
       evt.target.value = '';
       return;
     }
-    const rows = parseCSV(e.target.result);
+    const rows = parseCSV(textoDecodificado);
     if(rows.length === 0){
       toast('No se encontraron filas válidas en el archivo');
       return;
@@ -3259,7 +3438,7 @@ function importarCSV(evt, tipo){
     renderImportCounts();
     toast(rows.length + ' registros importados');
   };
-  reader.readAsText(file, 'UTF-8');
+  reader.readAsArrayBuffer(file);
   evt.target.value = '';
 }
 
@@ -3273,7 +3452,7 @@ function descargarRespaldo(){
     clientes, transportes, vendedores, articulos, planillas, pedidos, catalogos,
     recibos, planillasGeneradas,
     vendedorCodigo, vendedorNombre,
-    puntoVenta, fabricaCodigo, fabricaNombre, mostrarPlanillaAnterior, printSize, printUnoPorHoja,
+    puntoVenta, fabricaCodigo, fabricaNombre, mostrarPlanillaAnterior, printSize, printUnoPorHoja, printConfig,
     exportAvisoDesactivado,
     fechasImportacion
   };
@@ -3328,6 +3507,12 @@ function restaurarRespaldo(evt){
       if(data.fabricaCodigo !== undefined){ fabricaCodigo = data.fabricaCodigo; localStorage.setItem(LS_FABRICA_CODIGO, fabricaCodigo); }
       if(data.fabricaNombre !== undefined){ fabricaNombre = data.fabricaNombre; localStorage.setItem(LS_FABRICA_NOMBRE, fabricaNombre); }
       if(data.printSize){ printSize = data.printSize; localStorage.setItem(LS_PRINT_SIZE, printSize); }
+      if(data.printConfig && data.printConfig.recibos && data.printConfig.pedidos && data.printConfig.planillas){
+        printConfig = data.printConfig;
+      }else if(data.printSize){
+        printConfig = crearPrintConfigPorDefecto();
+      }
+      guardarPrintConfig();
       if(data.exportAvisoDesactivado !== undefined){
         exportAvisoDesactivado = !!data.exportAvisoDesactivado;
         localStorage.setItem(LS_EXPORT_AVISO_OFF, exportAvisoDesactivado ? '1' : '0');
@@ -3396,7 +3581,8 @@ function imprimirPlanilla(){
   const p = currentPlanilla();
   if(!p) return;
   persistCurrentHeader();
-  imprimirDocumento(buildPlanillaPrintHTML(p), null, null, false, 'PLA'+puntoVenta+p.numero);
+  const cfg = calcularImpresionTipo('planillas');
+  imprimirDocumento(buildPlanillaPrintHTML(p), cfg.sizeCss, cfg.margin, false, 'PLA'+puntoVenta+p.numero, cfg.esChico);
 }
 
 /* =========================================================
@@ -3432,9 +3618,9 @@ function buildPedidoPrintHTML(p, blockClass){
       </div>
       <table class="ps-table ps-pedido-table">
         <colgroup>
-          <col style="width:13%"><col style="width:9%"><col style="width:30%"><col style="width:8%"><col style="width:40%">
+          <col style="width:11%"><col style="width:8%"><col style="width:45%"><col style="width:8%"><col style="width:28%">
         </colgroup>
-        <thead><tr><th>Cant.</th><th>Código</th><th>Descripción</th><th>Bonif. %</th><th>Observación</th></tr></thead>
+        <thead><tr><th>Cant.</th><th>Código</th><th>Descripción</th><th>Bonif %</th><th>Observación</th></tr></thead>
         <tbody>${filas}</tbody>
       </table>
       <div class="ps-total ps-total-pedido"><div class="box">Total unidades: ${totalUnidades}</div></div>
@@ -3446,7 +3632,8 @@ function imprimirPedido(){
   const p = currentPedido();
   if(!p) return;
   persistCurrentPedidoHeader();
-  imprimirDocumento(buildPedidoPrintHTML(p), null, null, false, 'Ped'+puntoVenta+p.numero);
+  const cfg = calcularImpresionTipo('pedidos');
+  imprimirDocumento(buildPedidoPrintHTML(p), cfg.sizeCss, cfg.margin, false, 'Ped'+puntoVenta+p.numero, cfg.esChico);
 }
 function imprimirPedidosSeleccionados(){
   if(pedidosSeleccionados.size === 0){
@@ -3465,7 +3652,8 @@ function imprimirPedidosSeleccionados(){
   const mm = String(ahora.getMonth()+1).padStart(2,'0');
   const hh = String(ahora.getHours()).padStart(2,'0');
   const mi = String(ahora.getMinutes()).padStart(2,'0');
-  imprimirDocumento(html, null, null, false, 'P'+dd+mm+hh+mi);
+  const cfg = calcularImpresionTipo('pedidos');
+  imprimirDocumento(html, cfg.sizeCss, cfg.margin, false, 'P'+dd+mm+hh+mi, cfg.esChico);
 }
 
 /* =========================================================
