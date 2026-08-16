@@ -122,8 +122,9 @@
   .ac-item.freeform{color:var(--plum); font-style:italic;}
   .ac-selected{margin-top:6px; font-size:13px; color:var(--ink-soft);}
   .ac-selected b{color:var(--ink);}
-  .ac-selected-highlight{background:rgb(214,206,147); color:#3f3b1f; border-radius:8px; padding:8px 10px; font-weight:600; min-height:16px;}
-  .ac-selected-highlight.vacio{color:#7a7550; font-weight:500; font-style:italic;}
+  .ac-selected-highlight{background:#eef0e2; color:#5d3a5c; border-radius:8px; padding:8px 10px; font-weight:600; min-height:16px; cursor:pointer;}
+  .ac-selected-highlight:active{background:#ddc9dc;}
+  .ac-selected-highlight.vacio{color:#8a6f89; font-weight:500; font-style:italic;}
 
   /* boton buscar (abre pantalla completa) */
   .field-buscar-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
@@ -145,7 +146,7 @@
   .fs-search-item .code{color:var(--olive); font-weight:700; margin-right:8px;}
   .fs-search-item.freeform{color:var(--plum); font-style:italic;}
   .fs-search-empty{padding:30px 16px; text-align:center; color:var(--ink-soft); font-size:14px;}
-  .ac-selected-highlight b{color:#3f3b1f;}
+  .ac-selected-highlight b{color:#5d3a5c;}
 
   /* ---------- Grid de renglones ---------- */
   .section-title{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft); margin:20px 0 8px;}
@@ -254,6 +255,7 @@
     #printSheet{display:block !important;}
     body{background:#fff;}
     #printSheet{font-family:Arial,Helvetica,sans-serif; color:#111; padding:10px; font-size:12px;}
+    #printSheet.ps-texto-rotado{padding:0; overflow:visible;}
     .ps-block{page-break-after:always;}
     .ps-block:last-child{page-break-after:auto;}
     .ps-block-multi{page-break-after:auto; page-break-inside:avoid; border-bottom:2px dashed #999; margin-bottom:16px; padding-bottom:16px;}
@@ -293,7 +295,8 @@
     .ps-total-pedido{margin-bottom:6px;}
     .ps-tipos{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
     .ps-tipos div{background:#f7f5f2; border:1px solid #ddd; border-radius:6px; padding:6px 10px; font-size:11px;}
-    .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:11.5px; min-height:40px;}
+  .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:11.5px; min-height:40px;}
+  .ps-obs-inline{margin-top:6px; font-size:11px; color:#333;}
     .ps-obs-pedido{padding:7px 10px; min-height:auto;}
     .ps-obs .lbl{font-weight:bold; color:#5d3a5c; display:block; margin-bottom:4px; font-size:10px; text-transform:uppercase;}
     #printSheet.ps-size-chico{font-size:9.5px;}
@@ -345,9 +348,20 @@
   .ajustes-section-body{background:var(--white); border:1px solid var(--border); border-top:none; border-radius:0 0 14px 14px; padding:16px 18px 4px;}
 
   /* config de impresion por tipo de documento */
-  .print-config-block{padding-bottom:14px; margin-bottom:14px; border-bottom:1px solid var(--border);}
-  .print-config-block:last-child{border-bottom:none; margin-bottom:0;}
-  .print-config-block .section-subtitle{margin-top:0;}
+  .print-config-block{padding:12px 12px 10px; margin-bottom:10px; border-radius:10px;}
+  .print-config-block:nth-child(odd){background:var(--cream);}
+  .print-config-block:nth-child(even){background:var(--olive-light);}
+  .print-config-block:last-child{margin-bottom:0;}
+  .print-config-block .section-title{margin-top:0; font-size:12px; margin-bottom:8px;}
+  /* campos y controles mas chicos, para que entre todo con menos scroll */
+  .print-config-block .field{margin-bottom:9px;}
+  .print-config-block .field label{font-size:10.5px; margin-bottom:3px;}
+  .print-config-block .field input[type=number]{padding:7px 9px; font-size:13px; border-radius:8px;}
+  .print-config-block .row2{gap:8px;}
+  .print-config-block .segmented{gap:5px;}
+  .print-config-block .seg-opt{padding:6px 4px; font-size:11.5px; min-width:0; border-radius:8px;}
+  .print-config-block .toggle-row{padding:2px 0;}
+  .print-config-block .tr-txt{font-size:12px;}
 
   /* ---------- Pedidos: resaltar agregar articulo ---------- */
   .btn-agregar-articulo{background:rgb(214,206,147); color:#3f3b1f; font-size:15px; font-weight:800;}
@@ -383,7 +397,7 @@
             <label>Vendedor</label>
             <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('vendedor', seleccionarVendedorSetup, {freeform:{onUse:usarVendedorSetupLibre, label:function(t){return '+ Usar código &quot;'+t+'&quot;';}}})">Buscar</button>
           </div>
-          <div class="ac-selected ac-selected-highlight" id="setupVendedorSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="setupVendedorSelected" onclick="abrirBusquedaPantallaCompleta('vendedor', seleccionarVendedorSetup, {freeform:{onUse:usarVendedorSetupLibre, label:function(t){return '+ Usar código &quot;'+t+'&quot;';}}})"></div>
         </div>
         <div class="import-note" id="setupVendedorNote" style="display:none;">
           Todavía no hay una tabla de vendedores importada, así que por ahora el código no se valida. Escribilo directamente en el campo de arriba; más adelante podés importar la tabla desde Ajustes para que quede validado.
@@ -543,7 +557,7 @@
             <label>Transporte</label>
             <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporte)">Buscar</button>
           </div>
-          <div class="ac-selected ac-selected-highlight" id="transporteSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="transporteSelected" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporte)"></div>
         </div>
       </div>
 
@@ -620,14 +634,14 @@
             <label>Cliente</label>
             <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClienteRecibo)">Buscar</button>
           </div>
-          <div class="ac-selected ac-selected-highlight" id="rcClienteSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="rcClienteSelected" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClienteRecibo)"></div>
         </div>
         <div class="field">
           <div class="field-buscar-row">
             <label>Transporte</label>
             <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporteRecibo)">Buscar</button>
           </div>
-          <div class="ac-selected ac-selected-highlight" id="rcTransporteSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="rcTransporteSelected" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporteRecibo)"></div>
         </div>
         <div class="field" style="margin-bottom:0;">
           <label>Comprobantes afectados</label>
@@ -636,8 +650,8 @@
       </div>
 
       <div class="section-title">Pagos</div>
-      <div id="rcPagosList"></div>
       <button class="btn btn-block btn-agregar-pago" onclick="abrirModalPago()">+ Agregar pago</button>
+      <div id="rcPagosList"></div>
 
       <div class="totalbar">
         <div class="lbl">Total</div>
@@ -768,7 +782,7 @@
             <label>Cliente</label>
             <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClientePedido)">Buscar</button>
           </div>
-          <div class="ac-selected ac-selected-highlight" id="pedClienteSelected"></div>
+          <div class="ac-selected ac-selected-highlight" id="pedClienteSelected" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClientePedido)"></div>
         </div>
         <div class="field">
           <label>Observación</label>
@@ -777,12 +791,16 @@
       </div>
 
       <div class="section-title">Artículos</div>
-      <div id="pedRenglonesList"></div>
       <button class="btn btn-block btn-lg btn-agregar-articulo" onclick="abrirModalRenglonPedido()">+ Agregar artículo</button>
+      <div id="pedRenglonesList"></div>
 
       <div class="totalbar pedido-total">
         <div class="lbl">Total artículos</div>
         <div class="val" id="pedTotalVal">0</div>
+      </div>
+      <div class="totalbar pedido-total" style="margin-top:8px;">
+        <div class="lbl">Total pedido</div>
+        <div class="val" id="pedTotalMontoVal">$0</div>
       </div>
 
       <div class="actions-row">
@@ -928,7 +946,7 @@
                 <label>Cambiar vendedor</label>
                 <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('vendedor', seleccionarVendedorEdit, {freeform:{onUse:usarVendedorEditLibre, label:function(t){return '+ Usar código &quot;'+t+'&quot;';}}})">Buscar</button>
               </div>
-              <div class="ac-selected ac-selected-highlight" id="editVendedorSelected"></div>
+              <div class="ac-selected ac-selected-highlight" id="editVendedorSelected" onclick="abrirBusquedaPantallaCompleta('vendedor', seleccionarVendedorEdit, {freeform:{onUse:usarVendedorEditLibre, label:function(t){return '+ Usar código &quot;'+t+'&quot;';}}})"></div>
             </div>
             <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="guardarVendedorEdit()">Guardar cambio de vendedor</button>
           </div>
@@ -958,6 +976,13 @@
               <div class="field">
                 <label>Alto (mm, vacío = auto)</label>
                 <input type="number" id="printAlto_recibos" inputmode="numeric" placeholder="Automático" oninput="guardarPersonalizadoImpresion('recibos')">
+              </div>
+            </div>
+            <div class="field" id="printOrientCampo_recibos" style="display:none;">
+              <label>Orientación de hoja</label>
+              <div class="segmented" id="printOrientSeg_recibos">
+                <div class="seg-opt" data-orient="vertical" onclick="setOrientacionImpresionTipo('recibos','vertical')">Vertical</div>
+                <div class="seg-opt" data-orient="apaisada" onclick="setOrientacionImpresionTipo('recibos','apaisada')">Apaisada</div>
               </div>
             </div>
             <div class="field" style="margin-bottom:0;">
@@ -990,6 +1015,21 @@
                 <input type="number" id="printAlto_pedidos" inputmode="numeric" placeholder="Automático" oninput="guardarPersonalizadoImpresion('pedidos')">
               </div>
             </div>
+            <div class="field" id="printOrientCampo_pedidos" style="display:none;">
+              <label>Orientación de hoja</label>
+              <div class="segmented" id="printOrientSeg_pedidos">
+                <div class="seg-opt" data-orient="vertical" onclick="setOrientacionImpresionTipo('pedidos','vertical')">Vertical</div>
+                <div class="seg-opt" data-orient="apaisada" onclick="setOrientacionImpresionTipo('pedidos','apaisada')">Apaisada</div>
+              </div>
+            </div>
+            <div class="field" id="printTextoRotCampo_pedidos" style="display:none;">
+              <label>Orientación de texto</label>
+              <div class="segmented" id="printTextoRotSeg_pedidos">
+                <div class="seg-opt" data-textrot="normal" onclick="setTextoRotadoImpresionTipo('pedidos', false)">Normal</div>
+                <div class="seg-opt" data-textrot="rotado" onclick="setTextoRotadoImpresionTipo('pedidos', true)">Rotada 90°</div>
+              </div>
+              <div style="font-size:10px; color:var(--ink-soft); margin-top:4px;">Con "Rotada 90°" la hoja se imprime vertical (tal cual entra a la impresora); solo gira el contenido.</div>
+            </div>
             <div class="field">
               <label>Margen</label>
               <div class="segmented" id="printMargenSeg_pedidos">
@@ -1001,6 +1041,13 @@
               <div class="tr-txt">Un pedido por hoja al imprimir varios</div>
               <label class="switch">
                 <input type="checkbox" id="chkUnoPorHoja" onchange="guardarUnoPorHoja()">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row" id="rowHojaBlanco" style="margin-top:6px;">
+              <div class="tr-txt">Intercalar hoja en blanco entre cada pedido</div>
+              <label class="switch">
+                <input type="checkbox" id="chkHojaBlanco" onchange="guardarHojaBlancoIntercalada()">
                 <span class="slider"></span>
               </label>
             </div>
@@ -1113,7 +1160,7 @@
         <label>Cliente</label>
         <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarCliente, {freeform:{onUse:usarClienteLibre, label:function(t){return '+ Usar &quot;'+t+'&quot; como cliente varios (000000)';}}})">Buscar</button>
       </div>
-      <div class="ac-selected ac-selected-highlight" id="clienteSelected"></div>
+      <div class="ac-selected ac-selected-highlight" id="clienteSelected" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarCliente, {freeform:{onUse:usarClienteLibre, label:function(t){return '+ Usar &quot;'+t+'&quot; como cliente varios (000000)';}}})"></div>
     </div>
 
     <div class="row2">
@@ -1199,7 +1246,7 @@
         <label>Artículo</label>
         <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('articulo', seleccionarArticulo)">Buscar</button>
       </div>
-      <div class="ac-selected ac-selected-highlight" id="articuloSelected"></div>
+      <div class="ac-selected ac-selected-highlight" id="articuloSelected" onclick="abrirBusquedaPantallaCompleta('articulo', seleccionarArticulo)"></div>
     </div>
 
     <div class="row3">
@@ -1323,6 +1370,7 @@ const LS_FABRICA_NOMBRE = 'cobranzas_fabrica_nombre';
 const LS_MOSTRAR_PLANILLA_ANTERIOR = 'cobranzas_mostrar_planilla_anterior';
 const LS_PRINT_SIZE = 'cobranzas_print_size';
 const LS_PRINT_UNO_POR_HOJA = 'cobranzas_print_uno_por_hoja';
+const LS_PRINT_HOJA_BLANCO = 'cobranzas_print_hoja_blanco';
 const LS_PRINT_CONFIG = 'cobranzas_print_config';
 const LS_EXPORT_AVISO_OFF = 'cobranzas_export_aviso_off';
 const LS_FECHAS_IMPORTACION = 'cobranzas_fechas_importacion';
@@ -1346,11 +1394,12 @@ let fabricaNombre = localStorage.getItem(LS_FABRICA_NOMBRE) || 'Empresa ejemplo'
 let mostrarPlanillaAnterior = localStorage.getItem(LS_MOSTRAR_PLANILLA_ANTERIOR) !== '0';
 let printSize = localStorage.getItem(LS_PRINT_SIZE) || 'a4';
 let printUnoPorHoja = localStorage.getItem(LS_PRINT_UNO_POR_HOJA) === '1';
+let printHojaBlanco = localStorage.getItem(LS_PRINT_HOJA_BLANCO) === '1';
 /* Configuracion de impresion separada por tipo de documento (recibos/pedidos/planillas).
    Si el usuario ya tenia un tamaño global configurado (versiones anteriores), se usa
    como valor inicial para los tres tipos la primera vez. */
 function crearPrintConfigPorDefecto(){
-  const base = {tamano: printSize || 'a4', margen: (printSize === 'chico') ? 'estrecho' : 'normal', anchoPersonalizado:'', altoPersonalizado:''};
+  const base = {tamano: printSize || 'a4', margen: (printSize === 'chico') ? 'estrecho' : 'normal', anchoPersonalizado:'', altoPersonalizado:'', orientacion:'vertical', textoRotado:false};
   return {
     recibos: Object.assign({}, base),
     pedidos: Object.assign({}, base),
@@ -1360,7 +1409,13 @@ function crearPrintConfigPorDefecto(){
 let printConfig = (function(){
   try{
     const guardado = JSON.parse(localStorage.getItem(LS_PRINT_CONFIG) || 'null');
-    if(guardado && guardado.recibos && guardado.pedidos && guardado.planillas) return guardado;
+    if(guardado && guardado.recibos && guardado.pedidos && guardado.planillas){
+      ['recibos','pedidos','planillas'].forEach(t=>{
+        if(!guardado[t].orientacion) guardado[t].orientacion = 'vertical';
+        if(guardado[t].textoRotado === undefined) guardado[t].textoRotado = false;
+      });
+      return guardado;
+    }
   }catch(e){}
   return crearPrintConfigPorDefecto();
 })();
@@ -1554,6 +1609,8 @@ function renderAjustesConfig(){
   ['recibos','pedidos','planillas'].forEach(renderPrintConfigTipo);
   const chkUno = document.getElementById('chkUnoPorHoja');
   if(chkUno) chkUno.checked = printUnoPorHoja;
+  const chkHoja = document.getElementById('chkHojaBlanco');
+  if(chkHoja) chkHoja.checked = printHojaBlanco;
   const chkAviso = document.getElementById('chkExportAvisoOff');
   if(chkAviso) chkAviso.checked = exportAvisoDesactivado;
 }
@@ -1578,6 +1635,37 @@ function renderPrintConfigTipo(tipo){
   if(inAncho) inAncho.value = cfg.anchoPersonalizado || '';
   const inAlto = document.getElementById('printAlto_'+tipo);
   if(inAlto) inAlto.value = cfg.altoPersonalizado || '';
+  // orientacion: en Pedidos aplica a cualquier tamaño (menos "Chico", pensado para tickets angostos);
+  // en Recibos se mantiene disponible solo con tamaño personalizado.
+  // Si "texto rotado" esta activo, se oculta: la hoja queda vertical a la fuerza
+  // (combinar ambas rotaciones no tiene sentido, ver calcularImpresionTipo).
+  const campoOrient = document.getElementById('printOrientCampo_'+tipo);
+  if(campoOrient){
+    const mostrarOrient = (tipo === 'pedidos')
+      ? (cfg.tamano !== 'chico' && !cfg.textoRotado)
+      : (cfg.tamano === 'personalizado');
+    campoOrient.style.display = mostrarOrient ? 'block' : 'none';
+  }
+  const segOrient = document.getElementById('printOrientSeg_'+tipo);
+  if(segOrient){
+    segOrient.querySelectorAll('.seg-opt').forEach(el=>{
+      el.classList.toggle('active', el.dataset.orient === (cfg.orientacion || 'vertical'));
+    });
+  }
+  // orientacion de TEXTO (independiente de la hoja): solo existe para Pedidos, y solo
+  // tiene sentido si la hoja tiene un alto fijo (no aplica al modo "Chico"/rollo continuo,
+  // ni tampoco a "Personalizado" con alto en automático).
+  const campoTexto = document.getElementById('printTextoRotCampo_'+tipo);
+  if(campoTexto){
+    const altoEsFijo = cfg.tamano !== 'chico' && !(cfg.tamano === 'personalizado' && !cfg.altoPersonalizado);
+    campoTexto.style.display = (tipo === 'pedidos' && altoEsFijo) ? 'block' : 'none';
+  }
+  const segTexto = document.getElementById('printTextoRotSeg_'+tipo);
+  if(segTexto){
+    segTexto.querySelectorAll('.seg-opt').forEach(el=>{
+      el.classList.toggle('active', (el.dataset.textrot === 'rotado') === !!cfg.textoRotado);
+    });
+  }
 }
 function guardarPuntoVenta(){
   puntoVenta = document.getElementById('pv_punto_venta').value.trim() || '0001';
@@ -1603,6 +1691,18 @@ function setMargenImpresionTipo(tipo, margen){
   guardarPrintConfig();
   renderPrintConfigTipo(tipo);
 }
+function setOrientacionImpresionTipo(tipo, orientacion){
+  if(!printConfig[tipo]) return;
+  printConfig[tipo].orientacion = orientacion;
+  guardarPrintConfig();
+  renderPrintConfigTipo(tipo);
+}
+function setTextoRotadoImpresionTipo(tipo, valor){
+  if(!printConfig[tipo]) return;
+  printConfig[tipo].textoRotado = valor;
+  guardarPrintConfig();
+  renderPrintConfigTipo(tipo);
+}
 function guardarPersonalizadoImpresion(tipo){
   if(!printConfig[tipo]) return;
   const inAncho = document.getElementById('printAncho_'+tipo);
@@ -1615,31 +1715,72 @@ function guardarUnoPorHoja(){
   printUnoPorHoja = document.getElementById('chkUnoPorHoja').checked;
   localStorage.setItem(LS_PRINT_UNO_POR_HOJA, printUnoPorHoja ? '1' : '0');
 }
+function guardarHojaBlancoIntercalada(){
+  printHojaBlanco = document.getElementById('chkHojaBlanco').checked;
+  localStorage.setItem(LS_PRINT_HOJA_BLANCO, printHojaBlanco ? '1' : '0');
+}
 /* Calcula sizeCss/margin/clase-chico a partir de la config de impresion de un tipo
    de documento ('recibos'|'pedidos'|'planillas'). Devuelve tambien esTicket=false
-   siempre, ya que el ticket angosto de recibo es un formato aparte con su propio boton. */
+   siempre, ya que el ticket angosto de recibo es un formato aparte con su propio boton.
+   Ademas devuelve el ancho/alto final de la hoja en mm (ya con la orientacion de hoja
+   aplicada) y si corresponde rotar el TEXTO 90° (opcion aparte, solo para pedidos):
+   la hoja se imprime tal cual entra a la impresora, pero el contenido gira 90°
+   independientemente de eso. Util por ejemplo para imprimir en media hoja A4
+   (210x148mm) con el texto saliendo perpendicular. */
 function calcularImpresionTipo(tipo){
   const cfg = printConfig[tipo] || {tamano:'a4', margen:'normal'};
   let sizeCss;
   let esChico = false;
+  let anchoMM, altoMM;
+  // Si "texto rotado" esta activo, la orientacion de HOJA se ignora y queda vertical
+  // a la fuerza: combinar ambas rotaciones (hoja apaisada + texto rotado) no tiene
+  // sentido para el usuario y ademas rompe el calculo del tamaño del bloque rotado.
+  const textoRotadoPedido = (tipo === 'pedidos') && !!cfg.textoRotado;
+  const orientacionEfectiva = textoRotadoPedido ? 'vertical' : cfg.orientacion;
+  const apaisadaSimple = orientacionEfectiva === 'apaisada' ? ' landscape' : '';
   if(cfg.tamano === 'a4'){
-    sizeCss = 'A4';
+    sizeCss = 'A4' + apaisadaSimple;
+    anchoMM = 210; altoMM = 297;
+    if(apaisadaSimple){ const t=anchoMM; anchoMM=altoMM; altoMM=t; }
   }else if(cfg.tamano === 'carta'){
-    sizeCss = 'letter';
+    sizeCss = 'letter' + apaisadaSimple;
+    anchoMM = 215.9; altoMM = 279.4;
+    if(apaisadaSimple){ const t=anchoMM; anchoMM=altoMM; altoMM=t; }
   }else if(cfg.tamano === 'chico'){
     sizeCss = '80mm auto';
     esChico = true;
+    anchoMM = 80; altoMM = null;
   }else if(cfg.tamano === 'personalizado'){
-    const ancho = (cfg.anchoPersonalizado && Number(cfg.anchoPersonalizado) > 0) ? cfg.anchoPersonalizado+'mm' : '80mm';
-    const alto = (cfg.altoPersonalizado && Number(cfg.altoPersonalizado) > 0) ? cfg.altoPersonalizado+'mm' : 'auto';
-    sizeCss = ancho+' '+alto;
+    const anchoNum = (cfg.anchoPersonalizado && Number(cfg.anchoPersonalizado) > 0) ? Number(cfg.anchoPersonalizado) : 80;
+    const altoNum = (cfg.altoPersonalizado && Number(cfg.altoPersonalizado) > 0) ? Number(cfg.altoPersonalizado) : null;
+    // "Apaisada" solo tiene sentido si se definieron ambas medidas (hoja fija);
+    // si el alto quedó en automático (rollo continuo) la orientación no aplica.
+    // Se agrega la palabra clave "landscape" ademas de las medidas: varios sistemas
+    // de impresion de tablets/Android solo detectan la orientacion por esa palabra
+    // y no por cual medida es mas grande.
+    const apaisada = orientacionEfectiva === 'apaisada' && altoNum;
+    sizeCss = anchoNum+'mm '+(altoNum ? altoNum+'mm' : 'auto') + (apaisada ? ' landscape' : '');
+    anchoMM = apaisada ? altoNum : anchoNum;
+    altoMM = apaisada ? anchoNum : altoNum;
   }else{
     sizeCss = 'A4';
+    anchoMM = 210; altoMM = 297;
   }
-  const margin = cfg.margen === 'estrecho' ? '3mm' : '10mm';
-  return {sizeCss, margin, esChico};
+  const margenNum = cfg.margen === 'estrecho' ? 3 : 10;
+  const margin = margenNum+'mm';
+  // orientacion de texto: solo existe para pedidos, y solo tiene sentido si el
+  // alto de la hoja es una medida fija (no "automático"/rollo continuo).
+  const textoRotado = (tipo === 'pedidos') && cfg.textoRotado && !!altoMM;
+  return {sizeCss, margin, esChico, anchoMM, altoMM, margenNum, textoRotado};
 }
-function aplicarTamanoImpresion(overrideSizeCss, overrideMargin, esTicket, claseChico){
+/* Si textoRotado viene true, gira el contenido impreso 90° sobre si mismo,
+   independientemente del tamaño/orientacion de la hoja (que queda intacta,
+   tal cual entra a la impresora). El bloque exterior (ps-block/ps-block-multi)
+   se fija con el alto exacto del area imprimible de la hoja y centra a su
+   contenido (ps-rot-inner) con flexbox; el contenido interno es el que rota.
+   Asi, si el pedido tiene pocos renglones y sobra espacio, ese espacio libre
+   queda repartido parejo alrededor en vez de amontonado en una esquina. */
+function aplicarTamanoImpresion(overrideSizeCss, overrideMargin, esTicket, claseChico, textoRotado, anchoMM, altoMM, margenNum){
   let styleTag = document.getElementById('printPageStyle');
   if(!styleTag){
     styleTag = document.createElement('style');
@@ -1648,10 +1789,26 @@ function aplicarTamanoImpresion(overrideSizeCss, overrideMargin, esTicket, clase
   }
   const sizeCss = overrideSizeCss || 'A4';
   const margin = overrideMargin || '10mm';
-  styleTag.textContent = '@page{ size:'+sizeCss+'; margin:'+margin+'; }';
+  let css = '@page{ size:'+sizeCss+'; margin:'+margin+'; }';
+  if(textoRotado && anchoMM && altoMM){
+    const m = margenNum || 10;
+    const anchoUtil = Math.max(anchoMM - 2*m, 10);
+    const altoUtil = Math.max(altoMM - 2*m, 10);
+    css += '#printSheet.ps-texto-rotado .ps-block, #printSheet.ps-texto-rotado .ps-block-multi{'
+      + 'height:'+altoUtil+'mm; box-sizing:border-box; overflow:hidden;'
+      + 'display:flex; align-items:center; justify-content:center;'
+      + 'border-bottom:none; margin-bottom:0; padding-bottom:0;'
+      + '}'
+      + '#printSheet.ps-texto-rotado .ps-rot-inner{'
+      + 'width:'+altoUtil+'mm; max-height:'+anchoUtil+'mm; box-sizing:border-box;'
+      + 'transform:rotate(90deg); flex-shrink:0;'
+      + '}';
+  }
+  styleTag.textContent = css;
   const sheet = document.getElementById('printSheet');
   sheet.classList.toggle('ps-size-chico', !esTicket && !!claseChico);
   sheet.classList.toggle('ps-ticket', !!esTicket);
+  sheet.classList.toggle('ps-texto-rotado', !esTicket && !!textoRotado);
 }
 /* Sanitiza un texto para usarlo como nombre de archivo sugerido al "Guardar como PDF":
    saca caracteres inválidos y espacios. */
@@ -1666,9 +1823,9 @@ function sanitizeNombreArchivo(s){
    nombre sugerido al elegir "Guardar como PDF". El navegador puede seguir agregando
    fecha/hora/título en encabezado o pie de página física: para sacarlos del todo hay
    que desactivar "Encabezados y pies de página" en el cuadro de diálogo de impresión. */
-function imprimirDocumento(html, sizeCss, margin, esTicket, nombreArchivo, claseChico){
+function imprimirDocumento(html, sizeCss, margin, esTicket, nombreArchivo, claseChico, textoRotado, anchoMM, altoMM, margenNum){
   document.getElementById('printSheet').innerHTML = html;
-  aplicarTamanoImpresion(sizeCss, margin, esTicket, claseChico);
+  aplicarTamanoImpresion(sizeCss, margin, esTicket, claseChico, textoRotado, anchoMM, altoMM, margenNum);
   const tituloOriginal = document.title;
   document.title = nombreArchivo ? sanitizeNombreArchivo(nombreArchivo) : ' ';
   const restaurarTitulo = ()=>{
@@ -2385,7 +2542,8 @@ function renderPagos(){
   if((r.pagos||[]).length===0){
     list.innerHTML = `<div class="empty-state" style="padding:30px 10px;">Sin pagos cargados todavía.</div>`;
   }else{
-    list.innerHTML = r.pagos.map(pg=>`
+    // mas recientes arriba, los primeros cargados van quedando mas abajo
+    list.innerHTML = [...r.pagos].reverse().map(pg=>`
       <div class="rowline" onclick="editarPago('${pg.id}')">
         <div class="rl-left">
           <div class="rl-cliente">${escapeHtml(pg.tipo)}</div>
@@ -2917,7 +3075,8 @@ function renderRenglonesPedido(){
   if(p.renglones.length===0){
     list.innerHTML = `<div class="empty-state" style="padding:30px 10px;">Sin artículos cargados todavía.</div>`;
   }else{
-    list.innerHTML = p.renglones.map(r=>{
+    // mas recientes arriba, los primeros cargados van quedando mas abajo
+    list.innerHTML = [...p.renglones].reverse().map(r=>{
       const artActual = articulos.find(x=>String(x.codigo)===String(r.artCodigo));
       const precio = artActual ? artActual.precio : '';
       const precioTxt = (precio!=='' && precio!=null) ? fmtMoney(precio) : '';
@@ -2937,6 +3096,15 @@ function renderRenglonesPedido(){
   }
   const totalUnidades = p.renglones.reduce((s,r)=> s + (Number(r.cantidad)||0), 0);
   document.getElementById('pedTotalVal').textContent = totalUnidades + ' un. en ' + p.renglones.length + ' artículo(s)';
+  // Total del pedido: suma de cantidad x precio de cada renglon (solo cuenta
+  // los articulos que tengan precio cargado desde la tabla importada).
+  const totalMonto = p.renglones.reduce((s,r)=>{
+    const artActual = articulos.find(x=>String(x.codigo)===String(r.artCodigo));
+    const precio = artActual ? Number(artActual.precio) : NaN;
+    const cant = Number(r.cantidad) || 0;
+    return s + (isNaN(precio) ? 0 : precio * cant);
+  }, 0);
+  document.getElementById('pedTotalMontoVal').textContent = fmtMoney(totalMonto);
 }
 
 function persistCurrentPedidoHeader(){
@@ -3597,7 +3765,6 @@ function fmtFechaCorta(fecha){
 }
 function buildPedidoPrintHTML(p, blockClass){
   blockClass = blockClass || 'ps-block';
-  const totalUnidades = p.renglones.reduce((s,r)=> s + (Number(r.cantidad)||0), 0);
   const filas = p.renglones.map(r=>`
     <tr>
       <td>${escapeHtml(r.cantidad)}</td>
@@ -3607,9 +3774,10 @@ function buildPedidoPrintHTML(p, blockClass){
       <td>${escapeHtml(r.observacion||'')}</td>
     </tr>
   `).join('');
+  const obsGeneral = (p.observacion||'').trim();
 
   return `
-    <div class="${blockClass}">
+    <div class="${blockClass}"><div class="ps-rot-inner">
       ${empresaLineHTML()}
       <div class="ps-header-line">
         <span><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)}</span>
@@ -3623,9 +3791,8 @@ function buildPedidoPrintHTML(p, blockClass){
         <thead><tr><th>Cant.</th><th>Código</th><th>Descripción</th><th>Bonif %</th><th>Observación</th></tr></thead>
         <tbody>${filas}</tbody>
       </table>
-      <div class="ps-total ps-total-pedido"><div class="box">Total unidades: ${totalUnidades}</div></div>
-      <div class="ps-obs ps-obs-pedido"><span class="lbl">Observación</span>${escapeHtml(p.observacion||'-')}</div>
-    </div>
+      ${obsGeneral ? `<div class="ps-obs-inline">${escapeHtml(obsGeneral)}</div>` : ''}
+    </div></div>
   `;
 }
 function imprimirPedido(){
@@ -3633,7 +3800,7 @@ function imprimirPedido(){
   if(!p) return;
   persistCurrentPedidoHeader();
   const cfg = calcularImpresionTipo('pedidos');
-  imprimirDocumento(buildPedidoPrintHTML(p), cfg.sizeCss, cfg.margin, false, 'Ped'+puntoVenta+p.numero, cfg.esChico);
+  imprimirDocumento(buildPedidoPrintHTML(p), cfg.sizeCss, cfg.margin, false, 'Ped'+puntoVenta+p.numero, cfg.esChico, cfg.textoRotado, cfg.anchoMM, cfg.altoMM, cfg.margenNum);
 }
 function imprimirPedidosSeleccionados(){
   if(pedidosSeleccionados.size === 0){
@@ -3644,16 +3811,21 @@ function imprimirPedidosSeleccionados(){
   // si está activada la opción "un pedido por hoja" se usa un bloque con
   // salto de página después de cada uno (cualquier tamaño de hoja); si no,
   // los pedidos van seguidos, uno debajo del otro.
-  const unoPorHoja = printUnoPorHoja;
+  // Si además está activado "intercalar hoja en blanco", se fuerza un pedido
+  // por hoja (si no, la hoja en blanco no se distingue) y se agrega un bloque
+  // vacío entre cada pedido, que ocupa una página en blanco propia.
+  const intercalarBlanco = printHojaBlanco;
+  const unoPorHoja = printUnoPorHoja || intercalarBlanco;
   const blockClass = unoPorHoja ? 'ps-block' : 'ps-block-multi';
-  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass)).join('');
+  const separador = intercalarBlanco ? '<div class="ps-block ps-hoja-blanco"></div>' : '';
+  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass)).join(separador);
   const ahora = new Date();
   const dd = String(ahora.getDate()).padStart(2,'0');
   const mm = String(ahora.getMonth()+1).padStart(2,'0');
   const hh = String(ahora.getHours()).padStart(2,'0');
   const mi = String(ahora.getMinutes()).padStart(2,'0');
   const cfg = calcularImpresionTipo('pedidos');
-  imprimirDocumento(html, cfg.sizeCss, cfg.margin, false, 'P'+dd+mm+hh+mi, cfg.esChico);
+  imprimirDocumento(html, cfg.sizeCss, cfg.margin, false, 'P'+dd+mm+hh+mi, cfg.esChico, cfg.textoRotado, cfg.anchoMM, cfg.altoMM, cfg.margenNum);
 }
 
 /* =========================================================
