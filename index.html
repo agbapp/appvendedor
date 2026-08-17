@@ -371,6 +371,69 @@
   .totalbar.pedido-total{background:var(--olive-light); box-shadow:none;}
   .totalbar.pedido-total .lbl{color:#8b8465; font-size:11px; opacity:1;}
   .totalbar.pedido-total .val{color:#c3a6d6; font-size:12.5px; font-weight:700;}
+
+
+  /* ===== Copia de los estilos de impresion, SIN @media print, para el renderizador offscreen que arma la imagen del PDF a compartir ===== */
+  .ps-share-render{font-family:Arial,Helvetica,sans-serif; color:#111; font-size:12px; background:#fff;}
+    .ps-block{page-break-after:always;}
+    .ps-block:last-child{page-break-after:auto;}
+    .ps-block-multi{page-break-after:auto; page-break-inside:avoid; border-bottom:2px dashed #999; margin-bottom:16px; padding-bottom:16px;}
+    .ps-block-multi:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
+    .ps-header{display:flex; justify-content:space-between; border-bottom:3px solid #5d3a5c; padding-bottom:10px; margin-bottom:14px;}
+    .ps-header h1{font-size:18px; margin:0 0 4px; color:#5d3a5c;}
+    .ps-header .ps-meta{font-size:12px; line-height:1.6;}
+    .ps-header .ps-meta b{display:inline-block; width:110px;}
+    .ps-empresa{font-size:10px; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;}
+    .ps-header-recibo{border-bottom:3px solid #5d3a5c; padding-bottom:10px; margin-bottom:14px;}
+    .ps-header-recibo-top{display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin-bottom:5px;}
+    .ps-empresa-title{font-size:15px; font-weight:800; color:#5d3a5c; letter-spacing:0.2px;}
+    .ps-recibo-title{font-size:12px; font-weight:700; color:#5d3a5c; text-align:right; white-space:nowrap;}
+    .ps-header-line-inline{display:flex; align-items:baseline; gap:22px; font-size:12.5px;}
+    .ps-header-line-inline b{margin-right:3px;}
+    .ps-header-cliente{font-size:12px; margin-top:4px;}
+    .ps-pagos-table{width:100%; border-collapse:collapse; margin:4px 0 6px;}
+    .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:9.5px; text-transform:uppercase;}
+    .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:11px;}
+    .ps-pagos-table th:first-child, .ps-pagos-table td:first-child{padding-right:3px;}
+    .ps-pagos-table th:nth-child(2), .ps-pagos-table td:nth-child(2){padding-left:3px;}
+    table.ps-table{width:100%; border-collapse:collapse; margin-bottom:14px;}
+    table.ps-table th{background:#5d3a5c; color:#fff; text-align:left; padding:6px 8px; font-size:11px; text-transform:uppercase;}
+    table.ps-table td{padding:6px 8px; border-bottom:1px solid #ddd; font-size:11.5px;}
+    table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
+    table.ps-pedido-table{margin-bottom:4px;}
+    table.ps-pedido-table th, table.ps-pedido-table td{padding-left:5px; padding-right:5px;}
+    /* Encabezado de columnas mas chico y sin salto de linea (para que "Bonif %" entre en una sola linea) */
+    table.ps-pedido-table th{font-size:9px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
+    /* Cantidad: se deja espacio extra a la derecha para poder anotar los kilos a mano */
+    table.ps-pedido-table th:nth-child(1), table.ps-pedido-table td:nth-child(1){padding-right:26px;}
+    /* Código más pegado a Descripción */
+    table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:2px;}
+    table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:2px;}
+    .ps-total{display:flex; justify-content:flex-end; margin-bottom:14px;}
+    .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:14px;}
+    .ps-total-pedido{margin-bottom:6px;}
+    .ps-tipos{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
+    .ps-tipos div{background:#f7f5f2; border:1px solid #ddd; border-radius:6px; padding:6px 10px; font-size:11px;}
+  .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:11.5px; min-height:40px;}
+  .ps-obs-inline{margin-top:6px; font-size:11px; color:#333;}
+    .ps-obs-pedido{padding:7px 10px; min-height:auto;}
+    .ps-obs .lbl{font-weight:bold; color:#5d3a5c; display:block; margin-bottom:4px; font-size:10px; text-transform:uppercase;}
+    .ps-share-render.ps-size-chico{font-size:9.5px;}
+    .ps-share-render.ps-size-chico .ps-header h1{font-size:14px;}
+    .ps-share-render.ps-size-chico table.ps-table th{font-size:9px; padding:4px 5px;}
+    .ps-share-render.ps-size-chico table.ps-table td{font-size:9px; padding:4px 5px;}
+    .ps-share-render.ps-size-chico .ps-total .box{font-size:12px; padding:6px 12px;}
+    /* ticket angosto 5,5cm */
+    .ps-share-render.ps-ticket{font-family:'Courier New',Courier,monospace; font-size:10.5px; padding:0;}
+    .ps-share-render.ps-ticket .ps-block{page-break-after:always;}
+    .ps-share-render.ps-ticket .tk-center{text-align:center;}
+    .ps-share-render.ps-ticket .tk-bold{font-weight:bold;}
+    .ps-share-render.ps-ticket .tk-line{border-top:1px dashed #000; margin:5px 0;}
+    .ps-share-render.ps-ticket .tk-row{display:flex; justify-content:space-between; gap:6px;}
+    /* encabezado compacto de una sola línea (pedidos) */
+    .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:11.5px; white-space:nowrap;}
+    .ps-header-line b{color:#5d3a5c;}
+    .ps-share-render.ps-size-chico .ps-header-line{font-size:9px;}
 </style>
 </head>
 <body>
@@ -581,6 +644,7 @@
       <div class="actions-row">
         <button class="btn btn-primary" onclick="grabarPlanilla()">Grabar</button>
         <button class="btn btn-olive" onclick="imprimirPlanilla()">Imprimir / PDF</button>
+        <button class="btn btn-olive" onclick="compartirPlanilla()">Compartir</button>
         <button class="btn btn-danger" onclick="eliminarPlanilla()">Eliminar</button>
       </div>
     </div>
@@ -667,6 +731,7 @@
         <button class="btn btn-primary" onclick="grabarRecibo()">Grabar</button>
         <button class="btn btn-olive" onclick="imprimirReciboTicket()">Imprimir ticket</button>
         <button class="btn btn-olive" onclick="imprimirReciboPDF()">Recibo PDF</button>
+        <button class="btn btn-olive" onclick="compartirRecibo()">Compartir</button>
         <button class="btn btn-danger" onclick="eliminarRecibo()">Eliminar</button>
       </div>
     </div>
@@ -722,6 +787,7 @@
       <div id="planGenDetalle"></div>
       <div class="actions-row">
         <button class="btn btn-olive" onclick="imprimirPlanillaGenerada()">Imprimir / PDF</button>
+        <button class="btn btn-olive" onclick="compartirPlanillaGenerada()">Compartir</button>
         <button class="btn btn-danger" onclick="eliminarPlanillaGenerada()">Eliminar</button>
       </div>
     </div>
@@ -752,6 +818,7 @@
     <div class="selectbar" id="pedidosSelectbar" style="display:none;">
       <span id="pedidosSelectCount">0 seleccionados</span>
       <button class="btn btn-olive" onclick="imprimirPedidosSeleccionados()">Imprimir seleccionados</button>
+      <button class="btn btn-olive" onclick="compartirPedidosSeleccionados()">Compartir</button>
     </div>
   </div>
 
@@ -806,6 +873,7 @@
       <div class="actions-row">
         <button class="btn btn-primary" onclick="grabarPedido()">Grabar</button>
         <button class="btn btn-olive" onclick="imprimirPedido()">Imprimir Pedido</button>
+        <button class="btn btn-olive" onclick="compartirPedido()">Compartir</button>
         <button class="btn btn-danger" onclick="eliminarPedido()">Eliminar</button>
       </div>
     </div>
@@ -1837,6 +1905,121 @@ function imprimirDocumento(html, sizeCss, margin, esTicket, nombreArchivo, clase
   // por si el navegador no dispara "afterprint" (pasa en algunos WebView de tablets)
   setTimeout(restaurarTitulo, 1500);
 }
+/* =========================================================
+   COMPARTIR PDF (genera el archivo por dentro, sin pasar por
+   la vista previa de impresion del celular ni por Descargas)
+   ========================================================= */
+const MMPX = 96/25.4; // mm -> px de referencia (96dpi)
+const ESCALA_RENDER = 3; // factor de nitidez del PDF generado
+
+function crearContenedorOffscreen(anchoMM){
+  const cont = document.createElement('div');
+  cont.className = 'ps-share-render';
+  cont.style.position = 'fixed';
+  cont.style.left = '-99999px';
+  cont.style.top = '0';
+  cont.style.background = '#ffffff';
+  cont.style.width = anchoMM + 'mm';
+  document.body.appendChild(cont);
+  return cont;
+}
+
+async function capturarBloqueComoImagen(html, anchoMM){
+  const cont = crearContenedorOffscreen(anchoMM);
+  cont.innerHTML = html;
+  // esperar a que fuentes/layout esten listos antes de capturar
+  if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+  await new Promise(r=>setTimeout(r, 30));
+  const canvas = await html2canvas(cont, {scale: ESCALA_RENDER, backgroundColor:'#ffffff', useCORS:true});
+  document.body.removeChild(cont);
+  return canvas;
+}
+
+/* Arma y comparte un PDF a partir de "paginas": un array de objetos
+   {html} (una pagina con contenido) o {blanco:true} (pagina vacia).
+   cfg: {anchoMM, altoMM, margenNum, textoRotado} — el mismo objeto que
+   devuelve calcularImpresionTipo(). Si altoMM es null/undefined, se
+   arma UNA sola pagina continua (rollo), del alto que haga falta.
+*/
+async function generarYCompartirPDF(paginas, cfg, nombreArchivo, tituloCompartir){
+  if(!window.jspdf || !window.html2canvas){
+    toast('No se pudo cargar el generador de PDF');
+    return;
+  }
+  toast('Generando PDF...');
+  try{
+    const { jsPDF } = window.jspdf;
+    const anchoMM = cfg.anchoMM || 210;
+    const margenNum = (cfg.margenNum!=null) ? cfg.margenNum : 10;
+    const anchoUtilMM = Math.max(anchoMM - 2*margenNum, 10);
+    let doc = null;
+
+    if(!cfg.altoMM){
+      // ---- modo continuo (rollo): una sola pagina, del alto justo ----
+      const html = (paginas.find(p=>p.html) || {}).html || '';
+      const canvas = await capturarBloqueComoImagen(html, anchoUtilMM);
+      const altoImgMM = anchoUtilMM * canvas.height / canvas.width;
+      const altoPaginaMM = altoImgMM + 2*margenNum;
+      doc = new jsPDF({unit:'mm', format:[anchoMM, altoPaginaMM], orientation:'portrait'});
+      doc.addImage(canvas.toDataURL('image/jpeg',0.92), 'JPEG', margenNum, margenNum, anchoUtilMM, altoImgMM);
+    }else{
+      // ---- modo paginado: una pagina de tamaño fijo por cada bloque ----
+      const altoMM = cfg.altoMM;
+      const altoUtilMM = Math.max(altoMM - 2*margenNum, 10);
+      for(let i=0; i<paginas.length; i++){
+        const pag = paginas[i];
+        if(i===0){
+          doc = new jsPDF({unit:'mm', format:[anchoMM, altoMM], orientation:'portrait'});
+        }else{
+          doc.addPage([anchoMM, altoMM], 'portrait');
+        }
+        if(pag.blanco || !pag.html) continue;
+
+        if(cfg.textoRotado){
+          // se renderiza el contenido sin rotar, del ancho que le corresponde
+          // una vez girado (el alto util de la hoja), y se inserta rotado 90°
+          // centrado en la pagina.
+          const canvas = await capturarBloqueComoImagen(pag.html, altoUtilMM);
+          const W = altoUtilMM; // ancho pre-giro = alto util de la hoja
+          const H = Math.min(W * canvas.height / canvas.width, anchoUtilMM);
+          // jsPDF: con rotation=90, el punto (X,Y) que recibe addImage NO es la
+          // esquina de la imagen ya rotada. Se dedujo empíricamente (test con
+          // franjas de colores en cada borde) que, para que el rectángulo
+          // rotado quede centrado en (cx,cy), hay que pasar:
+          //   X = cx + H/2
+          //   Y = cy + W/2 - H
+          const cx = anchoMM/2, cy = altoMM/2;
+          const X = cx + H/2;
+          const Y = cy + W/2 - H;
+          doc.addImage(canvas.toDataURL('image/jpeg',0.92), 'JPEG', X, Y, W, H, undefined, undefined, 90);
+        }else{
+          const canvas = await capturarBloqueComoImagen(pag.html, anchoUtilMM);
+          const altoImgMM = Math.min(anchoUtilMM * canvas.height / canvas.width, altoUtilMM);
+          doc.addImage(canvas.toDataURL('image/jpeg',0.92), 'JPEG', margenNum, margenNum, anchoUtilMM, altoImgMM);
+        }
+      }
+    }
+
+    const blob = doc.output('blob');
+    const nombreFinal = sanitizeNombreArchivo(nombreArchivo) + '.pdf';
+    const file = new File([blob], nombreFinal, {type:'application/pdf'});
+
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title: tituloCompartir || nombreFinal});
+    }else if(navigator.share){
+      // algunos navegadores tienen share pero no soportan archivos: se baja el PDF como respaldo
+      doc.save(nombreFinal);
+      toast('Tu navegador no admite compartir archivos: se descargó el PDF');
+    }else{
+      doc.save(nombreFinal);
+      toast('Se descargó el PDF (este navegador no tiene menú de compartir)');
+    }
+  }catch(err){
+    console.error(err);
+    toast('No se pudo generar el PDF para compartir');
+  }
+}
+
 function irACobranza(){
   showView('view-home');
   renderHome();
@@ -2915,6 +3098,13 @@ function imprimirPlanillaGenerada(){
   const cfg = calcularImpresionTipo('planillas');
   imprimirDocumento(buildPlanillaGeneradaPrintHTML(pg), cfg.sizeCss, cfg.margin, false, 'PLA'+puntoVenta+pg.numero, cfg.esChico);
 }
+async function compartirPlanillaGenerada(){
+  const pg = currentPlanillaGenerada();
+  if(!pg) return;
+  const cfg = calcularImpresionTipo('planillas');
+  const paginas = [{html: buildPlanillaGeneradaPrintHTML(pg)}];
+  await generarYCompartirPDF(paginas, cfg, 'PLA'+puntoVenta+pg.numero, 'Planilla '+pg.numero);
+}
 function empresaLineHTML(){
   return fabricaNombre ? `<div class="ps-empresa">${escapeHtml(fabricaNombre)}</div>` : '';
 }
@@ -2974,6 +3164,14 @@ function imprimirReciboPDF(){
   persistCurrentReciboHeader();
   const cfg = calcularImpresionTipo('recibos');
   imprimirDocumento(buildReciboPrintHTML(r), cfg.sizeCss, cfg.margin, false, 'Rec'+puntoVenta+r.numero, cfg.esChico);
+}
+async function compartirRecibo(){
+  const r = currentRecibo();
+  if(!r) return;
+  persistCurrentReciboHeader();
+  const cfg = calcularImpresionTipo('recibos');
+  const paginas = [{html: buildReciboPrintHTML(r)}];
+  await generarYCompartirPDF(paginas, cfg, 'Rec'+puntoVenta+r.numero, 'Recibo '+r.numero);
 }
 
 /* =========================================================
@@ -3752,6 +3950,14 @@ function imprimirPlanilla(){
   const cfg = calcularImpresionTipo('planillas');
   imprimirDocumento(buildPlanillaPrintHTML(p), cfg.sizeCss, cfg.margin, false, 'PLA'+puntoVenta+p.numero, cfg.esChico);
 }
+async function compartirPlanilla(){
+  const p = currentPlanilla();
+  if(!p) return;
+  persistCurrentHeader();
+  const cfg = calcularImpresionTipo('planillas');
+  const paginas = [{html: buildPlanillaPrintHTML(p)}];
+  await generarYCompartirPDF(paginas, cfg, 'PLA'+puntoVenta+p.numero, 'Planilla '+p.numero);
+}
 
 /* =========================================================
    IMPRESION / PDF - PEDIDOS
@@ -3802,6 +4008,14 @@ function imprimirPedido(){
   const cfg = calcularImpresionTipo('pedidos');
   imprimirDocumento(buildPedidoPrintHTML(p), cfg.sizeCss, cfg.margin, false, 'Ped'+puntoVenta+p.numero, cfg.esChico, cfg.textoRotado, cfg.anchoMM, cfg.altoMM, cfg.margenNum);
 }
+async function compartirPedido(){
+  const p = currentPedido();
+  if(!p) return;
+  persistCurrentPedidoHeader();
+  const cfg = calcularImpresionTipo('pedidos');
+  const paginas = [{html: buildPedidoPrintHTML(p)}];
+  await generarYCompartirPDF(paginas, cfg, 'Ped'+puntoVenta+p.numero, 'Pedido '+p.numero);
+}
 function imprimirPedidosSeleccionados(){
   if(pedidosSeleccionados.size === 0){
     toast('Seleccioná al menos un pedido');
@@ -3826,6 +4040,25 @@ function imprimirPedidosSeleccionados(){
   const mi = String(ahora.getMinutes()).padStart(2,'0');
   const cfg = calcularImpresionTipo('pedidos');
   imprimirDocumento(html, cfg.sizeCss, cfg.margin, false, 'P'+dd+mm+hh+mi, cfg.esChico, cfg.textoRotado, cfg.anchoMM, cfg.altoMM, cfg.margenNum);
+}
+/* Comparte todos los pedidos seleccionados en un unico PDF (una pagina por
+   pedido). A diferencia de imprimir, aca no aplica "un pedido por hoja" ni
+   "hoja en blanco" (son trucos pensados para la impresora fisica, no tienen
+   sentido en un PDF que se manda por WhatsApp). */
+async function compartirPedidosSeleccionados(){
+  if(pedidosSeleccionados.size === 0){
+    toast('Seleccioná al menos un pedido');
+    return;
+  }
+  const seleccionados = pedidos.filter(p=> pedidosSeleccionados.has(p.id));
+  const cfg = calcularImpresionTipo('pedidos');
+  const paginas = seleccionados.map(p=>({html: buildPedidoPrintHTML(p)}));
+  const ahora = new Date();
+  const dd = String(ahora.getDate()).padStart(2,'0');
+  const mm = String(ahora.getMonth()+1).padStart(2,'0');
+  const hh = String(ahora.getHours()).padStart(2,'0');
+  const mi = String(ahora.getMinutes()).padStart(2,'0');
+  await generarYCompartirPDF(paginas, cfg, 'P'+dd+mm+hh+mi, seleccionados.length+' pedidos');
 }
 
 /* =========================================================
@@ -3857,5 +4090,7 @@ if('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
   });
 }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"></script>
 </body>
 </html>
