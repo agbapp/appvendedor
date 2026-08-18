@@ -140,6 +140,9 @@
   .fs-search-title{font-size:16px; font-weight:800; color:var(--ink);}
   .fs-search-input-wrap{padding:12px 16px; border-bottom:1px solid var(--border); flex-shrink:0;}
   .fs-search-input-wrap input{width:100%; padding:12px 13px; border:1.5px solid var(--border); border-radius:10px; font-size:15px; font-family:inherit;}
+  .fs-search-opciones{display:flex; gap:18px; margin-top:9px;}
+  .fs-search-chk{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-soft); cursor:pointer; user-select:none;}
+  .fs-search-chk input{width:16px; height:16px; accent-color:var(--olive); margin:0; cursor:pointer;}
   .fs-search-results{flex:1; overflow-y:auto; padding:4px 0;}
   .fs-search-item{padding:13px 16px; font-size:14.5px; border-bottom:1px solid var(--border); cursor:pointer;}
   .fs-search-item:active{background:var(--olive-light);}
@@ -283,13 +286,15 @@
     table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
     table.ps-pedido-table{margin-bottom:4px;}
     table.ps-pedido-table th, table.ps-pedido-table td{padding-left:5px; padding-right:5px;}
+    /* Renglones un poco mas juntos (menos alto por fila) */
+    table.ps-pedido-table td{padding-top:3px; padding-bottom:3px;}
     /* Encabezado de columnas mas chico y sin salto de linea (para que "Bonif %" entre en una sola linea) */
     table.ps-pedido-table th{font-size:9px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
     /* Cantidad: se deja espacio extra a la derecha para poder anotar los kilos a mano */
     table.ps-pedido-table th:nth-child(1), table.ps-pedido-table td:nth-child(1){padding-right:26px;}
-    /* Código más pegado a Descripción */
-    table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:2px;}
-    table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:2px;}
+    /* Código justificado a la derecha, pegado a Descripción */
+    table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:3px; text-align:right;}
+    table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:3px;}
     .ps-total{display:flex; justify-content:flex-end; margin-bottom:14px;}
     .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:14px;}
     .ps-total-pedido{margin-bottom:6px;}
@@ -402,13 +407,15 @@
     table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
     table.ps-pedido-table{margin-bottom:4px;}
     table.ps-pedido-table th, table.ps-pedido-table td{padding-left:5px; padding-right:5px;}
+    /* Renglones un poco mas juntos (menos alto por fila) */
+    table.ps-pedido-table td{padding-top:3px; padding-bottom:3px;}
     /* Encabezado de columnas mas chico y sin salto de linea (para que "Bonif %" entre en una sola linea) */
     table.ps-pedido-table th{font-size:9px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
     /* Cantidad: se deja espacio extra a la derecha para poder anotar los kilos a mano */
     table.ps-pedido-table th:nth-child(1), table.ps-pedido-table td:nth-child(1){padding-right:26px;}
-    /* Código más pegado a Descripción */
-    table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:2px;}
-    table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:2px;}
+    /* Código justificado a la derecha, pegado a Descripción */
+    table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:3px; text-align:right;}
+    table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:3px;}
     .ps-total{display:flex; justify-content:flex-end; margin-bottom:14px;}
     .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:14px;}
     .ps-total-pedido{margin-bottom:6px;}
@@ -1396,6 +1403,10 @@
   </div>
   <div class="fs-search-input-wrap">
     <input type="text" id="fsBusquedaInput" placeholder="Escribí para buscar..." oninput="filtrarBusquedaPantallaCompleta()">
+    <div class="fs-search-opciones">
+      <label class="fs-search-chk"><input type="checkbox" id="fsChkPorCodigo" onchange="filtrarBusquedaPantallaCompleta()"> Por código</label>
+      <label class="fs-search-chk"><input type="checkbox" id="fsChkQueComience" onchange="filtrarBusquedaPantallaCompleta()"> Que comience</label>
+    </div>
   </div>
   <div class="fs-search-results" id="fsBusquedaResultados"></div>
 </div>
@@ -1610,21 +1621,32 @@ function fsRenderResultadosBusqueda(q){
   const qNorm = (q || '').toLowerCase().trim();
   const tipo = fsBusquedaEstado.tipo;
   const datos = fsBusquedaDatos(tipo);
+  const porCodigo = document.getElementById('fsChkPorCodigo').checked;
+  const queComience = document.getElementById('fsChkQueComience').checked;
+  // "que comience": el texto tiene que estar al principio del campo.
+  // por defecto (destildado): alcanza con que el campo lo contenga en cualquier parte.
+  const coincide = (campo)=>{
+    const c = String(campo).toLowerCase();
+    return queComience ? c.startsWith(qNorm) : c.includes(qNorm);
+  };
   let matches;
   if(tipo === 'articulo'){
     matches = datos.filter(a=>
-      !qNorm ||
-      String(a.codigo).toLowerCase().includes(qNorm) ||
-      String(a.codigoAlt).toLowerCase().includes(qNorm) ||
-      String(a.descripcion).toLowerCase().includes(qNorm)
+      !qNorm || coincide(a.codigo) || coincide(a.codigoAlt) || coincide(a.descripcion)
     );
   }else{
     matches = datos.filter(x=>
-      !qNorm ||
-      String(x.codigo).toLowerCase().includes(qNorm) ||
-      String(x.nombre).toLowerCase().includes(qNorm)
+      !qNorm || coincide(x.codigo) || coincide(x.nombre)
     );
   }
+  // orden: "por código" tildado ordena por código; destildado (por defecto)
+  // ordena por descripción/nombre — igual que un buscador de sistema de PC.
+  const campoOrden = tipo === 'articulo'
+    ? (porCodigo ? 'codigo' : 'descripcion')
+    : (porCodigo ? 'codigo' : 'nombre');
+  matches = matches.slice().sort((a,b)=>
+    String(a[campoOrden]).localeCompare(String(b[campoOrden]), 'es', {numeric:true, sensitivity:'base'})
+  );
   matches = matches.slice(0, 300);
   fsBusquedaEstado.matchesActuales = matches;
   let html = '';
