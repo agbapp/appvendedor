@@ -860,9 +860,9 @@
         <div class="field">
           <div class="field-buscar-row">
             <label>Cliente</label>
-            <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClientePedido)">Buscar</button>
+            <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClientePedido, {freeform:{onUse:usarClientePedidoLibre, label:function(t){return '+ Usar &quot;'+t+'&quot; como cliente varios (000000)';}}})">Buscar</button>
           </div>
-          <div class="ac-selected ac-selected-highlight" id="pedClienteSelected" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClientePedido)"></div>
+          <div class="ac-selected ac-selected-highlight" id="pedClienteSelected" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClientePedido, {freeform:{onUse:usarClientePedidoLibre, label:function(t){return '+ Usar &quot;'+t+'&quot; como cliente varios (000000)';}}})"></div>
         </div>
         <div class="field">
           <label>Observación</label>
@@ -1325,9 +1325,9 @@
     <div class="field">
       <div class="field-buscar-row">
         <label>Artículo</label>
-        <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('articulo', seleccionarArticulo)">Buscar</button>
+        <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('articulo', seleccionarArticulo, {freeform:{onUse:usarArticuloLibre, label:function(t){return '+ Usar &quot;'+t+'&quot; como artículo sin código (0)';}}})">Buscar</button>
       </div>
-      <div class="ac-selected ac-selected-highlight" id="articuloSelected" onclick="abrirBusquedaPantallaCompleta('articulo', seleccionarArticulo)"></div>
+      <div class="ac-selected ac-selected-highlight" id="articuloSelected" onclick="abrirBusquedaPantallaCompleta('articulo', seleccionarArticulo, {freeform:{onUse:usarArticuloLibre, label:function(t){return '+ Usar &quot;'+t+'&quot; como artículo sin código (0)';}}})"></div>
     </div>
 
     <div class="row3">
@@ -3522,6 +3522,12 @@ function seleccionarClientePedido(codigo){
   renderPedClienteSelected();
   persistCurrentPedidoHeader();
 }
+function usarClientePedidoLibre(nombre){
+  if(!nombre) return;
+  pedClienteSeleccionado = {codigo:'000000', nombre: nombre};
+  renderPedClienteSelected();
+  persistCurrentPedidoHeader();
+}
 function renderPedClienteSelected(){
   renderSeleccionBox('pedClienteSelected', pedClienteSeleccionado ? `Seleccionado: <b>${escapeHtml(pedClienteSeleccionado.codigo)} - ${escapeHtml(pedClienteSeleccionado.nombre)}</b>` : '');
 }
@@ -3548,6 +3554,11 @@ function seleccionarArticulo(codigo){
   const a = articulos.find(x=>String(x.codigo)===String(codigo));
   if(!a) return;
   articuloSeleccionado = a;
+  renderArticuloSelected();
+}
+function usarArticuloLibre(descripcion){
+  if(!descripcion) return;
+  articuloSeleccionado = {codigo:'0', codigoAlt:'', descripcion: descripcion, precio: null};
   renderArticuloSelected();
 }
 function renderArticuloSelected(){
