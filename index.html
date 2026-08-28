@@ -162,6 +162,22 @@
   .rl-importe{font-weight:700; color:var(--olive); font-size:15px;}
   .tag-tipo{display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:20px; margin-top:3px; background:var(--olive-light); color:#5b6136;}
 
+  /* ---------- Consultar deuda ---------- */
+  .deuda-cliente-block{background:var(--white); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:12px;}
+  .deuda-cliente-nombre{font-weight:800; font-size:14.5px; color:var(--plum); margin-bottom:10px;}
+  .deuda-linea{margin-bottom:12px;}
+  .deuda-linea:last-child{margin-bottom:0;}
+  .deuda-linea-titulo{display:flex; justify-content:space-between; align-items:center; font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; color:var(--ink-soft); border-bottom:1.5px solid var(--border); padding-bottom:5px; margin-bottom:6px;}
+  .deuda-linea-total{color:var(--plum); font-size:13.5px;}
+  .deuda-linea-vacio{font-size:12.5px; color:var(--ink-soft); font-style:italic; padding:4px 0;}
+  .deuda-comp-row{border-bottom:1px solid var(--border); padding:8px 2px; cursor:pointer;}
+  .deuda-comp-row:last-child{border-bottom:none;}
+  .deuda-comp-top{display:flex; gap:8px; font-size:13px;}
+  .deuda-comp-fecha{color:var(--ink-soft); flex-shrink:0;}
+  .deuda-comp-desc{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .deuda-comp-bottom{display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .deuda-comp-detalle{margin-top:6px; padding:8px 10px; background:var(--cream); border-radius:8px; font-size:12.5px; display:flex; flex-direction:column; gap:2px;}
+
   .totalbar{display:flex; justify-content:space-between; align-items:center; background:var(--plum); color:var(--white); border-radius:12px; padding:14px 16px; margin:16px 0;}
   .totalbar .lbl{font-size:13px; opacity:0.85; text-transform:uppercase; letter-spacing:0.4px;}
   .totalbar .val{font-size:22px; font-weight:800;}
@@ -510,6 +526,14 @@
           <div class="mb-txt">
             <div class="mb-title">Carga de Pedidos</div>
             <div class="mb-sub" id="menuSubPedidos">Notas de pedido</div>
+          </div>
+          <div class="mb-arrow">&#8250;</div>
+        </button>
+        <button class="menu-btn" onclick="irAConsultarDeuda()">
+          <div class="ic">&#128181;</div>
+          <div class="mb-txt">
+            <div class="mb-title">Consultar deuda</div>
+            <div class="mb-sub">Línea 1 y Línea 2, por cliente</div>
           </div>
           <div class="mb-arrow">&#8250;</div>
         </button>
@@ -892,6 +916,42 @@
     </div>
   </div>
 
+  <!-- ================= CONSULTAR DEUDA ================= -->
+  <div class="view" id="view-consultar-deuda">
+    <div class="topbar">
+      <button class="backbtn" onclick="showView('view-menu'); renderMenu();">&#8592;</button>
+      <div style="flex:1; text-align:center;">
+        <h1 style="font-size:15px;">Consultar deuda</h1>
+      </div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="content narrow">
+      <div class="field">
+        <div class="field-buscar-row">
+          <label>Cliente</label>
+          <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClienteDeuda)">Buscar</button>
+        </div>
+        <div class="ac-selected ac-selected-highlight" id="deudaClienteSelected" onclick="abrirBusquedaPantallaCompleta('cliente', seleccionarClienteDeuda)"></div>
+      </div>
+      <div class="field">
+        <div class="field-buscar-row">
+          <label>Transporte</label>
+          <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporteDeuda)">Buscar</button>
+        </div>
+        <div class="ac-selected ac-selected-highlight" id="deudaTransporteSelected" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporteDeuda)"></div>
+      </div>
+      <div class="row2">
+        <button class="btn btn-outline" onclick="limpiarFiltrosDeuda()">Limpiar filtros</button>
+        <button class="btn btn-primary" onclick="consultarDeuda()">Consultar</button>
+      </div>
+      <div class="row2" id="rowBotonesDeudaCliente" style="display:none; margin-top:10px;">
+        <button class="btn btn-olive" id="btnCompartirDeuda" onclick="compartirDeudaCliente()">Compartir</button>
+        <button class="btn btn-outline" id="btnDescargarDeuda" onclick="descargarDeudaClientePDF()">Descargar PDF</button>
+      </div>
+      <div id="deudaResultado" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
   <!-- ================= CATALOGOS ================= -->
   <div class="view" id="view-catalogos">
     <div class="topbar">
@@ -988,6 +1048,26 @@
             <label class="filelabel">
               Elegir archivo CSV de artículos
               <input type="file" accept=".csv,.txt,text/csv,text/plain,text/comma-separated-values,application/vnd.ms-excel,*/*" onchange="importarCSV(event,'articulos')">
+            </label>
+          </div>
+
+          <div class="import-card">
+            <h3>Deuda - Línea 1</h3>
+            <p>Archivo CSV con columnas: código cliente, nombre, fecha, descripción, debe, haber, saldo del comprobante, saldo acumulado, código vendedor, código transporte — un renglón por comprobante con saldo pendiente. Se usa en Consultar deuda.</p>
+            <div class="count-pill" id="countDeuda1">Sin archivo importado</div>
+            <label class="filelabel">
+              Elegir archivo CSV de deuda (Línea 1)
+              <input type="file" accept=".csv,.txt,text/csv,text/plain,text/comma-separated-values,application/vnd.ms-excel,*/*" onchange="importarCSV(event,'deuda1')">
+            </label>
+          </div>
+
+          <div class="import-card">
+            <h3>Deuda - Línea 2</h3>
+            <p>Mismo formato que Línea 1, para la segunda empresa/línea. Se muestra por separado, nunca mezclada con la Línea 1.</p>
+            <div class="count-pill" id="countDeuda2">Sin archivo importado</div>
+            <label class="filelabel">
+              Elegir archivo CSV de deuda (Línea 2)
+              <input type="file" accept=".csv,.txt,text/csv,text/plain,text/comma-separated-values,application/vnd.ms-excel,*/*" onchange="importarCSV(event,'deuda2')">
             </label>
           </div>
 
@@ -1160,6 +1240,37 @@
               <div class="segmented" id="printMargenSeg_planillas">
                 <div class="seg-opt" data-margen="normal" onclick="setMargenImpresionTipo('planillas','normal')">Normal</div>
                 <div class="seg-opt" data-margen="estrecho" onclick="setMargenImpresionTipo('planillas','estrecho')">Estrecho</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="print-config-block">
+            <div class="section-title">Deuda (Consultar deuda)</div>
+            <p style="font-size:11.5px; color:var(--ink-soft); margin:-4px 0 10px;">Configuración propia, independiente de Planillas — la tabla de comprobantes necesita bastante ancho para no cortarse.</p>
+            <div class="field">
+              <label>Tamaño de hoja</label>
+              <div class="segmented" id="printSizeSeg_deuda">
+                <div class="seg-opt" data-size="a4" onclick="setTamanoImpresionTipo('deuda','a4')">A4</div>
+                <div class="seg-opt" data-size="carta" onclick="setTamanoImpresionTipo('deuda','carta')">Carta</div>
+                <div class="seg-opt" data-size="chico" onclick="setTamanoImpresionTipo('deuda','chico')">Chico</div>
+                <div class="seg-opt" data-size="personalizado" onclick="setTamanoImpresionTipo('deuda','personalizado')">Personalizado</div>
+              </div>
+            </div>
+            <div class="row2" id="printPersonalizado_deuda" style="display:none;">
+              <div class="field">
+                <label>Ancho (mm)</label>
+                <input type="number" id="printAncho_deuda" inputmode="numeric" placeholder="Ej: 210" oninput="guardarPersonalizadoImpresion('deuda')">
+              </div>
+              <div class="field">
+                <label>Alto (mm, vacío = auto)</label>
+                <input type="number" id="printAlto_deuda" inputmode="numeric" placeholder="Automático" oninput="guardarPersonalizadoImpresion('deuda')">
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Margen</label>
+              <div class="segmented" id="printMargenSeg_deuda">
+                <div class="seg-opt" data-margen="normal" onclick="setMargenImpresionTipo('deuda','normal')">Normal</div>
+                <div class="seg-opt" data-margen="estrecho" onclick="setMargenImpresionTipo('deuda','estrecho')">Estrecho</div>
               </div>
             </div>
           </div>
@@ -1384,6 +1495,10 @@
         <div class="ic">&#128230;</div>
         <div class="tt">Carga de Pedidos</div>
       </button>
+      <button class="quicknav-item" onclick="quickNavIr('deuda')">
+        <div class="ic">&#128181;</div>
+        <div class="tt">Consultar deuda</div>
+      </button>
       <button class="quicknav-item" onclick="quickNavIr('catalogos')">
         <div class="ic">&#128218;</div>
         <div class="tt">Catálogos Productos</div>
@@ -1433,7 +1548,9 @@ const LS = {
   pedidos: 'cobranzas_pedidos',
   catalogos: 'cobranzas_catalogos',
   recibos: 'cobranzas_recibos',
-  planillasGeneradas: 'cobranzas_planillas_generadas'
+  planillasGeneradas: 'cobranzas_planillas_generadas',
+  deudaLinea1: 'cobranzas_deuda_linea1',
+  deudaLinea2: 'cobranzas_deuda_linea2'
 };
 
 function loadJSON(key, fallback){
@@ -1468,6 +1585,8 @@ let vendedores = loadJSON(LS.vendedores, []);
 let planillas = loadJSON(LS.planillas, []);
 let articulos = loadJSON(LS.articulos, []);
 let pedidos = loadJSON(LS.pedidos, []);
+let deudaLinea1 = loadJSON(LS.deudaLinea1, []);
+let deudaLinea2 = loadJSON(LS.deudaLinea2, []);
 let catalogos = loadJSON(LS.catalogos, []);
 let recibos = loadJSON(LS.recibos, []);
 let planillasGeneradas = loadJSON(LS.planillasGeneradas, []);
@@ -1485,10 +1604,16 @@ let printHojaBlanco = localStorage.getItem(LS_PRINT_HOJA_BLANCO) === '1';
    como valor inicial para los tres tipos la primera vez. */
 function crearPrintConfigPorDefecto(){
   const base = {tamano: printSize || 'a4', margen: (printSize === 'chico') ? 'estrecho' : 'normal', anchoPersonalizado:'', altoPersonalizado:'', orientacion:'vertical', textoRotado:false};
+  // Deuda arranca siempre en A4 normal por su cuenta (no copia la config de
+  // Planillas): la tabla de comprobantes tiene varias columnas y necesita
+  // ancho de sobra, sin depender de un tamaño angosto que se haya elegido
+  // para la impresora de planillas.
+  const deudaBase = {tamano:'a4', margen:'normal', anchoPersonalizado:'', altoPersonalizado:'', orientacion:'vertical', textoRotado:false};
   return {
     recibos: Object.assign({}, base),
     pedidos: Object.assign({}, base),
-    planillas: Object.assign({}, base)
+    planillas: Object.assign({}, base),
+    deuda: Object.assign({}, deudaBase)
   };
 }
 let printConfig = (function(){
@@ -1499,6 +1624,11 @@ let printConfig = (function(){
         if(!guardado[t].orientacion) guardado[t].orientacion = 'vertical';
         if(guardado[t].textoRotado === undefined) guardado[t].textoRotado = false;
       });
+      // configuraciones guardadas antes de que existiera "Consultar deuda":
+      // se agrega ahora, siempre en A4 normal (nunca copiando Planillas).
+      if(!guardado.deuda){
+        guardado.deuda = {tamano:'a4', margen:'normal', anchoPersonalizado:'', altoPersonalizado:'', orientacion:'vertical', textoRotado:false};
+      }
       return guardado;
     }
   }catch(e){}
@@ -1702,7 +1832,7 @@ function renderAjustesConfig(){
   if(fn) fn.value = fabricaNombre;
   const chkPlanAnt = document.getElementById('chkMostrarPlanillaAnterior');
   if(chkPlanAnt) chkPlanAnt.checked = mostrarPlanillaAnterior;
-  ['recibos','pedidos','planillas'].forEach(renderPrintConfigTipo);
+  ['recibos','pedidos','planillas','deuda'].forEach(renderPrintConfigTipo);
   const chkUno = document.getElementById('chkUnoPorHoja');
   if(chkUno) chkUno.checked = printUnoPorHoja;
   const chkHoja = document.getElementById('chkHojaBlanco');
@@ -2013,10 +2143,14 @@ async function agruparPedidosParaCompartir(seleccionados, cfg){
    devuelve calcularImpresionTipo(). Si altoMM es null/undefined, se
    arma UNA sola pagina continua (rollo), del alto que haga falta.
 */
-async function generarYCompartirPDF(paginas, cfg, nombreArchivo, tituloCompartir){
+/* Arma el documento PDF en si (paginado, rotacion, corte de contenido muy
+   largo, etc.) sin decidir que hacer con el resultado — lo usan tanto
+   "compartir" como "descargar directo". Devuelve {doc, nombreFinal} o null
+   si no se pudo generar (y ya avisa el error con un toast). */
+async function generarDocumentoPDF(paginas, cfg, nombreArchivo){
   if(!window.jspdf || !window.html2canvas){
     toast('No se pudo cargar el generador de PDF');
-    return;
+    return null;
   }
   toast('Generando PDF...');
   try{
@@ -2102,8 +2236,20 @@ async function generarYCompartirPDF(paginas, cfg, nombreArchivo, tituloCompartir
       }
     }
 
-    const blob = doc.output('blob');
     const nombreFinal = sanitizeNombreArchivo(nombreArchivo) + '.pdf';
+    return {doc, nombreFinal};
+  }catch(err){
+    console.error(err);
+    toast('No se pudo generar el PDF');
+    return null;
+  }
+}
+async function generarYCompartirPDF(paginas, cfg, nombreArchivo, tituloCompartir){
+  const res = await generarDocumentoPDF(paginas, cfg, nombreArchivo);
+  if(!res) return;
+  const {doc, nombreFinal} = res;
+  try{
+    const blob = doc.output('blob');
     const file = new File([blob], nombreFinal, {type:'application/pdf'});
 
     let compartido = false;
@@ -2127,6 +2273,14 @@ async function generarYCompartirPDF(paginas, cfg, nombreArchivo, tituloCompartir
     console.error(err);
     toast('No se pudo generar el PDF para compartir');
   }
+}
+/* Descarga directa, sin pasar por el menu de compartir — pensado para uso
+   en PC, donde descargar es mas comodo/predecible que compartir. */
+async function generarYDescargarPDF(paginas, cfg, nombreArchivo){
+  const res = await generarDocumentoPDF(paginas, cfg, nombreArchivo);
+  if(!res) return;
+  res.doc.save(res.nombreFinal);
+  toast('PDF descargado');
 }
 
 function irACobranza(){
@@ -2163,6 +2317,222 @@ function irAPedidos(){
   showView('view-pedidos-home');
   renderPedidosHome();
 }
+/* =========================================================
+   CONSULTAR DEUDA (Linea 1 / Linea 2)
+   ========================================================= */
+let deudaClienteSel = null;   // {codigo, nombre} o null = todos
+let deudaTransporteSel = null; // {codigo, nombre} o null = todos
+let deudaResultadoActual = null; // guardado para el boton Compartir
+
+function irAConsultarDeuda(){
+  showView('view-consultar-deuda');
+  document.getElementById('deudaResultado').innerHTML = '';
+  document.getElementById('rowBotonesDeudaCliente').style.display = 'none';
+  deudaResultadoActual = null;
+  renderDeudaFiltros();
+}
+function seleccionarClienteDeuda(codigo){
+  const c = clientes.find(x=>x.codigo===codigo);
+  if(!c) return;
+  deudaClienteSel = c;
+  renderDeudaFiltros();
+}
+function seleccionarTransporteDeuda(codigo){
+  const t = transportes.find(x=>x.codigo===codigo);
+  if(!t) return;
+  deudaTransporteSel = t;
+  renderDeudaFiltros();
+}
+function limpiarFiltrosDeuda(){
+  deudaClienteSel = null;
+  deudaTransporteSel = null;
+  renderDeudaFiltros();
+  document.getElementById('deudaResultado').innerHTML = '';
+  document.getElementById('rowBotonesDeudaCliente').style.display = 'none';
+  deudaResultadoActual = null;
+}
+function renderDeudaFiltros(){
+  const elC = document.getElementById('deudaClienteSelected');
+  if(deudaClienteSel){
+    elC.innerHTML = `Seleccionado: <b>${escapeHtml(deudaClienteSel.codigo)} - ${escapeHtml(deudaClienteSel.nombre)}</b>`;
+    elC.classList.remove('vacio');
+  }else{
+    elC.innerHTML = 'Todos los clientes';
+    elC.classList.add('vacio');
+  }
+  const elT = document.getElementById('deudaTransporteSelected');
+  if(deudaTransporteSel){
+    elT.innerHTML = `Seleccionado: <b>${escapeHtml(deudaTransporteSel.codigo)} - ${escapeHtml(deudaTransporteSel.nombre)}</b>`;
+    elT.classList.remove('vacio');
+  }else{
+    elT.innerHTML = 'Todos los transportes';
+    elT.classList.add('vacio');
+  }
+}
+/* El filtro por vendedor (codvend === vendedorCodigo) siempre se aplica,
+   sin importar los filtros de cliente/transporte que elija el usuario: es
+   una restricción de seguridad, no una opción — así, si por error llegara a
+   cargarse en este celular un archivo con datos de otro vendedor, ese
+   vendedor no puede consultar comprobantes que no son suyos. */
+function filtrarFilasDeuda(filas){
+  return filas.filter(r=>
+    r.codvend === vendedorCodigo &&
+    (!deudaClienteSel || r.codclie === deudaClienteSel.codigo) &&
+    (!deudaTransporteSel || r.codtrans === deudaTransporteSel.codigo)
+  );
+}
+function consultarDeuda(){
+  const filas1 = filtrarFilasDeuda(deudaLinea1);
+  const filas2 = filtrarFilasDeuda(deudaLinea2);
+  // clientes unicos que aparecen en cualquiera de las dos lineas, ordenados por nombre
+  const clientesMap = new Map();
+  [...filas1, ...filas2].forEach(r=>{
+    if(!clientesMap.has(r.codclie)) clientesMap.set(r.codclie, r.nombre);
+  });
+  const clientesOrdenados = [...clientesMap.entries()].sort((a,b)=> String(a[1]).localeCompare(String(b[1]), 'es'));
+
+  const cont = document.getElementById('deudaResultado');
+  if(clientesOrdenados.length === 0){
+    cont.innerHTML = '<div class="empty-state" style="padding:30px 10px;">Sin resultados para este filtro.</div>';
+    document.getElementById('rowBotonesDeudaCliente').style.display = 'none';
+    deudaResultadoActual = null;
+    return;
+  }
+
+  const bloques = clientesOrdenados.map(([codclie, nombre])=>{
+    const filasCliente1 = filas1.filter(r=>r.codclie===codclie);
+    const filasCliente2 = filas2.filter(r=>r.codclie===codclie);
+    return {codclie, nombre, filasCliente1, filasCliente2};
+  });
+
+  cont.innerHTML = bloques.map(b=> buildDeudaClienteBlockHTML(b)).join('');
+
+  // Compartir/Descargar solo tienen sentido si el resultado es de un unico cliente
+  const rowBotones = document.getElementById('rowBotonesDeudaCliente');
+  if(clientesOrdenados.length === 1){
+    rowBotones.style.display = 'flex';
+    deudaResultadoActual = bloques[0];
+  }else{
+    rowBotones.style.display = 'none';
+    deudaResultadoActual = null;
+  }
+}
+function buildDeudaClienteBlockHTML(b){
+  return `
+    <div class="deuda-cliente-block">
+      <div class="deuda-cliente-nombre">${escapeHtml(b.codclie)} - ${escapeHtml(b.nombre)}</div>
+      ${buildDeudaLineaHTML('Línea 1', b.filasCliente1)}
+      ${buildDeudaLineaHTML('Línea 2', b.filasCliente2)}
+    </div>
+  `;
+}
+function buildDeudaLineaHTML(titulo, filas){
+  if(filas.length === 0){
+    return `<div class="deuda-linea"><div class="deuda-linea-titulo">${titulo}</div><div class="deuda-linea-vacio">Sin comprobantes pendientes.</div></div>`;
+  }
+  // el saldo acumulado del ultimo renglon (ya viene calculado y ordenado desde el archivo) es el total adeudado
+  const totalLinea = filas[filas.length-1].saldo;
+  const filasHtml = filas.map(r=>{
+    return `
+      <div class="deuda-comp-row" onclick="toggleDeudaDetalle(this)">
+        <div class="deuda-comp-top">
+          <span class="deuda-comp-fecha">${escapeHtml(fmtFechaDeuda(r.fecha))}</span>
+          <span class="deuda-comp-desc">${escapeHtml(r.descrip)}</span>
+        </div>
+        <div class="deuda-comp-bottom">
+          <span>Saldo comp.: ${fmtMoney(r.saldocom)}</span>
+          <span>${fmtMoney(r.saldo)}</span>
+        </div>
+        <div class="deuda-comp-detalle" style="display:none;">
+          <div><b>Descripción:</b> ${escapeHtml(r.descrip)}</div>
+          <div><b>Debe:</b> ${fmtMoney(r.debe)}</div>
+          <div><b>Haber (pago a cuenta):</b> ${fmtMoney(r.haber)}</div>
+          <div><b>Saldo pendiente del comprobante:</b> ${fmtMoney(r.saldocom)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  return `
+    <div class="deuda-linea">
+      <div class="deuda-linea-titulo"><span>${titulo}</span><span class="deuda-linea-total">Total: ${fmtMoney(totalLinea)}</span></div>
+      ${filasHtml}
+    </div>
+  `;
+}
+function toggleDeudaDetalle(el){
+  const det = el.querySelector('.deuda-comp-detalle');
+  if(det) det.style.display = det.style.display === 'none' ? 'block' : 'none';
+}
+/* Version detallada (una fila de tabla por comprobante, con todos los
+   campos) usada solo en el reporte que se comparte por PDF — distinta de
+   la version compacta que se ve en pantalla. */
+function buildDeudaLineaTablaHTML(titulo, filas){
+  if(filas.length === 0){
+    return `<div style="margin-bottom:14px; font-size:12px;"><b>${titulo}</b><div style="color:#777; margin-top:4px;">Sin comprobantes pendientes.</div></div>`;
+  }
+  const totalLinea = filas[filas.length-1].saldo;
+  const filasHtml = filas.map(r=>`
+    <tr>
+      <td>${escapeHtml(fmtFechaDeuda(r.fecha))}</td>
+      <td>${escapeHtml(r.descrip)}</td>
+      <td>${fmtMoney(r.debe)}</td>
+      <td>${fmtMoney(r.haber)}</td>
+      <td>${fmtMoney(r.saldocom)}</td>
+      <td>${fmtMoney(r.saldo)}</td>
+    </tr>
+  `).join('');
+  return `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px;">
+        <b>${titulo}</b>
+        <span><b>Total:</b> ${fmtMoney(totalLinea)}</span>
+      </div>
+      <table class="ps-table">
+        <colgroup><col style="width:9%"><col style="width:31%"><col style="width:15%"><col style="width:15%"><col style="width:15%"><col style="width:15%"></colgroup>
+        <thead><tr><th>Fecha</th><th>Descripción</th><th>Debe</th><th>Haber</th><th>Saldo comp.</th><th>Saldo</th></tr></thead>
+        <tbody>${filasHtml}</tbody>
+      </table>
+    </div>
+  `;
+}
+function buildDeudaClientePaginasCompartir(b){
+  const html = `
+    <div class="ps-block"><div class="ps-rot-inner">
+      ${empresaLineHTML()}
+      <div class="ps-header-line">
+        <span><b>Estado de cuenta</b></span>
+        <span><b>Cliente:</b> ${escapeHtml(b.codclie)} - ${escapeHtml(b.nombre)}</span>
+        <span><b>Fecha:</b> ${fmtFechaCorta(new Date().toISOString().slice(0,10))}</span>
+      </div>
+      ${buildDeudaLineaTablaHTML('Línea 1', b.filasCliente1)}
+      ${buildDeudaLineaTablaHTML('Línea 2', b.filasCliente2)}
+    </div></div>
+  `;
+  return [{html}];
+}
+async function compartirDeudaCliente(){
+  if(!deudaResultadoActual){
+    toast('Consultá un único cliente para poder compartir');
+    return;
+  }
+  const b = deudaResultadoActual;
+  const cfg = calcularImpresionTipo('deuda');
+  const paginas = buildDeudaClientePaginasCompartir(b);
+  await generarYCompartirPDF(paginas, cfg, 'Deuda_'+b.codclie, 'Estado de cuenta '+b.nombre);
+}
+/* Descarga directa del mismo PDF que arma "Compartir" — pensado para cuando
+   se usa la app desde una PC, donde descargar es mas practico. */
+async function descargarDeudaClientePDF(){
+  if(!deudaResultadoActual){
+    toast('Consultá un único cliente para poder descargar');
+    return;
+  }
+  const b = deudaResultadoActual;
+  const cfg = calcularImpresionTipo('deuda');
+  const paginas = buildDeudaClientePaginasCompartir(b);
+  await generarYDescargarPDF(paginas, cfg, 'Deuda_'+b.codclie);
+}
+
 function irACatalogos(){
   showView('view-catalogos');
   renderCatalogosPublico();
@@ -2251,6 +2621,7 @@ function cerrarQuickNav(){
 function ejecutarQuickNav(target){
   if(target === 'cobranza') irACobranzaMenu();
   else if(target === 'pedidos') irAPedidos();
+  else if(target === 'deuda') irAConsultarDeuda();
   else if(target === 'catalogos') irACatalogos();
   else if(target === 'menu'){ showView('view-menu'); renderMenu(); }
 }
@@ -2273,6 +2644,7 @@ const HNAV_ITEMS = [
   {target:'menu', label:'Inicio', view:'view-menu'},
   {target:'cobranza', label:'Cobranza', view:'view-cobranza-menu'},
   {target:'pedidos', label:'Pedidos', view:'view-pedidos-home'},
+  {target:'deuda', label:'Deuda', view:'view-consultar-deuda'},
   {target:'catalogos', label:'Catálogos', view:'view-catalogos'}
 ];
 function inicializarHNav(){
@@ -3756,6 +4128,8 @@ function renderImportCounts(){
   document.getElementById('countTransportes').textContent = fmtFechaImport('transportes', transportes.length, 'transporte', 'transportes');
   document.getElementById('countVendedores').textContent = fmtFechaImport('vendedores', vendedores.length, 'vendedor', 'vendedores');
   document.getElementById('countArticulos').textContent = fmtFechaImport('articulos', articulos.length, 'artículo', 'artículos');
+  document.getElementById('countDeuda1').textContent = fmtFechaImport('deuda1', deudaLinea1.length, 'comprobante', 'comprobantes');
+  document.getElementById('countDeuda2').textContent = fmtFechaImport('deuda2', deudaLinea2.length, 'comprobante', 'comprobantes');
   document.getElementById('vendedorActual').textContent = 'Código: ' + (vendedorCodigo || '-') + (vendedorNombre ? ' - ' + vendedorNombre : '');
   document.getElementById('countPlanillasExport').textContent = planillas.length + ' planillas guardadas';
   document.getElementById('countPedidosExport').textContent = pedidos.length + ' pedidos guardados';
@@ -3873,12 +4247,52 @@ function exportarPedidosCSV(){
   toast('Archivos exportados');
 }
 
+/* Separa una linea de CSV respetando comillas: si un campo viene entre
+   comillas, cualquier coma o punto y coma que tenga adentro NO corta la
+   columna (evita que una descripcion como "Pérez, Juan" rompa el resto de
+   la fila). Detecta el separador (',' o ';') contando apariciones FUERA de
+   comillas, para no confundirse con el que este dentro de un campo. */
+function splitCSVLine(line){
+  let comas = 0, puntoYComa = 0, dentroComillas = false;
+  for(let i=0; i<line.length; i++){
+    const ch = line[i];
+    if(ch === '"') dentroComillas = !dentroComillas;
+    else if(!dentroComillas && ch === ',') comas++;
+    else if(!dentroComillas && ch === ';') puntoYComa++;
+  }
+  const delim = puntoYComa > comas ? ';' : ',';
+
+  const result = [];
+  let cur = '';
+  let inQuotes = false;
+  for(let i=0; i<line.length; i++){
+    const ch = line[i];
+    if(inQuotes){
+      if(ch === '"'){
+        if(line[i+1] === '"'){ cur += '"'; i++; } // comilla escapada (""), se mantiene como comilla literal
+        else{ inQuotes = false; }
+      }else{
+        cur += ch;
+      }
+    }else{
+      if(ch === '"'){
+        inQuotes = true;
+      }else if(ch === delim){
+        result.push(cur.trim());
+        cur = '';
+      }else{
+        cur += ch;
+      }
+    }
+  }
+  result.push(cur.trim());
+  return result;
+}
 function parseCSV(text){
   const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
   const rows = [];
   for(const line of lines){
-    const delim = line.includes(';') ? ';' : ',';
-    const parts = line.split(delim).map(p=>p.replace(/^"|"$/g,'').trim());
+    const parts = splitCSVLine(line);
     if(parts.length < 2) continue;
     // Solo se usan las columnas codigo y nombre para buscar; cualquier columna
     // extra (postal, localidad, provincia, etc.) se ignora.
@@ -3894,13 +4308,40 @@ function parseArticulosCSV(text){
   const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
   const rows = [];
   for(const line of lines){
-    const delim = line.includes(';') ? ';' : ',';
-    const parts = line.split(delim).map(p=>p.replace(/^"|"$/g,'').trim());
+    const parts = splitCSVLine(line);
     if(parts.length < 3) continue;
     const precioNum = parts[3] !== undefined ? parseFloat(String(parts[3]).replace(',', '.')) : NaN;
     rows.push({codigo: parts[0], codigoAlt: parts[1], descripcion: parts[2], precio: isNaN(precioNum) ? '' : precioNum});
   }
   if(rows.length && /^(codigo|código|cod)$/i.test(rows[0].codigo)){
+    rows.shift();
+  }
+  return rows;
+}
+/* Formato: codclie,nombre,fecha,descrip,debe,haber,saldocom,saldo,codvend,codtrans
+   Ya viene filtrado (solo comprobantes con saldo pendiente), ordenado por
+   cliente y fecha, con el saldo acumulado ya calculado desde el origen. */
+function parseDeudaCSV(text){
+  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+  const rows = [];
+  const num = (s)=>{ const n = parseFloat(String(s||'').replace(',', '.')); return isNaN(n) ? 0 : n; };
+  for(const line of lines){
+    const parts = splitCSVLine(line);
+    if(parts.length < 10) continue;
+    rows.push({
+      codclie: parts[0],
+      nombre: parts[1],
+      fecha: parts[2],
+      descrip: parts[3],
+      debe: num(parts[4]),
+      haber: num(parts[5]),
+      saldocom: num(parts[6]),
+      saldo: num(parts[7]),
+      codvend: parts[8],
+      codtrans: parts[9]
+    });
+  }
+  if(rows.length && /^(codigo|código|cod|codclie)$/i.test(rows[0].codclie)){
     rows.shift();
   }
   return rows;
@@ -3952,6 +4393,20 @@ function importarCSV(evt, tipo){
       evt.target.value = '';
       return;
     }
+    if(tipo === 'deuda1' || tipo === 'deuda2'){
+      const rows = parseDeudaCSV(textoDecodificado);
+      if(rows.length === 0){
+        toast('No se encontraron filas válidas en el archivo');
+        return;
+      }
+      if(tipo === 'deuda1'){ deudaLinea1 = rows; saveJSON(LS.deudaLinea1, deudaLinea1); }
+      else{ deudaLinea2 = rows; saveJSON(LS.deudaLinea2, deudaLinea2); }
+      marcarFechaImportacion(tipo, fechaArchivo);
+      renderImportCounts();
+      toast(rows.length + ' comprobantes importados');
+      evt.target.value = '';
+      return;
+    }
     const rows = parseCSV(textoDecodificado);
     if(rows.length === 0){
       toast('No se encontraron filas válidas en el archivo');
@@ -3983,7 +4438,7 @@ function descargarRespaldo(){
     version: 3,
     fecha: new Date().toISOString(),
     clientes, transportes, vendedores, articulos, planillas, pedidos, catalogos,
-    recibos, planillasGeneradas,
+    recibos, planillasGeneradas, deudaLinea1, deudaLinea2,
     vendedorCodigo, vendedorNombre,
     puntoVenta, fabricaCodigo, fabricaNombre, mostrarPlanillaAnterior, printSize, printUnoPorHoja, printConfig,
     exportAvisoDesactivado,
@@ -4021,6 +4476,8 @@ function restaurarRespaldo(evt){
       catalogos = Array.isArray(data.catalogos) ? data.catalogos : [];
       recibos = Array.isArray(data.recibos) ? data.recibos : [];
       planillasGeneradas = Array.isArray(data.planillasGeneradas) ? data.planillasGeneradas : [];
+      deudaLinea1 = Array.isArray(data.deudaLinea1) ? data.deudaLinea1 : [];
+      deudaLinea2 = Array.isArray(data.deudaLinea2) ? data.deudaLinea2 : [];
       saveJSON(LS.clientes, clientes);
       saveJSON(LS.transportes, transportes);
       saveJSON(LS.vendedores, vendedores);
@@ -4030,6 +4487,8 @@ function restaurarRespaldo(evt){
       saveJSON(LS.catalogos, catalogos);
       saveJSON(LS.recibos, recibos);
       saveJSON(LS.planillasGeneradas, planillasGeneradas);
+      saveJSON(LS.deudaLinea1, deudaLinea1);
+      saveJSON(LS.deudaLinea2, deudaLinea2);
       if(data.vendedorCodigo){
         vendedorCodigo = data.vendedorCodigo;
         vendedorNombre = data.vendedorNombre || '';
@@ -4135,6 +4594,25 @@ function fmtFechaCorta(fecha){
   if(partes.length!==3) return fecha;
   const [y,m,d] = partes;
   return d+'/'+m+'/'+y.slice(2);
+}
+/* Interpreta la fecha del archivo de deuda (viene de un sistema externo,
+   VFP, cuyo formato exacto de exportacion puede variar) reconociendo los
+   formatos mas comunes, y la devuelve como DD/MM/AA. Si no reconoce el
+   formato, muestra el texto tal cual vino en vez de ocultar informacion. */
+function fmtFechaDeuda(fecha){
+  if(!fecha) return '';
+  const s = String(fecha).trim();
+  let m;
+  if((m = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/))){ // AAAA-MM-DD
+    return m[3].padStart(2,'0')+'/'+m[2].padStart(2,'0')+'/'+m[1].slice(2);
+  }
+  if((m = s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/))){ // DD-MM-AAAA
+    return m[1].padStart(2,'0')+'/'+m[2].padStart(2,'0')+'/'+m[3].slice(2);
+  }
+  if((m = s.match(/^(\d{4})(\d{2})(\d{2})$/))){ // AAAAMMDD sin separadores
+    return m[3]+'/'+m[2]+'/'+m[1].slice(2);
+  }
+  return s;
 }
 function buildPedidoPrintHTML(p, blockClass){
   blockClass = blockClass || 'ps-block';
