@@ -88,7 +88,7 @@
   .planilla-card::before{left:-8px;}
   .planilla-card::after{right:-8px;}
   .pc-check{width:22px; height:22px; flex-shrink:0; accent-color:var(--plum);}
-  .pc-left{display:flex; flex-direction:column; gap:3px; min-width:0;}
+  .pc-left{display:flex; flex-direction:column; gap:3px; min-width:0; flex:1;}
   .pc-num{font-weight:700; font-size:15px; color:var(--plum-dark);}
   .pc-meta{font-size:12.5px; color:var(--ink-soft);}
   .pc-right{text-align:right; display:flex; flex-direction:column; gap:2px; align-items:flex-end;}
@@ -265,6 +265,8 @@
 
   /* ---------- Selection bar (imprimir varios) ---------- */
   .selectbar{position:sticky; bottom:0; background:var(--plum); color:var(--white); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; box-shadow:0 -2px 10px rgba(0,0,0,0.15); z-index:15;}
+  .selectbar-botones-parejos{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .selectbar-botones-parejos .btn{width:100%; padding:10px 6px; font-size:13.5px;}
   .selectbar span{font-size:13.5px; font-weight:600;}
 
   /* ---------- Print sheet (hidden on screen) ---------- */
@@ -273,32 +275,34 @@
     #app, .topbar, .view, .content, .modal-backdrop, .toast, .selectbar{display:none !important;}
     #printSheet{display:block !important;}
     body{background:#fff;}
-    #printSheet{font-family:Arial,Helvetica,sans-serif; color:#111; padding:10px; font-size:12px;}
+    #printSheet{font-family:Arial,Helvetica,sans-serif; color:#111; padding:10px; font-size:13px;}
     #printSheet.ps-texto-rotado{padding:0; overflow:visible;}
     .ps-block{page-break-after:always;}
     .ps-block:last-child{page-break-after:auto;}
     .ps-block-multi{page-break-after:auto; page-break-inside:avoid; border-bottom:2px dashed #999; margin-bottom:16px; padding-bottom:16px;}
     .ps-block-multi:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
     .ps-header{display:flex; justify-content:space-between; border-bottom:3px solid #5d3a5c; padding-bottom:10px; margin-bottom:14px;}
-    .ps-header h1{font-size:18px; margin:0 0 4px; color:#5d3a5c;}
-    .ps-header .ps-meta{font-size:12px; line-height:1.6;}
+    .ps-header h1{font-size:19px; margin:0 0 4px; color:#5d3a5c;}
+    .ps-header .ps-meta{font-size:13px; line-height:1.6;}
     .ps-header .ps-meta b{display:inline-block; width:110px;}
-    .ps-empresa{font-size:10px; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;}
+    .ps-empresa{font-size:11px; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;}
     .ps-header-recibo{border-bottom:3px solid #5d3a5c; padding-bottom:10px; margin-bottom:14px;}
     .ps-header-recibo-top{display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin-bottom:5px;}
-    .ps-empresa-title{font-size:15px; font-weight:800; color:#5d3a5c; letter-spacing:0.2px;}
-    .ps-recibo-title{font-size:12px; font-weight:700; color:#5d3a5c; text-align:right; white-space:nowrap;}
-    .ps-header-line-inline{display:flex; align-items:baseline; gap:22px; font-size:12.5px;}
+    .ps-empresa-title{font-size:16px; font-weight:800; color:#5d3a5c; letter-spacing:0.2px;}
+    .ps-recibo-title{font-size:13px; font-weight:700; color:#5d3a5c; text-align:right; white-space:nowrap;}
+    .ps-header-line-inline{display:flex; align-items:baseline; gap:22px; font-size:13.5px;}
     .ps-header-line-inline b{margin-right:3px;}
-    .ps-header-cliente{font-size:12px; margin-top:4px;}
+    .ps-header-cliente{font-size:13px; margin-top:4px;}
     .ps-pagos-table{width:100%; border-collapse:collapse; margin:4px 0 6px;}
-    .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:9.5px; text-transform:uppercase;}
-    .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:11px;}
+    .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:10.5px; text-transform:uppercase;}
+    .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:12px;}
     .ps-pagos-table th:first-child, .ps-pagos-table td:first-child{padding-right:3px;}
     .ps-pagos-table th:nth-child(2), .ps-pagos-table td:nth-child(2){padding-left:3px;}
     table.ps-table{width:100%; border-collapse:collapse; margin-bottom:14px;}
-    table.ps-table th{background:#5d3a5c; color:#fff; text-align:left; padding:6px 8px; font-size:11px; text-transform:uppercase;}
-    table.ps-table td{padding:6px 8px; border-bottom:1px solid #ddd; font-size:11.5px;}
+    table.ps-table th{background:#5d3a5c; color:#fff; text-align:left; padding:6px 8px; font-size:12px; text-transform:uppercase;}
+    table.ps-table-plano th{background:none; color:#111; text-align:left; padding:5px 8px; font-size:11.5px; text-transform:uppercase; border-bottom:2px solid #111;}
+    table.ps-table td{padding:6px 8px; border-bottom:1px solid #ddd; font-size:12.5px;}
+    table.ps-table-plano td{padding:5px 8px; border-bottom:1px solid #ddd; font-size:12px;}
     table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
     table.ps-pedido-table{margin-bottom:4px;}
     table.ps-planilla-reducida-table th:nth-child(1), table.ps-planilla-reducida-table td:nth-child(1){white-space:nowrap;}
@@ -306,21 +310,21 @@
     /* Renglones un poco mas juntos (menos alto por fila) */
     table.ps-pedido-table td{padding-top:3px; padding-bottom:3px;}
     /* Encabezado de columnas mas chico y sin salto de linea (para que "Bonif %" entre en una sola linea) */
-    table.ps-pedido-table th{font-size:9px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
+    table.ps-pedido-table th{font-size:9.5px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
     /* Cantidad: se deja espacio extra a la derecha para poder anotar los kilos a mano */
     table.ps-pedido-table th:nth-child(1), table.ps-pedido-table td:nth-child(1){padding-right:26px;}
     /* Código justificado a la derecha, pegado a Descripción */
     table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:3px; text-align:right;}
     table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:3px;}
     .ps-total{display:flex; justify-content:flex-end; margin-bottom:14px;}
-    .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:14px;}
+    .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:15px;}
     .ps-total-pedido{margin-bottom:6px;}
     .ps-tipos{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
-    .ps-tipos div{background:#f7f5f2; border:1px solid #ddd; border-radius:6px; padding:6px 10px; font-size:11px;}
-  .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:11.5px; min-height:40px;}
-  .ps-obs-inline{margin-top:6px; font-size:11px; color:#333;}
+    .ps-tipos div{background:#f7f5f2; border:1px solid #ddd; border-radius:6px; padding:6px 10px; font-size:12px;}
+  .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:12.5px; min-height:40px;}
+  .ps-obs-inline{margin-top:6px; font-size:12px; color:#333;}
     .ps-obs-pedido{padding:7px 10px; min-height:auto;}
-    .ps-obs .lbl{font-weight:bold; color:#5d3a5c; display:block; margin-bottom:4px; font-size:10px; text-transform:uppercase;}
+    .ps-obs .lbl{font-weight:bold; color:#5d3a5c; display:block; margin-bottom:4px; font-size:11px; text-transform:uppercase;}
     #printSheet.ps-size-chico{font-size:9.5px;}
     #printSheet.ps-size-chico .ps-header h1{font-size:14px;}
     #printSheet.ps-size-chico table.ps-table th{font-size:9px; padding:4px 5px;}
@@ -336,7 +340,7 @@
     #printSheet.ps-ticket .tk-row{display:flex; justify-content:space-between; gap:6px;}
 
     /* encabezado compacto de una sola línea (pedidos) */
-    .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:11.5px; white-space:nowrap;}
+    .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:12.5px; white-space:nowrap;}
     .ps-header-line b{color:#5d3a5c;}
     #printSheet.ps-size-chico .ps-header-line{font-size:9px;}
   }
@@ -396,31 +400,33 @@
 
 
   /* ===== Copia de los estilos de impresion, SIN @media print, para el renderizador offscreen que arma la imagen del PDF a compartir ===== */
-  .ps-share-render{font-family:Arial,Helvetica,sans-serif; color:#111; font-size:12px; background:#fff;}
+  .ps-share-render{font-family:Arial,Helvetica,sans-serif; color:#111; font-size:13px; background:#fff;}
     .ps-block{page-break-after:always;}
     .ps-block:last-child{page-break-after:auto;}
     .ps-block-multi{page-break-after:auto; page-break-inside:avoid; border-bottom:2px dashed #999; margin-bottom:16px; padding-bottom:16px;}
     .ps-block-multi:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
     .ps-header{display:flex; justify-content:space-between; border-bottom:3px solid #5d3a5c; padding-bottom:10px; margin-bottom:14px;}
-    .ps-header h1{font-size:18px; margin:0 0 4px; color:#5d3a5c;}
-    .ps-header .ps-meta{font-size:12px; line-height:1.6;}
+    .ps-header h1{font-size:19px; margin:0 0 4px; color:#5d3a5c;}
+    .ps-header .ps-meta{font-size:13px; line-height:1.6;}
     .ps-header .ps-meta b{display:inline-block; width:110px;}
-    .ps-empresa{font-size:10px; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;}
+    .ps-empresa{font-size:11px; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;}
     .ps-header-recibo{border-bottom:3px solid #5d3a5c; padding-bottom:10px; margin-bottom:14px;}
     .ps-header-recibo-top{display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin-bottom:5px;}
-    .ps-empresa-title{font-size:15px; font-weight:800; color:#5d3a5c; letter-spacing:0.2px;}
-    .ps-recibo-title{font-size:12px; font-weight:700; color:#5d3a5c; text-align:right; white-space:nowrap;}
-    .ps-header-line-inline{display:flex; align-items:baseline; gap:22px; font-size:12.5px;}
+    .ps-empresa-title{font-size:16px; font-weight:800; color:#5d3a5c; letter-spacing:0.2px;}
+    .ps-recibo-title{font-size:13px; font-weight:700; color:#5d3a5c; text-align:right; white-space:nowrap;}
+    .ps-header-line-inline{display:flex; align-items:baseline; gap:22px; font-size:13.5px;}
     .ps-header-line-inline b{margin-right:3px;}
-    .ps-header-cliente{font-size:12px; margin-top:4px;}
+    .ps-header-cliente{font-size:13px; margin-top:4px;}
     .ps-pagos-table{width:100%; border-collapse:collapse; margin:4px 0 6px;}
-    .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:9.5px; text-transform:uppercase;}
-    .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:11px;}
+    .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:10.5px; text-transform:uppercase;}
+    .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:12px;}
     .ps-pagos-table th:first-child, .ps-pagos-table td:first-child{padding-right:3px;}
     .ps-pagos-table th:nth-child(2), .ps-pagos-table td:nth-child(2){padding-left:3px;}
     table.ps-table{width:100%; border-collapse:collapse; margin-bottom:14px;}
-    table.ps-table th{background:#5d3a5c; color:#fff; text-align:left; padding:6px 8px; font-size:11px; text-transform:uppercase;}
-    table.ps-table td{padding:6px 8px; border-bottom:1px solid #ddd; font-size:11.5px;}
+    table.ps-table th{background:#5d3a5c; color:#fff; text-align:left; padding:6px 8px; font-size:12px; text-transform:uppercase;}
+    table.ps-table-plano th{background:none; color:#111; text-align:left; padding:5px 8px; font-size:11.5px; text-transform:uppercase; border-bottom:2px solid #111;}
+    table.ps-table td{padding:6px 8px; border-bottom:1px solid #ddd; font-size:12.5px;}
+    table.ps-table-plano td{padding:5px 8px; border-bottom:1px solid #ddd; font-size:12px;}
     table.ps-table tr:nth-child(even) td{background:#f7f5f2;}
     table.ps-pedido-table{margin-bottom:4px;}
     table.ps-planilla-reducida-table th:nth-child(1), table.ps-planilla-reducida-table td:nth-child(1){white-space:nowrap;}
@@ -428,21 +434,21 @@
     /* Renglones un poco mas juntos (menos alto por fila) */
     table.ps-pedido-table td{padding-top:3px; padding-bottom:3px;}
     /* Encabezado de columnas mas chico y sin salto de linea (para que "Bonif %" entre en una sola linea) */
-    table.ps-pedido-table th{font-size:9px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
+    table.ps-pedido-table th{font-size:9.5px; padding-top:5px; padding-bottom:5px; white-space:nowrap;}
     /* Cantidad: se deja espacio extra a la derecha para poder anotar los kilos a mano */
     table.ps-pedido-table th:nth-child(1), table.ps-pedido-table td:nth-child(1){padding-right:26px;}
     /* Código justificado a la derecha, pegado a Descripción */
     table.ps-pedido-table th:nth-child(2), table.ps-pedido-table td:nth-child(2){padding-right:3px; text-align:right;}
     table.ps-pedido-table th:nth-child(3), table.ps-pedido-table td:nth-child(3){padding-left:3px;}
     .ps-total{display:flex; justify-content:flex-end; margin-bottom:14px;}
-    .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:14px;}
+    .ps-total .box{background:#8d9457; color:#fff; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:15px;}
     .ps-total-pedido{margin-bottom:6px;}
     .ps-tipos{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
-    .ps-tipos div{background:#f7f5f2; border:1px solid #ddd; border-radius:6px; padding:6px 10px; font-size:11px;}
-  .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:11.5px; min-height:40px;}
-  .ps-obs-inline{margin-top:6px; font-size:11px; color:#333;}
+    .ps-tipos div{background:#f7f5f2; border:1px solid #ddd; border-radius:6px; padding:6px 10px; font-size:12px;}
+  .ps-obs{border:1px solid #ddd; border-radius:6px; padding:10px; font-size:12.5px; min-height:40px;}
+  .ps-obs-inline{margin-top:6px; font-size:12px; color:#333;}
     .ps-obs-pedido{padding:7px 10px; min-height:auto;}
-    .ps-obs .lbl{font-weight:bold; color:#5d3a5c; display:block; margin-bottom:4px; font-size:10px; text-transform:uppercase;}
+    .ps-obs .lbl{font-weight:bold; color:#5d3a5c; display:block; margin-bottom:4px; font-size:11px; text-transform:uppercase;}
     .ps-share-render.ps-size-chico{font-size:9.5px;}
     .ps-share-render.ps-size-chico .ps-header h1{font-size:14px;}
     .ps-share-render.ps-size-chico table.ps-table th{font-size:9px; padding:4px 5px;}
@@ -456,7 +462,7 @@
     .ps-share-render.ps-ticket .tk-line{border-top:1px dashed #000; margin:5px 0;}
     .ps-share-render.ps-ticket .tk-row{display:flex; justify-content:space-between; gap:6px;}
     /* encabezado compacto de una sola línea (pedidos) */
-    .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:11.5px; white-space:nowrap;}
+    .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:12.5px; white-space:nowrap;}
     .ps-header-line b{color:#5d3a5c;}
     .ps-share-render.ps-size-chico .ps-header-line{font-size:9px;}
 </style>
@@ -847,15 +853,22 @@
         <button class="btn btn-primary btn-block btn-lg" onclick="nuevoPedido()">+ Nota de Pedido</button>
       </div>
       <div class="fab-row" style="margin-top:-8px;">
-        <button class="btn btn-outline btn-block" id="btnToggleSeleccion" onclick="toggleSeleccionPedidos()">Seleccionar varios para imprimir</button>
+        <button class="btn btn-outline btn-block" id="btnToggleSeleccion" onclick="toggleSeleccionPedidos()">Seleccionar varios para imprimir / eliminar</button>
+      </div>
+      <div class="row2" id="rowSeleccionTodosPedidos" style="display:none; margin-top:-8px; margin-bottom:14px;">
+        <button class="btn btn-outline" onclick="seleccionarTodosPedidos()">Seleccionar todos</button>
+        <button class="btn btn-outline" onclick="borrarSeleccionPedidos()">Borrar selección</button>
       </div>
       <div id="pedidosHomeList"></div>
     </div>
-    <div class="selectbar" id="pedidosSelectbar" style="display:none;">
-      <span id="pedidosSelectCount">0 seleccionados</span>
-      <button class="btn btn-olive" onclick="imprimirPedidosSeleccionados()">Imprimir seleccionados</button>
-      <button class="btn btn-olive" onclick="compartirPedidosSeleccionados()">Compartir</button>
-      <button class="btn btn-olive" onclick="exportarPedidosSeleccionadosExcel()">Excel</button>
+    <div class="selectbar" id="pedidosSelectbar" style="display:none; flex-direction:column; align-items:stretch;">
+      <span id="pedidosSelectCount" style="text-align:center; margin-bottom:9px;">0 seleccionados</span>
+      <div class="selectbar-botones-parejos">
+        <button class="btn btn-olive" onclick="imprimirPedidosSeleccionados()">Imprimir</button>
+        <button class="btn btn-olive" onclick="compartirPedidosSeleccionados()">Compartir</button>
+        <button class="btn btn-olive" onclick="exportarPedidosSeleccionadosExcel()">Excel</button>
+        <button class="btn btn-danger" onclick="eliminarPedidosSeleccionados()">Eliminar</button>
+      </div>
     </div>
   </div>
 
@@ -948,6 +961,7 @@
         <button class="btn btn-olive" id="btnCompartirDeuda" onclick="compartirDeudaCliente()">Compartir</button>
         <button class="btn btn-outline" id="btnDescargarDeuda" onclick="descargarDeudaClientePDF()">Descargar PDF</button>
       </div>
+      <button class="btn btn-outline btn-block" id="btnDescargarListadoDeuda" style="display:none; margin-top:8px;" onclick="descargarListadoDeudaPDF()">Descargar PDF del listado</button>
       <div id="deudaResultado" style="margin-top:16px;"></div>
     </div>
   </div>
@@ -2266,21 +2280,63 @@ async function generarYCompartirPDF(paginas, cfg, nombreArchivo, tituloCompartir
       }
     }
     if(!compartido){
-      doc.save(nombreFinal);
-      toast(navigator.share ? 'No se pudo compartir: se descargó el PDF' : 'Se descargó el PDF (este navegador no tiene menú de compartir)');
+      try{ doc.save(nombreFinal); }catch(e){ console.error(e); }
+      const url = URL.createObjectURL(blob);
+      mostrarDescargaManual(url, nombreFinal);
+      toast(navigator.share ? 'No se pudo compartir: PDF listo para descargar' : 'PDF listo para descargar (este navegador no tiene menú de compartir)');
     }
   }catch(err){
     console.error(err);
     toast('No se pudo generar el PDF para compartir');
   }
 }
+/* Muestra un aviso fijo abajo de la pantalla con un link REAL de descarga,
+   para que el usuario lo toque directamente. Se usa como respaldo de la
+   descarga automática: en algunos celulares, si la generación del PDF tarda
+   unos segundos, el navegador bloquea en silencio la descarga automática
+   (sin ningún error visible) porque considera que ya pasó "demasiado
+   tiempo" desde el toque inicial del botón. Un toque nuevo y directo sobre
+   este link nunca se bloquea. */
+function mostrarDescargaManual(blobUrl, nombreArchivo){
+  let cont = document.getElementById('descargaManualOverlay');
+  if(!cont){
+    cont = document.createElement('div');
+    cont.id = 'descargaManualOverlay';
+    cont.style.cssText = 'position:fixed; left:14px; right:14px; bottom:14px; background:#2b2530; color:#fff; border-radius:14px; padding:12px 14px; z-index:600; display:flex; align-items:center; gap:12px; box-shadow:0 4px 20px rgba(0,0,0,0.35); font-family:inherit;';
+    document.body.appendChild(cont);
+  }
+  cont.innerHTML = '';
+  const txt = document.createElement('div');
+  txt.style.cssText = 'font-size:13px; flex:1; line-height:1.3;';
+  txt.textContent = 'PDF listo — tocá para descargar:';
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = nombreArchivo;
+  link.textContent = 'Descargar';
+  link.style.cssText = 'background:#8d9457; color:#fff; padding:9px 18px; border-radius:8px; font-weight:700; text-decoration:none; flex-shrink:0; font-size:13.5px;';
+  link.onclick = ()=>{ setTimeout(()=>{ if(cont.parentNode) cont.remove(); }, 400); };
+  const cerrar = document.createElement('button');
+  cerrar.textContent = '✕';
+  cerrar.setAttribute('aria-label', 'Cerrar');
+  cerrar.style.cssText = 'background:none; border:none; color:#fff; font-size:16px; cursor:pointer; flex-shrink:0; padding:4px;';
+  cerrar.onclick = ()=> cont.remove();
+  cont.appendChild(txt);
+  cont.appendChild(link);
+  cont.appendChild(cerrar);
+}
 /* Descarga directa, sin pasar por el menu de compartir — pensado para uso
-   en PC, donde descargar es mas comodo/predecible que compartir. */
+   en PC, donde descargar es mas comodo/predecible que compartir. Se intenta
+   la descarga automatica de jsPDF primero, y ademas se deja siempre visible
+   un link real de respaldo (ver mostrarDescargaManual), por si el celular
+   bloqueo la automatica sin avisar. */
 async function generarYDescargarPDF(paginas, cfg, nombreArchivo){
   const res = await generarDocumentoPDF(paginas, cfg, nombreArchivo);
   if(!res) return;
-  res.doc.save(res.nombreFinal);
-  toast('PDF descargado');
+  try{ res.doc.save(res.nombreFinal); }catch(e){ console.error(e); }
+  const blob = res.doc.output('blob');
+  const url = URL.createObjectURL(blob);
+  mostrarDescargaManual(url, res.nombreFinal);
+  toast('PDF listo');
 }
 
 function irACobranza(){
@@ -2322,13 +2378,16 @@ function irAPedidos(){
    ========================================================= */
 let deudaClienteSel = null;   // {codigo, nombre} o null = todos
 let deudaTransporteSel = null; // {codigo, nombre} o null = todos
-let deudaResultadoActual = null; // guardado para el boton Compartir
+let deudaResultadoActual = null; // guardado para el boton Compartir (solo cuando es 1 cliente)
+let deudaBloquesActuales = null; // guardado para el PDF del listado general (1 o varios clientes)
 
 function irAConsultarDeuda(){
   showView('view-consultar-deuda');
   document.getElementById('deudaResultado').innerHTML = '';
   document.getElementById('rowBotonesDeudaCliente').style.display = 'none';
+  document.getElementById('btnDescargarListadoDeuda').style.display = 'none';
   deudaResultadoActual = null;
+  deudaBloquesActuales = null;
   renderDeudaFiltros();
 }
 function seleccionarClienteDeuda(codigo){
@@ -2349,7 +2408,9 @@ function limpiarFiltrosDeuda(){
   renderDeudaFiltros();
   document.getElementById('deudaResultado').innerHTML = '';
   document.getElementById('rowBotonesDeudaCliente').style.display = 'none';
+  document.getElementById('btnDescargarListadoDeuda').style.display = 'none';
   deudaResultadoActual = null;
+  deudaBloquesActuales = null;
 }
 function renderDeudaFiltros(){
   const elC = document.getElementById('deudaClienteSelected');
@@ -2395,7 +2456,9 @@ function consultarDeuda(){
   if(clientesOrdenados.length === 0){
     cont.innerHTML = '<div class="empty-state" style="padding:30px 10px;">Sin resultados para este filtro.</div>';
     document.getElementById('rowBotonesDeudaCliente').style.display = 'none';
+    document.getElementById('btnDescargarListadoDeuda').style.display = 'none';
     deudaResultadoActual = null;
+    deudaBloquesActuales = null;
     return;
   }
 
@@ -2406,8 +2469,9 @@ function consultarDeuda(){
   });
 
   cont.innerHTML = bloques.map(b=> buildDeudaClienteBlockHTML(b)).join('');
+  deudaBloquesActuales = bloques;
 
-  // Compartir/Descargar solo tienen sentido si el resultado es de un unico cliente
+  // Compartir/Descargar (de UN cliente) solo tienen sentido si el resultado es de un unico cliente
   const rowBotones = document.getElementById('rowBotonesDeudaCliente');
   if(clientesOrdenados.length === 1){
     rowBotones.style.display = 'flex';
@@ -2416,6 +2480,9 @@ function consultarDeuda(){
     rowBotones.style.display = 'none';
     deudaResultadoActual = null;
   }
+  // El PDF del listado general (todos los clientes que trajo el filtro) siempre
+  // esta disponible, sea uno o varios clientes.
+  document.getElementById('btnDescargarListadoDeuda').style.display = 'block';
 }
 function buildDeudaClienteBlockHTML(b){
   return `
@@ -2454,7 +2521,7 @@ function buildDeudaLineaHTML(titulo, filas){
   }).join('');
   return `
     <div class="deuda-linea">
-      <div class="deuda-linea-titulo"><span>${titulo}</span><span class="deuda-linea-total">Total: ${fmtMoney(totalLinea)}</span></div>
+      <div class="deuda-linea-titulo"><span>${titulo}</span><span class="deuda-linea-total">${fmtMoney(totalLinea)}</span></div>
       ${filasHtml}
     </div>
   `;
@@ -2466,7 +2533,8 @@ function toggleDeudaDetalle(el){
 /* Version detallada (una fila de tabla por comprobante, con todos los
    campos) usada solo en el reporte que se comparte por PDF — distinta de
    la version compacta que se ve en pantalla. */
-function buildDeudaLineaTablaHTML(titulo, filas){
+function buildDeudaLineaTablaHTML(titulo, filas, plano){
+  const claseTabla = plano ? 'ps-table ps-table-plano' : 'ps-table';
   if(filas.length === 0){
     return `<div style="margin-bottom:14px; font-size:12px;"><b>${titulo}</b><div style="color:#777; margin-top:4px;">Sin comprobantes pendientes.</div></div>`;
   }
@@ -2487,7 +2555,7 @@ function buildDeudaLineaTablaHTML(titulo, filas){
         <b>${titulo}</b>
         <span><b>Total:</b> ${fmtMoney(totalLinea)}</span>
       </div>
-      <table class="ps-table">
+      <table class="${claseTabla}">
         <colgroup><col style="width:9%"><col style="width:31%"><col style="width:15%"><col style="width:15%"><col style="width:15%"><col style="width:15%"></colgroup>
         <thead><tr><th>Fecha</th><th>Descripción</th><th>Debe</th><th>Haber</th><th>Saldo comp.</th><th>Saldo</th></tr></thead>
         <tbody>${filasHtml}</tbody>
@@ -2506,6 +2574,32 @@ function buildDeudaClientePaginasCompartir(b){
       </div>
       ${buildDeudaLineaTablaHTML('Línea 1', b.filasCliente1)}
       ${buildDeudaLineaTablaHTML('Línea 2', b.filasCliente2)}
+    </div></div>
+  `;
+  return [{html}];
+}
+/* Arma el listado de VARIOS clientes como un unico flujo continuo (uno
+   debajo del otro, separados por una linea punteada), en vez de forzar una
+   hoja nueva por cada cliente. El corte de hoja natural se sigue aplicando
+   solo cuando el contenido realmente no entra (ver generarDocumentoPDF), no
+   por cada cliente. Ademas usa la tabla "plana" (sin el color de marca), 
+   pensada para un listado interno mas economico de tinta. */
+function buildDeudaListadoPaginas(bloques){
+  const secciones = bloques.map((b,i)=>`
+    <div style="${i>0 ? 'margin-top:14px; padding-top:14px; border-top:1px dashed #999;' : ''}">
+      <div style="font-weight:bold; font-size:13px; margin-bottom:6px;">${escapeHtml(b.codclie)} - ${escapeHtml(b.nombre)}</div>
+      ${buildDeudaLineaTablaHTML('Línea 1', b.filasCliente1, true)}
+      ${buildDeudaLineaTablaHTML('Línea 2', b.filasCliente2, true)}
+    </div>
+  `).join('');
+  const html = `
+    <div class="ps-block"><div class="ps-rot-inner">
+      ${empresaLineHTML()}
+      <div class="ps-header-line">
+        <span><b>Listado de deuda</b></span>
+        <span><b>Fecha:</b> ${fmtFechaCorta(new Date().toISOString().slice(0,10))}</span>
+      </div>
+      ${secciones}
     </div></div>
   `;
   return [{html}];
@@ -2531,6 +2625,26 @@ async function descargarDeudaClientePDF(){
   const cfg = calcularImpresionTipo('deuda');
   const paginas = buildDeudaClientePaginasCompartir(b);
   await generarYDescargarPDF(paginas, cfg, 'Deuda_'+b.codclie);
+}
+/* Descarga el listado completo de la consulta actual (uno o varios
+   clientes), en un flujo continuo (uno debajo del otro, no una hoja fija
+   por cliente), sin el color de marca (tabla plana, mas economica de
+   tinta). A diferencia de "Compartir" (pensado para mandarle a UN cliente
+   su propio estado de cuenta), esto es para uso interno del vendedor, asi
+   que no tiene la restriccion de un unico cliente. */
+async function descargarListadoDeudaPDF(){
+  if(!deudaBloquesActuales || deudaBloquesActuales.length === 0){
+    toast('Hacé una consulta primero');
+    return;
+  }
+  const cfg = calcularImpresionTipo('deuda');
+  const paginas = buildDeudaListadoPaginas(deudaBloquesActuales);
+  const ahora = new Date();
+  const dd = String(ahora.getDate()).padStart(2,'0');
+  const mm = String(ahora.getMonth()+1).padStart(2,'0');
+  const hh = String(ahora.getHours()).padStart(2,'0');
+  const mi = String(ahora.getMinutes()).padStart(2,'0');
+  await generarYDescargarPDF(paginas, cfg, 'Deuda_listado_'+dd+mm+hh+mi);
 }
 
 function irACatalogos(){
@@ -3705,16 +3819,19 @@ async function compartirRecibo(){
 /* =========================================================
    PEDIDOS: HOME
    ========================================================= */
-function renderPedidosHome(){
+function pedidosFiltradosHome(){
   const q = (document.getElementById('searchInputPedidos').value || '').toLowerCase().trim();
-  const list = document.getElementById('pedidosHomeList');
   const sorted = [...pedidos].sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || (b.numero||'').localeCompare(a.numero||''));
-  const filtered = sorted.filter(p=>{
+  return sorted.filter(p=>{
     if(!q) return true;
     return (p.numero||'').toLowerCase().includes(q) ||
            (p.clienteNombre||'').toLowerCase().includes(q) ||
            (p.observacion||'').toLowerCase().includes(q);
   });
+}
+function renderPedidosHome(){
+  const list = document.getElementById('pedidosHomeList');
+  const filtered = pedidosFiltradosHome();
 
   document.getElementById('pedidosHomeSub').textContent = pedidos.length + (pedidos.length===1 ? ' pedido' : ' pedidos');
 
@@ -3745,14 +3862,43 @@ function renderPedidosHome(){
 function toggleSeleccionPedidos(){
   pedidosSeleccionMode = !pedidosSeleccionMode;
   pedidosSeleccionados.clear();
-  document.getElementById('btnToggleSeleccion').textContent = pedidosSeleccionMode ? 'Cancelar selección' : 'Seleccionar varios para imprimir';
+  document.getElementById('btnToggleSeleccion').textContent = pedidosSeleccionMode ? 'Cancelar selección' : 'Seleccionar varios para imprimir / eliminar';
   document.getElementById('pedidosSelectbar').style.display = pedidosSeleccionMode ? 'flex' : 'none';
+  document.getElementById('rowSeleccionTodosPedidos').style.display = pedidosSeleccionMode ? 'flex' : 'none';
   renderPedidosHome();
 }
 function toggleSeleccionPedido(id){
   if(pedidosSeleccionados.has(id)) pedidosSeleccionados.delete(id);
   else pedidosSeleccionados.add(id);
   document.getElementById('pedidosSelectCount').textContent = pedidosSeleccionados.size + ' seleccionados';
+  renderPedidosHome();
+}
+function seleccionarTodosPedidos(){
+  // selecciona todos los pedidos actualmente visibles (respeta el buscador, si hay texto cargado)
+  pedidosFiltradosHome().forEach(p=> pedidosSeleccionados.add(p.id));
+  document.getElementById('pedidosSelectCount').textContent = pedidosSeleccionados.size + ' seleccionados';
+  renderPedidosHome();
+}
+function borrarSeleccionPedidos(){
+  pedidosSeleccionados.clear();
+  document.getElementById('pedidosSelectCount').textContent = '0 seleccionados';
+  renderPedidosHome();
+}
+function eliminarPedidosSeleccionados(){
+  if(pedidosSeleccionados.size === 0){
+    toast('Seleccioná al menos un pedido');
+    return;
+  }
+  const cant = pedidosSeleccionados.size;
+  const texto = cant === 1
+    ? '¿Eliminar el pedido seleccionado? Esta acción no se puede deshacer.'
+    : `¿Eliminar los ${cant} pedidos seleccionados? Esta acción no se puede deshacer.`;
+  if(!confirm(texto)) return;
+  pedidos = pedidos.filter(p=> !pedidosSeleccionados.has(p.id));
+  saveJSON(LS.pedidos, pedidos);
+  pedidosSeleccionados.clear();
+  document.getElementById('pedidosSelectCount').textContent = '0 seleccionados';
+  toast(cant === 1 ? 'Pedido eliminado' : cant + ' pedidos eliminados');
   renderPedidosHome();
 }
 
@@ -4631,9 +4777,9 @@ function buildPedidoPrintHTML(p, blockClass){
     <div class="${blockClass}"><div class="ps-rot-inner">
       ${empresaLineHTML()}
       <div class="ps-header-line">
-        <span><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)}</span>
-        <span><b>Cliente:</b> ${escapeHtml(p.clienteCodigo||'')} ${escapeHtml(p.clienteNombre||'')}</span>
         <span><b>Fecha:</b> ${fmtFechaCorta(p.fecha)}</span>
+        <span><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)}</span>
+        <span><b>Cliente:</b> <b>${escapeHtml(p.clienteCodigo||'')} ${escapeHtml(p.clienteNombre||'')}</b></span>
       </div>
       <table class="ps-table ps-pedido-table">
         <colgroup>
