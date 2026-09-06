@@ -295,6 +295,9 @@
     .ps-header-cliente{font-size:13px; margin-top:4px;}
     .ps-pagos-table{width:100%; border-collapse:collapse; margin:4px 0 6px;}
     .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:10.5px; text-transform:uppercase;}
+    .ps-pagos-compactos{display:flex; flex-wrap:wrap; gap:2px 16px; margin:6px 0;}
+    .ps-pago-compacto{flex:0 0 46%; font-size:11px; padding:2px 0;}
+    .ps-pago-compacto-obs{color:#777; font-size:10px;}
     .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:12px;}
     .ps-pagos-table th:first-child, .ps-pagos-table td:first-child{padding-right:3px;}
     .ps-pagos-table th:nth-child(2), .ps-pagos-table td:nth-child(2){padding-left:3px;}
@@ -419,6 +422,9 @@
     .ps-header-cliente{font-size:13px; margin-top:4px;}
     .ps-pagos-table{width:100%; border-collapse:collapse; margin:4px 0 6px;}
     .ps-pagos-table th{background:#f0ede8; color:#5d3a5c; text-align:left; padding:4px 7px; font-size:10.5px; text-transform:uppercase;}
+    .ps-pagos-compactos{display:flex; flex-wrap:wrap; gap:2px 16px; margin:6px 0;}
+    .ps-pago-compacto{flex:0 0 46%; font-size:11px; padding:2px 0;}
+    .ps-pago-compacto-obs{color:#777; font-size:10px;}
     .ps-pagos-table td{padding:4px 7px; border-bottom:1px solid #eee; font-size:12px;}
     .ps-pagos-table th:first-child, .ps-pagos-table td:first-child{padding-right:3px;}
     .ps-pagos-table th:nth-child(2), .ps-pagos-table td:nth-child(2){padding-left:3px;}
@@ -540,6 +546,14 @@
           <div class="mb-txt">
             <div class="mb-title">Consultar deuda</div>
             <div class="mb-sub">Línea 1 y Línea 2, por cliente</div>
+          </div>
+          <div class="mb-arrow">&#8250;</div>
+        </button>
+        <button class="menu-btn" onclick="irAConsultarPrecios()">
+          <div class="ic">&#128176;</div>
+          <div class="mb-txt">
+            <div class="mb-title">Consultar lista de Precios</div>
+            <div class="mb-sub">Buscar artículo y ver precio</div>
           </div>
           <div class="mb-arrow">&#8250;</div>
         </button>
@@ -787,7 +801,24 @@
       <div style="width:38px;"></div>
     </div>
     <div class="content narrow">
-      <div id="genPlanillaList"></div>
+      <div class="field" id="genPlanillaFiltroLocalidadWrap" style="display:none;">
+        <label>Localidad</label>
+        <select id="genPlanillaFiltroLocalidad" style="width:100%; padding:11px 13px; border:1.5px solid var(--border); border-radius:10px; font-size:14.5px; font-family:inherit; background:var(--white);">
+          <option value="">Todas las localidades</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="field-buscar-row">
+          <label>Transporte</label>
+          <button type="button" class="btn-buscar-campo" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporteGenPlanilla)">Buscar</button>
+        </div>
+        <div class="ac-selected ac-selected-highlight" id="genPlanillaTransporteSelected" onclick="abrirBusquedaPantallaCompleta('transporte', seleccionarTransporteGenPlanilla)"></div>
+      </div>
+      <div class="row2">
+        <button class="btn btn-outline" onclick="limpiarFiltrosGenPlanilla()">Limpiar filtros</button>
+        <button class="btn btn-primary" onclick="consultarGenPlanilla()">Consultar</button>
+      </div>
+      <div id="genPlanillaList" style="margin-top:14px;"></div>
     </div>
     <div class="selectbar" id="genPlanillaSelectbar" style="display:none;">
       <span id="genPlanillaSelectCount">0 seleccionados</span>
@@ -2130,14 +2161,14 @@ async function agruparPedidosParaCompartir(seleccionados, cfg){
   const anchoUtilMM = Math.max((cfg.anchoMM||210) - 2*margenNum, 10);
   const unoPorHoja = printUnoPorHoja || cfg.textoRotado || !cfg.altoMM;
   if(unoPorHoja){
-    return seleccionados.map(p=>({html: buildPedidoPrintHTML(p)}));
+    return seleccionados.map(p=>({html: buildPedidoPrintHTML(p, undefined, true)}));
   }
   const altoUtilMM = Math.max((cfg.altoMM||297) - 2*margenNum, 10);
   const paginas = [];
   let grupoHtml = [];
   let alturaAcumMM = 0;
   for(const p of seleccionados){
-    const htmlPedido = buildPedidoPrintHTML(p, 'ps-block-multi');
+    const htmlPedido = buildPedidoPrintHTML(p, 'ps-block-multi', true);
     const altoPedidoMM = await medirAltoMM(htmlPedido, anchoUtilMM);
     if(grupoHtml.length>0 && (alturaAcumMM + altoPedidoMM) > altoUtilMM){
       paginas.push({html: grupoHtml.join('')});
@@ -2360,9 +2391,67 @@ function irAConsultaRecibos(){
   showView('view-recibos-home');
   renderRecibosHome();
 }
+let genPlanillaTransporteSel = null; // filtro elegido, todavia no aplicado hasta tocar "Consultar"
+let genPlanillaFiltroAplicado = null; // {localidad, transporteCodigo} - lo que se aplico la ultima vez que se toco "Consultar"
 function irAGenerarPlanilla(){
   showView('view-generar-planilla');
   genPlanillaSeleccionados.clear();
+  genPlanillaTransporteSel = null;
+  genPlanillaFiltroAplicado = null;
+  poblarFiltroLocalidadGenPlanilla();
+  const selLoc = document.getElementById('genPlanillaFiltroLocalidad');
+  if(selLoc) selLoc.value = '';
+  renderGenPlanillaTransporteSelected();
+  document.getElementById('genPlanillaList').innerHTML = '<div class="empty-state" style="padding:30px 10px;">Elegí los filtros (o dejalos en "todos") y tocá "Consultar" para ver los recibos disponibles.</div>';
+  document.getElementById('genPlanillaSelectbar').style.display = 'none';
+}
+/* El filtro de localidad solo se muestra si hay al menos un cliente con
+   localidad cargada (viene de la 4ta columna opcional en el CSV de
+   clientes) — si nadie la usa, no ocupa lugar en pantalla. */
+function poblarFiltroLocalidadGenPlanilla(){
+  const wrap = document.getElementById('genPlanillaFiltroLocalidadWrap');
+  const localidades = [...new Set(clientes.map(c=> (c.localidad||'').trim()).filter(Boolean))]
+    .sort((a,b)=> a.localeCompare(b, 'es'));
+  if(localidades.length === 0){
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  const sel = document.getElementById('genPlanillaFiltroLocalidad');
+  const valorActual = sel.value;
+  sel.innerHTML = '<option value="">Todas las localidades</option>' +
+    localidades.map(loc=> `<option value="${escapeHtml(loc)}">${escapeHtml(loc)}</option>`).join('');
+  sel.value = localidades.includes(valorActual) ? valorActual : '';
+}
+function seleccionarTransporteGenPlanilla(codigo){
+  const t = transportes.find(x=>x.codigo===codigo);
+  if(!t) return;
+  genPlanillaTransporteSel = t;
+  renderGenPlanillaTransporteSelected();
+}
+function renderGenPlanillaTransporteSelected(){
+  const el = document.getElementById('genPlanillaTransporteSelected');
+  if(!el) return;
+  if(genPlanillaTransporteSel){
+    el.innerHTML = `Seleccionado: <b>${escapeHtml(genPlanillaTransporteSel.codigo)} - ${escapeHtml(genPlanillaTransporteSel.nombre)}</b>`;
+    el.classList.remove('vacio');
+  }else{
+    el.innerHTML = 'Todos los transportes';
+    el.classList.add('vacio');
+  }
+}
+function limpiarFiltrosGenPlanilla(){
+  genPlanillaTransporteSel = null;
+  const selLoc = document.getElementById('genPlanillaFiltroLocalidad');
+  if(selLoc) selLoc.value = '';
+  renderGenPlanillaTransporteSelected();
+}
+function consultarGenPlanilla(){
+  const localidad = (document.getElementById('genPlanillaFiltroLocalidad')?.value || '').trim();
+  genPlanillaFiltroAplicado = {
+    localidad,
+    transporteCodigo: genPlanillaTransporteSel ? genPlanillaTransporteSel.codigo : ''
+  };
   renderGenerarPlanillaList();
 }
 function irAConsultaPlanillasGeneradas(){
@@ -2389,6 +2478,19 @@ function irAConsultarDeuda(){
   deudaResultadoActual = null;
   deudaBloquesActuales = null;
   renderDeudaFiltros();
+}
+/* Consultar lista de precios: reutiliza el mismo buscador de artículos de
+   pantalla completa que ya usa Carga de Pedidos (ahí mismo se ve el precio
+   de cada artículo, a la derecha de cada resultado). Al tocar uno, en vez
+   de agregarlo a un pedido, solo confirma con un aviso — no hace falta
+   armar una pantalla nueva. */
+function irAConsultarPrecios(){
+  abrirBusquedaPantallaCompleta('articulo', function(codigo){
+    const a = articulos.find(x=> String(x.codigo)===String(codigo));
+    if(!a) return;
+    const precioTxt = (a.precio!=='' && a.precio!=null) ? fmtMoney(a.precio) : 'sin precio cargado';
+    toast(a.descripcion + ': ' + precioTxt);
+  });
 }
 function seleccionarClienteDeuda(codigo){
   const c = clientes.find(x=>x.codigo===codigo);
@@ -3484,11 +3586,26 @@ function eliminarPago(){
    ========================================================= */
 function renderGenerarPlanillaList(){
   const box = document.getElementById('genPlanillaList');
-  const disponibles = recibos.filter(r=> !r.planillaId && !r.draft)
+  if(!genPlanillaFiltroAplicado){
+    // todavia no se toco "Consultar" en esta visita a la pantalla
+    return;
+  }
+  const { localidad, transporteCodigo } = genPlanillaFiltroAplicado;
+  let disponibles = recibos.filter(r=> !r.planillaId && !r.draft)
     .sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || (b.numero||'').localeCompare(a.numero||''));
+  if(localidad){
+    disponibles = disponibles.filter(r=>{
+      const cli = clientes.find(c=> c.codigo === r.clienteCodigo);
+      return cli && (cli.localidad||'').trim() === localidad;
+    });
+  }
+  if(transporteCodigo){
+    disponibles = disponibles.filter(r=> r.transporteCodigo === transporteCodigo);
+  }
   if(disponibles.length === 0){
-    box.innerHTML = `<div class="empty-state"><div class="big">&#128203;</div>No hay recibos disponibles para incluir en una planilla.<br>Grabá recibos primero, o revisá si ya están todos en alguna planilla.</div>`;
-    document.getElementById('genPlanillaSelectbar').style.display = 'none';
+    box.innerHTML = `<div class="empty-state"><div class="big">&#128203;</div>No hay recibos disponibles para incluir en una planilla con este filtro.<br>Probá "Limpiar filtros", o grabá recibos primero.</div>`;
+    document.getElementById('genPlanillaSelectbar').style.display = genPlanillaSeleccionados.size ? 'flex' : 'none';
+    document.getElementById('genPlanillaSelectCount').textContent = genPlanillaSeleccionados.size + ' seleccionados';
     return;
   }
   box.innerHTML = disponibles.map(r=>{
@@ -3641,14 +3758,28 @@ function buildPagosTableHTML(pagos){
       <tbody>${filas}</tbody>
     </table>`;
 }
+/* Version compacta de la lista de pagos, usada solo en la Planilla de
+   Cobranza (varios recibos juntos): sin fila de encabezado, tipo+importe
+   unidos en un solo renglon, observación más chica al lado, y dos pagos
+   por línea (en vez de una tabla de 1 pago por fila) para ocupar menos
+   espacio cuando hay muchos recibos en la misma hoja. */
+function buildPagosCompactoHTML(pagos){
+  if(!pagos || !pagos.length){
+    return '<div style="font-size:11px; color:#777;">Sin pagos cargados.</div>';
+  }
+  const items = pagos.map(pg=>{
+    const obs = (pg.observacion||'').trim();
+    return `<div class="ps-pago-compacto"><b>${escapeHtml(pg.tipo)}:</b> ${fmtMoney(pg.importe)}${obs ? ` <span class="ps-pago-compacto-obs">(${escapeHtml(obs)})</span>` : ''}</div>`;
+  });
+  return `<div class="ps-pagos-compactos">${items.join('')}</div>`;
+}
 function buildReciboBlockHTML(r){
   const comprobantesTexto = (r.comprobantes||'').split(/\n/).map(l=>l.trim()).filter(Boolean).join(', ') || '-';
   return `
     <div style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px dashed #ccc;">
-      <div style="font-weight:bold; font-size:13px; margin-bottom:4px;">Recibo N° ${escapeHtml(fmtNumeroRecibo(r))} — Fecha: ${escapeHtml(r.fecha||'')} — Cliente: ${escapeHtml(r.clienteCodigo||'')} ${escapeHtml(r.clienteNombre||'')}</div>
+      <div style="font-weight:bold; font-size:13px; margin-bottom:4px;">Recibo: ${escapeHtml(fmtNumeroRecibo(r))} – (${escapeHtml(fmtFechaLarga(r.fecha))}) – ${escapeHtml(r.clienteCodigo||'')} ${escapeHtml(r.clienteNombre||'')} &nbsp; Total: ${fmtMoney(totalRecibo(r))}</div>
       <div style="font-size:11px; color:#333; margin-top:8px;"><b>Comprobantes:</b> ${escapeHtml(comprobantesTexto)}</div>
-      <div style="font-size:11px; color:#333; margin-top:4px;"><b>Valores:</b></div>
-      ${buildPagosTableHTML(r.pagos)}
+      ${buildPagosCompactoHTML(r.pagos)}
       <div style="font-size:10px; margin-top:4px;"><b>Total Recibo:</b> ${fmtMoney(totalRecibo(r))}</div>
     </div>
   `;
@@ -4440,9 +4571,11 @@ function parseCSV(text){
   for(const line of lines){
     const parts = splitCSVLine(line);
     if(parts.length < 2) continue;
-    // Solo se usan las columnas codigo y nombre para buscar; cualquier columna
-    // extra (postal, localidad, provincia, etc.) se ignora.
-    rows.push({codigo: parts[0], nombre: parts[1]});
+    // Se usan codigo y nombre para buscar. Localidad (si viene) es la 4ta
+    // columna: codigo, nombre, codigo postal, localidad — se usa para el
+    // filtro de "Generar planilla". El codigo postal (3ra columna) no se usa
+    // por ahora.
+    rows.push({codigo: parts[0], nombre: parts[1], codigoPostal: (parts[2]||'').trim(), localidad: (parts[3]||'').trim()});
   }
   // descartar fila de encabezado si el primer campo no parece código
   if(rows.length && /^(codigo|código|cod)$/i.test(rows[0].codigo)){
@@ -4741,6 +4874,13 @@ function fmtFechaCorta(fecha){
   const [y,m,d] = partes;
   return d+'/'+m+'/'+y.slice(2);
 }
+function fmtFechaLarga(fecha){
+  if(!fecha) return '';
+  const partes = String(fecha).split('-');
+  if(partes.length!==3) return fecha;
+  const [y,m,d] = partes;
+  return d+'/'+m+'/'+y;
+}
 /* Interpreta la fecha del archivo de deuda (viene de un sistema externo,
    VFP, cuyo formato exacto de exportacion puede variar) reconociendo los
    formatos mas comunes, y la devuelve como DD/MM/AA. Si no reconoce el
@@ -4760,7 +4900,7 @@ function fmtFechaDeuda(fecha){
   }
   return s;
 }
-function buildPedidoPrintHTML(p, blockClass){
+function buildPedidoPrintHTML(p, blockClass, sinEmpresa){
   blockClass = blockClass || 'ps-block';
   const filas = p.renglones.map(r=>`
     <tr>
@@ -4775,7 +4915,7 @@ function buildPedidoPrintHTML(p, blockClass){
 
   return `
     <div class="${blockClass}"><div class="ps-rot-inner">
-      ${empresaLineHTML()}
+      ${sinEmpresa ? '' : empresaLineHTML()}
       <div class="ps-header-line">
         <span><b>Fecha:</b> ${fmtFechaCorta(p.fecha)}</span>
         <span><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)}</span>
@@ -4823,7 +4963,7 @@ function imprimirPedidosSeleccionados(){
   const unoPorHoja = printUnoPorHoja || intercalarBlanco;
   const blockClass = unoPorHoja ? 'ps-block' : 'ps-block-multi';
   const separador = intercalarBlanco ? '<div class="ps-block ps-hoja-blanco"></div>' : '';
-  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass)).join(separador);
+  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass, true)).join(separador);
   const ahora = new Date();
   const dd = String(ahora.getDate()).padStart(2,'0');
   const mm = String(ahora.getMonth()+1).padStart(2,'0');
