@@ -897,7 +897,7 @@
       <div class="selectbar-botones-parejos">
         <button class="btn btn-olive" onclick="imprimirPedidosSeleccionados()">Imprimir</button>
         <button class="btn btn-olive" onclick="compartirPedidosSeleccionados()">Compartir</button>
-        <button class="btn btn-olive" onclick="exportarPedidosSeleccionadosExcel()">Excel</button>
+        <button class="btn btn-olive" onclick="exportarPedidosSeleccionadosExcel()">Compartir Excel</button>
         <button class="btn btn-danger" onclick="eliminarPedidosSeleccionados()">Eliminar</button>
       </div>
     </div>
@@ -2161,25 +2161,59 @@ async function agruparPedidosParaCompartir(seleccionados, cfg){
   const anchoUtilMM = Math.max((cfg.anchoMM||210) - 2*margenNum, 10);
   const unoPorHoja = printUnoPorHoja || cfg.textoRotado || !cfg.altoMM;
   if(unoPorHoja){
-    return seleccionados.map(p=>({html: buildPedidoPrintHTML(p, undefined, true)}));
+    return seleccionados.map(p=>({html: buildPedidoPrintHTML(p, undefined, true, true)}));
   }
   const altoUtilMM = Math.max((cfg.altoMM||297) - 2*margenNum, 10);
-  const paginas = [];
-  let grupoHtml = [];
+  // Margen de seguridad: la medicion previa (offscreen, para decidir cuantos
+  // pedidos entran juntos en una hoja) y el renderizado final no siempre
+  // coinciden exacto (redondeos, fuentes). Sin este colchon, un grupo que
+  // "just" entraba podia terminar desbordando la hoja real al renderizarse
+  // de verdad, activando el corte en tramos a mitad de un renglon (se veia
+  // ese renglon repetido/borroso entre una hoja y la siguiente).
+  const MARGEN_SEGURIDAD_MM = 6;
+
+  // Primero se arma cada grupo como un ARRAY de htmls (uno por pedido, no
+  // concatenados todavia), para poder sacar el ultimo elemento facilmente
+  // mas adelante si hiciera falta, sin tener que volver a parsear HTML.
+  const htmlsPedidos = seleccionados.map(p=> buildPedidoPrintHTML(p, 'ps-block-multi', true, true));
+  const alturas = [];
+  for(const html of htmlsPedidos){
+    alturas.push(await medirAltoMM(html, anchoUtilMM));
+  }
+
+  const grupos = []; // array de arrays de html
+  let grupoActual = [];
   let alturaAcumMM = 0;
-  for(const p of seleccionados){
-    const htmlPedido = buildPedidoPrintHTML(p, 'ps-block-multi', true);
-    const altoPedidoMM = await medirAltoMM(htmlPedido, anchoUtilMM);
-    if(grupoHtml.length>0 && (alturaAcumMM + altoPedidoMM) > altoUtilMM){
-      paginas.push({html: grupoHtml.join('')});
-      grupoHtml = [];
+  for(let i=0; i<htmlsPedidos.length; i++){
+    if(grupoActual.length>0 && (alturaAcumMM + alturas[i] + MARGEN_SEGURIDAD_MM) > altoUtilMM){
+      grupos.push(grupoActual);
+      grupoActual = [];
       alturaAcumMM = 0;
     }
-    grupoHtml.push(htmlPedido);
-    alturaAcumMM += altoPedidoMM;
+    grupoActual.push(htmlsPedidos[i]);
+    alturaAcumMM += alturas[i];
   }
-  if(grupoHtml.length>0) paginas.push({html: grupoHtml.join('')});
-  return paginas;
+  if(grupoActual.length>0) grupos.push(grupoActual);
+
+  // Verificacion final: se mide el ALTO REAL de cada grupo ya armado (no
+  // solo la suma estimada de sus partes). Si por algun motivo igual no
+  // entra, se saca el ultimo pedido del grupo y pasa a ser el primero del
+  // grupo siguiente — asi nunca se llega a cortar un pedido a mitad de
+  // renglon por un grupo mal calculado.
+  for(let i=0; i<grupos.length; i++){
+    while(grupos[i].length > 1){
+      const altoReal = await medirAltoMM(grupos[i].join(''), anchoUtilMM);
+      if(altoReal <= altoUtilMM + 0.5) break;
+      const sobrante = grupos[i].pop();
+      if(grupos[i+1]){
+        grupos[i+1].unshift(sobrante);
+      }else{
+        grupos.push([sobrante]);
+      }
+    }
+  }
+
+  return grupos.map(g=>({html: g.join('')}));
 }
 
 /* Arma y comparte un PDF a partir de "paginas": un array de objetos
@@ -2328,7 +2362,8 @@ async function generarYCompartirPDF(paginas, cfg, nombreArchivo, tituloCompartir
    (sin ningún error visible) porque considera que ya pasó "demasiado
    tiempo" desde el toque inicial del botón. Un toque nuevo y directo sobre
    este link nunca se bloquea. */
-function mostrarDescargaManual(blobUrl, nombreArchivo){
+function mostrarDescargaManual(blobUrl, nombreArchivo, tipoArchivo){
+  tipoArchivo = tipoArchivo || 'PDF';
   let cont = document.getElementById('descargaManualOverlay');
   if(!cont){
     cont = document.createElement('div');
@@ -2339,7 +2374,7 @@ function mostrarDescargaManual(blobUrl, nombreArchivo){
   cont.innerHTML = '';
   const txt = document.createElement('div');
   txt.style.cssText = 'font-size:13px; flex:1; line-height:1.3;';
-  txt.textContent = 'PDF listo — tocá para descargar:';
+  txt.textContent = tipoArchivo + ' listo — tocá para descargar:';
   const link = document.createElement('a');
   link.href = blobUrl;
   link.download = nombreArchivo;
@@ -3777,10 +3812,12 @@ function buildReciboBlockHTML(r){
   const comprobantesTexto = (r.comprobantes||'').split(/\n/).map(l=>l.trim()).filter(Boolean).join(', ') || '-';
   return `
     <div style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px dashed #ccc;">
-      <div style="font-weight:bold; font-size:13px; margin-bottom:4px;">Recibo: ${escapeHtml(fmtNumeroRecibo(r))} – (${escapeHtml(fmtFechaLarga(r.fecha))}) – ${escapeHtml(r.clienteCodigo||'')} ${escapeHtml(r.clienteNombre||'')} &nbsp; Total: ${fmtMoney(totalRecibo(r))}</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:4px;">
+        <div>Recibo: ${escapeHtml(fmtNumeroRecibo(r))} – (${escapeHtml(fmtFechaLarga(r.fecha))}) – <b>${escapeHtml(r.clienteCodigo||'')} ${escapeHtml(r.clienteNombre||'')}</b></div>
+        <div style="font-weight:bold; white-space:nowrap;">Total: ${fmtMoney(totalRecibo(r))}</div>
+      </div>
       <div style="font-size:11px; color:#333; margin-top:8px;"><b>Comprobantes:</b> ${escapeHtml(comprobantesTexto)}</div>
       ${buildPagosCompactoHTML(r.pagos)}
-      <div style="font-size:10px; margin-top:4px;"><b>Total Recibo:</b> ${fmtMoney(totalRecibo(r))}</div>
     </div>
   `;
 }
@@ -4900,7 +4937,7 @@ function fmtFechaDeuda(fecha){
   }
   return s;
 }
-function buildPedidoPrintHTML(p, blockClass, sinEmpresa){
+function buildPedidoPrintHTML(p, blockClass, sinEmpresa, plano){
   blockClass = blockClass || 'ps-block';
   const filas = p.renglones.map(r=>`
     <tr>
@@ -4912,6 +4949,7 @@ function buildPedidoPrintHTML(p, blockClass, sinEmpresa){
     </tr>
   `).join('');
   const obsGeneral = (p.observacion||'').trim();
+  const claseTabla = 'ps-table ps-pedido-table' + (plano ? ' ps-table-plano' : '');
 
   return `
     <div class="${blockClass}"><div class="ps-rot-inner">
@@ -4921,7 +4959,7 @@ function buildPedidoPrintHTML(p, blockClass, sinEmpresa){
         <span><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)}</span>
         <span><b>Cliente:</b> <b>${escapeHtml(p.clienteCodigo||'')} ${escapeHtml(p.clienteNombre||'')}</b></span>
       </div>
-      <table class="ps-table ps-pedido-table">
+      <table class="${claseTabla}">
         <colgroup>
           <col style="width:11%"><col style="width:8%"><col style="width:45%"><col style="width:8%"><col style="width:28%">
         </colgroup>
@@ -4937,14 +4975,14 @@ function imprimirPedido(){
   if(!p) return;
   persistCurrentPedidoHeader();
   const cfg = calcularImpresionTipo('pedidos');
-  imprimirDocumento(buildPedidoPrintHTML(p), cfg.sizeCss, cfg.margin, false, 'Ped'+puntoVenta+p.numero, cfg.esChico, cfg.textoRotado, cfg.anchoMM, cfg.altoMM, cfg.margenNum);
+  imprimirDocumento(buildPedidoPrintHTML(p, undefined, false, true), cfg.sizeCss, cfg.margin, false, 'Ped'+puntoVenta+p.numero, cfg.esChico, cfg.textoRotado, cfg.anchoMM, cfg.altoMM, cfg.margenNum);
 }
 async function compartirPedido(){
   const p = currentPedido();
   if(!p) return;
   persistCurrentPedidoHeader();
   const cfg = calcularImpresionTipo('pedidos');
-  const paginas = [{html: buildPedidoPrintHTML(p)}];
+  const paginas = [{html: buildPedidoPrintHTML(p, undefined, false, true)}];
   await generarYCompartirPDF(paginas, cfg, 'Ped'+puntoVenta+p.numero, 'Pedido '+p.numero);
 }
 function imprimirPedidosSeleccionados(){
@@ -4963,7 +5001,7 @@ function imprimirPedidosSeleccionados(){
   const unoPorHoja = printUnoPorHoja || intercalarBlanco;
   const blockClass = unoPorHoja ? 'ps-block' : 'ps-block-multi';
   const separador = intercalarBlanco ? '<div class="ps-block ps-hoja-blanco"></div>' : '';
-  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass, true)).join(separador);
+  const html = seleccionados.map(p=> buildPedidoPrintHTML(p, blockClass, true, true)).join(separador);
   const ahora = new Date();
   const dd = String(ahora.getDate()).padStart(2,'0');
   const mm = String(ahora.getMonth()+1).padStart(2,'0');
@@ -5010,19 +5048,37 @@ async function exportarPedidosSeleccionadosExcel(){
   }
   const seleccionados = pedidos.filter(p=> pedidosSeleccionados.has(p.id))
     .sort((a,b)=> (a.numero||'').localeCompare(b.numero||''));
-  const filas = [['Pedido N°','Fecha','Cliente Código','Cliente Nombre','Cantidad','Código Artículo','Descripción','Bonif %','Observación']];
+  const nombreVendedorPorCodigo = (codigo)=>{
+    if(!codigo) return '';
+    if(codigo === vendedorCodigo && vendedorNombre) return vendedorNombre;
+    const v = vendedores.find(x=>x.codigo===codigo);
+    return v ? (v.nombre||'') : '';
+  };
+  const filas = [['Punto de Venta','Pedido N°','Fecha','Cliente Código','Cliente Nombre','Cliente Localidad','Cliente C.Postal','Vendedor Código','Vendedor Nombre','Transporte','Cantidad','Código Artículo','Descripción','Bonif %','Observación']];
   seleccionados.forEach(p=>{
+    const vendCodigo = p.codVend || vendedorCodigo;
+    const vendNombre = nombreVendedorPorCodigo(vendCodigo);
+    const transporteTexto = p.transporteNombre || '';
+    const cli = clientes.find(c=> c.codigo === p.clienteCodigo);
+    const cliLocalidad = cli ? (cli.localidad||'') : '';
+    const cliCPostal = cli ? (cli.codigoPostal||'') : '';
     const renglones = p.renglones || [];
     if(renglones.length === 0){
-      filas.push([p.numero||'', fmtFechaCorta(p.fecha), p.clienteCodigo||'', p.clienteNombre||'', '', '', '(sin artículos)', '', '']);
+      filas.push([puntoVenta, p.numero||'', fmtFechaCorta(p.fecha), p.clienteCodigo||'', p.clienteNombre||'', cliLocalidad, cliCPostal, vendCodigo||'', vendNombre, transporteTexto, '', '', '(sin artículos)', '', '']);
       return;
     }
     renglones.forEach(r=>{
       filas.push([
+        puntoVenta,
         p.numero || '',
         fmtFechaCorta(p.fecha),
         p.clienteCodigo || '',
         p.clienteNombre || '',
+        cliLocalidad,
+        cliCPostal,
+        vendCodigo || '',
+        vendNombre,
+        transporteTexto,
         Number(r.cantidad) || r.cantidad || '',
         r.artCodigo || '',
         r.artDescripcion || '',
@@ -5032,7 +5088,7 @@ async function exportarPedidosSeleccionadosExcel(){
     });
   });
   const ws = XLSX.utils.aoa_to_sheet(filas);
-  ws['!cols'] = [{wch:12},{wch:12},{wch:14},{wch:28},{wch:10},{wch:12},{wch:35},{wch:9},{wch:25}];
+  ws['!cols'] = [{wch:10},{wch:12},{wch:12},{wch:14},{wch:28},{wch:16},{wch:12},{wch:12},{wch:18},{wch:18},{wch:10},{wch:12},{wch:35},{wch:9},{wch:25}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Pedidos');
 
@@ -5061,8 +5117,10 @@ async function exportarPedidosSeleccionadosExcel(){
       }
     }
     if(!compartido){
-      XLSX.writeFile(wb, nombreArchivo);
-      toast('Se descargó el Excel');
+      try{ XLSX.writeFile(wb, nombreArchivo); }catch(e){ console.error(e); }
+      const url = URL.createObjectURL(blob);
+      mostrarDescargaManual(url, nombreArchivo, 'Excel');
+      toast('Excel listo');
     }
   }catch(err){
     console.error(err);
