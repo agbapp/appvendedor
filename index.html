@@ -18,7 +18,7 @@
 <style>
   :root{
     --plum:#5d3a5c;
-    --plum-dark:#432a42;
+    --plum-dark:#9a7b98;
     --plum-light:#8a5e88;
     --olive:#8d9457;
     --olive-light:#eef0e2;
@@ -1144,6 +1144,15 @@
           </div>
 
           <div class="import-card">
+            <h3>Código de artículo a usar</h3>
+            <p>Elegí cuál de los dos códigos del artículo (numérico o alfanumérico) se muestra primero en el buscador, en la carga de pedidos, en Consultar lista de Precios, en lo impreso y en el Excel. El otro código no se pierde, solo cambia cuál aparece de entrada.</p>
+            <div class="segmented" id="codigoArticuloPrefSeg">
+              <div class="seg-opt" data-valor="numerico" onclick="setCodigoArticuloPref('numerico')">Numérico</div>
+              <div class="seg-opt" data-valor="alfanumerico" onclick="setCodigoArticuloPref('alfanumerico')">Alfanumérico</div>
+            </div>
+          </div>
+
+          <div class="import-card">
             <h3>Vendedor de esta tablet</h3>
             <p>Se usa para identificar todas las planillas y pedidos cargados acá.</p>
             <div class="count-pill" id="vendedorActual">Código: -</div>
@@ -1608,6 +1617,73 @@ function saveJSON(key, val){
   localStorage.setItem(key, JSON.stringify(val));
 }
 
+/* =========================================================
+   ARCHIVOS GRANDES (fotos/PDF de catalogos) — IndexedDB
+   El resto de la app (clientes, pedidos, etc.) usa localStorage, que en
+   la mayoria de los navegadores tiene un limite total de apenas unos 5-10MB
+   — de sobra para texto, pero una sola foto de celular ya lo puede superar.
+   Los ARCHIVOS de catalogo (fotos, PDF) se guardan aparte, en IndexedDB,
+   que soporta muchisimo mas espacio. Los catalogos de tipo "link" no
+   necesitan esto (son solo una URL de texto, se guardan en localStorage
+   igual que antes).
+   ========================================================= */
+const IDB_ARCHIVOS_NOMBRE = 'cobranzas_archivos_db';
+const IDB_ARCHIVOS_STORE = 'catalogos';
+function idbArchivosOpen(){
+  return new Promise((resolve, reject)=>{
+    if(!window.indexedDB){ reject(new Error('IndexedDB no disponible en este navegador')); return; }
+    const req = indexedDB.open(IDB_ARCHIVOS_NOMBRE, 1);
+    req.onupgradeneeded = function(e){
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(IDB_ARCHIVOS_STORE)){
+        db.createObjectStore(IDB_ARCHIVOS_STORE, {keyPath:'id'});
+      }
+    };
+    req.onsuccess = function(e){ resolve(e.target.result); };
+    req.onerror = function(e){ reject(e.target.error || new Error('No se pudo abrir el almacenamiento de archivos')); };
+  });
+}
+async function idbGuardarArchivo(id, dataUrl){
+  const db = await idbArchivosOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_ARCHIVOS_STORE, 'readwrite');
+    tx.objectStore(IDB_ARCHIVOS_STORE).put({id, dataUrl});
+    tx.oncomplete = ()=> resolve();
+    tx.onerror = (e)=> reject(e.target.error);
+  });
+}
+async function idbLeerArchivo(id){
+  const db = await idbArchivosOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_ARCHIVOS_STORE, 'readonly');
+    const req = tx.objectStore(IDB_ARCHIVOS_STORE).get(id);
+    req.onsuccess = ()=> resolve(req.result ? req.result.dataUrl : null);
+    req.onerror = (e)=> reject(e.target.error);
+  });
+}
+async function idbBorrarArchivo(id){
+  const db = await idbArchivosOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_ARCHIVOS_STORE, 'readwrite');
+    tx.objectStore(IDB_ARCHIVOS_STORE).delete(id);
+    tx.oncomplete = ()=> resolve();
+    tx.onerror = (e)=> reject(e.target.error);
+  });
+}
+/* Convierte un data URL (base64) en un Blob, para abrirlo como archivo
+   real en vez de un texto gigante en la barra de direcciones — mas
+   liviano y confiable para archivos grandes. */
+function dataURLaBlob(dataUrl){
+  const partes = dataUrl.split(',');
+  const mimeMatch = partes[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+  const bstr = atob(partes[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while(n--){ u8arr[n] = bstr.charCodeAt(n); }
+  return new Blob([u8arr], {type:mime});
+}
+
 const LS_VENDEDOR = 'cobranzas_vendedor';
 const LS_VENDEDOR_NOMBRE = 'cobranzas_vendedor_nombre';
 const LS_LAST_EXPORT = 'cobranzas_last_export';
@@ -1621,6 +1697,7 @@ const LS_PRINT_HOJA_BLANCO = 'cobranzas_print_hoja_blanco';
 const LS_PRINT_CONFIG = 'cobranzas_print_config';
 const LS_EXPORT_AVISO_OFF = 'cobranzas_export_aviso_off';
 const LS_FECHAS_IMPORTACION = 'cobranzas_fechas_importacion';
+const LS_CODIGO_ARTICULO_PREF = 'cobranzas_codigo_articulo_pref';
 const TIPO_CODES = {'Efectivo':'EF', 'Cheque':'CH', 'Transferencia':'TR', 'Retención':'RE'};
 const TIPO_PAGO_CODES = {'Efectivo':'EF', 'Depósito':'DE', 'Cheque':'CH', 'Cheque Electrónico':'CE', 'Retención':'RE'};
 
@@ -1640,6 +1717,11 @@ let vendedorNombre = localStorage.getItem(LS_VENDEDOR_NOMBRE) || '';
 let puntoVenta = localStorage.getItem(LS_PUNTO_VENTA) || '0001';
 let fabricaCodigo = localStorage.getItem(LS_FABRICA_CODIGO) || '';
 let fabricaNombre = localStorage.getItem(LS_FABRICA_NOMBRE) || 'Empresa ejemplo';
+// 'numerico' (por defecto) o 'alfanumerico' — que codigo de articulo se usa
+// como principal en el buscador, pedidos, impresion, PDF y Excel. Es una
+// preferencia propia de cada celular (cada empresa puede usar el que
+// corresponda), no cambia el dato guardado, solo cual se muestra primero.
+let codigoArticuloPref = localStorage.getItem(LS_CODIGO_ARTICULO_PREF) || 'numerico';
 let mostrarPlanillaAnterior = localStorage.getItem(LS_MOSTRAR_PLANILLA_ANTERIOR) !== '0';
 let printSize = localStorage.getItem(LS_PRINT_SIZE) || 'a4';
 let printUnoPorHoja = localStorage.getItem(LS_PRINT_UNO_POR_HOJA) === '1';
@@ -1823,7 +1905,7 @@ function fsRenderResultadosBusqueda(q){
   // orden: "por código" tildado ordena por código; destildado (por defecto)
   // ordena por descripción/nombre — igual que un buscador de sistema de PC.
   const campoOrden = tipo === 'articulo'
-    ? (porCodigo ? 'codigo' : 'descripcion')
+    ? (porCodigo ? (codigoArticuloPref==='alfanumerico' ? 'codigoAlt' : 'codigo') : 'descripcion')
     : (porCodigo ? 'codigo' : 'nombre');
   matches = matches.slice().sort((a,b)=>
     String(a[campoOrden]).localeCompare(String(b[campoOrden]), 'es', {numeric:true, sensitivity:'base'})
@@ -1839,7 +1921,7 @@ function fsRenderResultadosBusqueda(q){
     html += `<div class="fs-search-empty">Sin resultados</div>`;
   }else if(tipo === 'articulo'){
     html += matches.map((a,i)=>
-      `<div class="fs-search-item" onclick="fsSeleccionarResultado(${i})"><span class="code">${escapeHtml(a.codigo)}</span>${escapeHtml(a.descripcion)}${a.codigoAlt ? ' <span style="color:var(--ink-soft);">('+escapeHtml(a.codigoAlt)+')</span>' : ''}${a.precio!=='' && a.precio!=null ? ' <span style="color:var(--ink-soft); float:right;">'+fmtMoney(a.precio)+'</span>' : ''}</div>`
+      `<div class="fs-search-item" onclick="fsSeleccionarResultado(${i})"><span class="code">${escapeHtml(codigoArticuloMostrar(a))}</span>${escapeHtml(a.descripcion)}${(codigoArticuloPref==='alfanumerico' ? a.codigo : a.codigoAlt) ? ' <span style="color:var(--ink-soft);">('+escapeHtml(codigoArticuloPref==='alfanumerico' ? a.codigo : a.codigoAlt)+')</span>' : ''}${a.precio!=='' && a.precio!=null ? ' <span style="color:var(--ink-soft); float:right;">'+fmtMoney(a.precio)+'</span>' : ''}</div>`
     ).join('');
   }else{
     html += matches.map((x,i)=>
@@ -1878,6 +1960,7 @@ function renderAjustesConfig(){
   const chkPlanAnt = document.getElementById('chkMostrarPlanillaAnterior');
   if(chkPlanAnt) chkPlanAnt.checked = mostrarPlanillaAnterior;
   ['recibos','pedidos','planillas','deuda'].forEach(renderPrintConfigTipo);
+  renderCodigoArticuloPref();
   const chkUno = document.getElementById('chkUnoPorHoja');
   if(chkUno) chkUno.checked = printUnoPorHoja;
   const chkHoja = document.getElementById('chkHojaBlanco');
@@ -1955,6 +2038,18 @@ function setTamanoImpresionTipo(tipo, size){
   printConfig[tipo].tamano = size;
   guardarPrintConfig();
   renderPrintConfigTipo(tipo);
+}
+function setCodigoArticuloPref(valor){
+  codigoArticuloPref = valor;
+  localStorage.setItem(LS_CODIGO_ARTICULO_PREF, valor);
+  renderCodigoArticuloPref();
+}
+function renderCodigoArticuloPref(){
+  const seg = document.getElementById('codigoArticuloPrefSeg');
+  if(!seg) return;
+  seg.querySelectorAll('.seg-opt').forEach(el=>{
+    el.classList.toggle('active', el.dataset.valor === codigoArticuloPref);
+  });
 }
 function setMargenImpresionTipo(tipo, margen){
   if(!printConfig[tipo]) return;
@@ -3065,6 +3160,23 @@ function fmtMoney(n){
   n = Number(n)||0;
   return '$ ' + n.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
+/* Devuelve el codigo a MOSTRAR de un articulo (objeto con .codigo/.codigoAlt),
+   segun la preferencia elegida en Ajustes. Si la preferencia es alfanumerico
+   pero ese articulo no tiene codigoAlt cargado, se cae al numerico (nunca
+   se muestra vacio). */
+function codigoArticuloMostrar(a){
+  if(!a) return '';
+  if(codigoArticuloPref === 'alfanumerico' && a.codigoAlt) return a.codigoAlt;
+  return a.codigo || '';
+}
+/* Igual que codigoArticuloMostrar, pero para un renglon YA GUARDADO en un
+   pedido (usa artCodigo/artCodigoAlt en vez de codigo/codigoAlt, que es como
+   se guarda ahi). */
+function codigoRenglonMostrar(r){
+  if(!r) return '';
+  if(codigoArticuloPref === 'alfanumerico' && r.artCodigoAlt) return r.artCodigoAlt;
+  return r.artCodigo || '';
+}
 function totalPlanilla(p){
   return p.renglones.reduce((s,r)=> s + (Number(r.importe)||0), 0);
 }
@@ -4123,8 +4235,8 @@ function renderRenglonesPedido(){
       return `
       <div class="rowline" onclick="editarRenglonPedido('${r.id}')">
         <div class="rl-left">
-          <div class="rl-cliente">${escapeHtml(r.artCodigo)} · ${escapeHtml(r.artDescripcion)}</div>
-          <div class="rl-meta">${r.artCodigoAlt ? 'Cód: '+escapeHtml(r.artCodigoAlt) : ''} ${r.bonificacion ? '· Bonif: '+escapeHtml(r.bonificacion)+'%' : ''} ${r.observacion ? '· '+escapeHtml(r.observacion) : ''}</div>
+          <div class="rl-cliente">${escapeHtml(codigoRenglonMostrar(r))} · ${escapeHtml(r.artDescripcion)}</div>
+          <div class="rl-meta">${(codigoArticuloPref==='alfanumerico' ? r.artCodigo : r.artCodigoAlt) ? 'Cód: '+escapeHtml(codigoArticuloPref==='alfanumerico' ? r.artCodigo : r.artCodigoAlt) : ''} ${r.bonificacion ? '· Bonif: '+escapeHtml(r.bonificacion)+'%' : ''} ${r.observacion ? '· '+escapeHtml(r.observacion) : ''}</div>
         </div>
         <div class="rl-right">
           <div class="rl-importe">${escapeHtml(r.cantidad)} un.</div>
@@ -4255,7 +4367,7 @@ function renderArticuloSelected(){
     return;
   }
   const tienePrecio = articuloSeleccionado.precio!=='' && articuloSeleccionado.precio!=null;
-  renderSeleccionBox('articuloSelected', `Seleccionado: <b>${escapeHtml(articuloSeleccionado.codigo)} - ${escapeHtml(articuloSeleccionado.descripcion)}</b>`);
+  renderSeleccionBox('articuloSelected', `Seleccionado: <b>${escapeHtml(codigoArticuloMostrar(articuloSeleccionado))} - ${escapeHtml(articuloSeleccionado.descripcion)}</b>`);
   if(precioInput) precioInput.value = tienePrecio ? fmtMoney(articuloSeleccionado.precio) : '-';
 }
 
@@ -4348,18 +4460,31 @@ function agregarCatalogo(){
     saveJSON(LS.catalogos, catalogos);
     limpiarFormCatalogo();
     renderCatalogosAjustes();
+    renderCatalogosPublico();
     toast('Catálogo agregado');
   }else{
     const fileInput = document.getElementById('cat_archivo');
     const file = fileInput.files[0];
     if(!file){ toast('Elegí un archivo'); return; }
+    toast('Guardando archivo...');
     const reader = new FileReader();
-    reader.onload = function(e){
-      catalogos.push({id:uid(), nombre, tipo:catTipoActual, valor:e.target.result, fecha:new Date().toISOString()});
-      saveJSON(LS.catalogos, catalogos);
-      limpiarFormCatalogo();
-      renderCatalogosAjustes();
-      toast('Catálogo agregado');
+    reader.onload = async function(e){
+      const id = uid();
+      try{
+        // El archivo (foto/PDF) va a IndexedDB, no a localStorage: puede
+        // pesar varios MB y localStorage tiene muy poco espacio (5-10MB
+        // en total, compartido con toda la demas info de la app).
+        await idbGuardarArchivo(id, e.target.result);
+        catalogos.push({id, nombre, tipo:catTipoActual, valor:'', enIndexedDB:true, fecha:new Date().toISOString()});
+        saveJSON(LS.catalogos, catalogos);
+        limpiarFormCatalogo();
+        renderCatalogosAjustes();
+        renderCatalogosPublico();
+        toast('Catálogo agregado');
+      }catch(err){
+        console.error(err);
+        toast('No se pudo guardar el archivo (puede estar muy lleno el almacenamiento del celular)');
+      }
     };
     reader.onerror = function(){ toast('No se pudo leer el archivo'); };
     reader.readAsDataURL(file);
@@ -4370,10 +4495,14 @@ function limpiarFormCatalogo(){
   document.getElementById('cat_url').value = '';
   document.getElementById('cat_archivo').value = '';
 }
-function eliminarCatalogo(id){
+async function eliminarCatalogo(id){
   if(!confirm('¿Eliminar este catálogo?')) return;
-  catalogos = catalogos.filter(c=>c.id!==id);
+  const c = catalogos.find(x=>x.id===id);
+  catalogos = catalogos.filter(x=>x.id!==id);
   saveJSON(LS.catalogos, catalogos);
+  if(c && c.enIndexedDB){
+    try{ await idbBorrarArchivo(id); }catch(err){ console.error(err); }
+  }
   renderCatalogosAjustes();
   renderCatalogosPublico();
 }
@@ -4383,10 +4512,23 @@ function iconoCatalogo(tipo){
 function tipoCatalogoLabel(tipo){
   return tipo==='link' ? 'Link / Página' : tipo==='pdf' ? 'Archivo PDF' : 'Foto';
 }
-function abrirCatalogo(id){
+async function abrirCatalogo(id){
   const c = catalogos.find(x=>x.id===id);
   if(!c) return;
-  window.open(c.valor, '_blank');
+  if(c.enIndexedDB){
+    try{
+      const dataUrl = await idbLeerArchivo(c.id);
+      if(!dataUrl){ toast('No se encontró el archivo guardado'); return; }
+      const blob = dataURLaBlob(dataUrl);
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    }catch(err){
+      console.error(err);
+      toast('No se pudo abrir el archivo');
+    }
+  }else{
+    window.open(c.valor, '_blank');
+  }
 }
 function renderCatalogosAjustes(){
   const box = document.getElementById('catalogosAjustesList');
@@ -4416,6 +4558,7 @@ function renderCatalogosPublico(){
         <div class="cat-nombre">${escapeHtml(c.nombre)}</div>
         <div class="cat-tipo">${tipoCatalogoLabel(c.tipo)}</div>
       </div>
+      <button class="del-x" onclick="event.stopPropagation(); eliminarCatalogo('${c.id}')" title="Eliminar">&times;</button>
       <div class="mb-arrow">&#8250;</div>
     </div>
   `).join('');
@@ -4942,7 +5085,7 @@ function buildPedidoPrintHTML(p, blockClass, sinEmpresa, plano){
   const filas = p.renglones.map(r=>`
     <tr>
       <td>${escapeHtml(r.cantidad)}</td>
-      <td>${escapeHtml(r.artCodigo)}</td>
+      <td>${escapeHtml(codigoRenglonMostrar(r))}</td>
       <td>${escapeHtml(r.artDescripcion)}</td>
       <td>${r.bonificacion ? escapeHtml(r.bonificacion)+'%' : '-'}</td>
       <td>${escapeHtml(r.observacion||'')}</td>
@@ -5080,7 +5223,7 @@ async function exportarPedidosSeleccionadosExcel(){
         vendNombre,
         transporteTexto,
         Number(r.cantidad) || r.cantidad || '',
-        r.artCodigo || '',
+        codigoRenglonMostrar(r) || '',
         r.artDescripcion || '',
         r.bonificacion ? Number(r.bonificacion) : '',
         r.observacion || ''
