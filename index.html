@@ -344,6 +344,7 @@
 
     /* encabezado compacto de una sola línea (pedidos) */
     .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:12.5px; white-space:nowrap;}
+    .ps-header-line-pedido{justify-content:space-between;}
     .ps-header-line b{color:#5d3a5c;}
     #printSheet.ps-size-chico .ps-header-line{font-size:9px;}
   }
@@ -469,6 +470,7 @@
     .ps-share-render.ps-ticket .tk-row{display:flex; justify-content:space-between; gap:6px;}
     /* encabezado compacto de una sola línea (pedidos) */
     .ps-header-line{display:flex; flex-wrap:wrap; column-gap:14px; row-gap:2px; align-items:baseline; border-bottom:2px solid #5d3a5c; padding-bottom:8px; margin-bottom:12px; font-size:12.5px; white-space:nowrap;}
+    .ps-header-line-pedido{justify-content:space-between;}
     .ps-header-line b{color:#5d3a5c;}
     .ps-share-render.ps-size-chico .ps-header-line{font-size:9px;}
 </style>
@@ -5116,10 +5118,9 @@ function buildPedidoPrintHTML(p, blockClass, sinEmpresa, plano){
   return `
     <div class="${blockClass}"><div class="ps-rot-inner">
       ${sinEmpresa ? '' : empresaLineHTML()}
-      <div class="ps-header-line">
-        <span><b>Fecha:</b> ${fmtFechaCorta(p.fecha)}</span>
-        <span><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)}</span>
+      <div class="ps-header-line ps-header-line-pedido">
         <span><b>Cliente:</b> <b>${escapeHtml(p.clienteCodigo||'')} ${escapeHtml(p.clienteNombre||'')}</b></span>
+        <span class="ps-header-derecha"><b>PEDIDO N.º:</b> ${escapeHtml(p.numero)} &nbsp; <b>Fecha:</b> ${fmtFechaCorta(p.fecha)}</span>
       </div>
       <table class="${claseTabla}">
         <colgroup>
