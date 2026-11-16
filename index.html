@@ -160,6 +160,13 @@
   .rl-meta{font-size:12px; color:var(--ink-soft);}
   .rl-right{text-align:right; flex-shrink:0;}
   .rl-importe{font-weight:700; color:var(--olive); font-size:15px;}
+  .rowline.rl-dev{border-color:#e3a3a3; background:#fdf3f3;}
+  .rowline.rl-dev .rl-importe{color:#b3261e;}
+  .tag-dev{display:inline-block; font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:20px; background:#b3261e; color:#fff; margin-right:4px; vertical-align:middle;}
+  .rp-tipo-mov{display:none; gap:8px; margin-top:-4px;}
+  .rp-tipo-mov.show{display:flex;}
+  .rp-tipo-mov button{flex:1; padding:9px; border-radius:10px; border:1.5px solid #e3a3a3; background:#fff; color:#b3261e; font-weight:700; font-size:14px;}
+  .rp-tipo-mov button.active{background:#b3261e; color:#fff; border-color:#b3261e;}
   .tag-tipo{display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:20px; margin-top:3px; background:var(--olive-light); color:#5b6136;}
 
   /* ---------- Consultar deuda ---------- */
@@ -1500,7 +1507,7 @@
     <div class="row3">
       <div class="field">
         <label>Cantidad</label>
-        <input type="number" id="rp_cantidad" inputmode="decimal" step="1" placeholder="0">
+        <input type="number" id="rp_cantidad" inputmode="decimal" step="1" placeholder="0" oninput="actualizarTipoMovUI()">
       </div>
       <div class="field">
         <label>Bonificación %</label>
@@ -1510,6 +1517,11 @@
         <label>Precio</label>
         <input type="text" id="rp_precio" readonly placeholder="-">
       </div>
+    </div>
+
+    <div class="field rp-tipo-mov" id="rp_tipoMovBox">
+      <button type="button" id="rp_tm_DEVOLUCION" onclick="setTipoMov('DEVOLUCION')">Devolución</button>
+      <button type="button" id="rp_tm_CAMBIO" onclick="setTipoMov('CAMBIO')">Cambio</button>
     </div>
 
     <div class="field">
@@ -4235,9 +4247,9 @@ function renderRenglonesPedido(){
       const precio = artActual ? artActual.precio : '';
       const precioTxt = (precio!=='' && precio!=null) ? fmtMoney(precio) : '';
       return `
-      <div class="rowline" onclick="editarRenglonPedido('${r.id}')">
+      <div class="rowline${Number(r.cantidad)<0 ? ' rl-dev' : ''}" onclick="editarRenglonPedido('${r.id}')">
         <div class="rl-left">
-          <div class="rl-cliente">${escapeHtml(codigoRenglonMostrar(r))} · ${escapeHtml(r.artDescripcion)}</div>
+          <div class="rl-cliente">${Number(r.cantidad)<0 ? '<span class="tag-dev">'+(tipoMovDeDescripcion(r.artDescripcion)==='CAMBIO'?'CAMBIO':'DEV')+'</span>' : ''}${escapeHtml(codigoRenglonMostrar(r))} · ${escapeHtml(r.artDescripcion)}</div>
           <div class="rl-meta">${(codigoArticuloPref==='alfanumerico' ? r.artCodigo : r.artCodigoAlt) ? 'Cód: '+escapeHtml(codigoArticuloPref==='alfanumerico' ? r.artCodigo : r.artCodigoAlt) : ''} ${r.bonificacion ? '· Bonif: '+escapeHtml(r.bonificacion)+'%' : ''} ${r.observacion ? '· '+escapeHtml(r.observacion) : ''}</div>
         </div>
         <div class="rl-right">
@@ -4335,8 +4347,35 @@ function renderPedClienteSelected(){
 /* =========================================================
    MODAL RENGLON PEDIDO + AUTOCOMPLETE ARTICULO
    ========================================================= */
+/* Devoluciones / cambios: se cargan con cantidad negativa. La palabra
+   DEVOLUCION o CAMBIO se agrega al principio de la descripcion del renglon
+   (asi llega en DESART del CSV aunque el campo se corte por largo). */
+const TIPOS_MOV = ['DEVOLUCION','CAMBIO'];
+let rpTipoMov = 'DEVOLUCION';
+function quitarPrefijoMov(desc){
+  let d = String(desc||'');
+  for(const tm of TIPOS_MOV){
+    if(d.toUpperCase().startsWith(tm+' - ')) return d.slice(tm.length+3);
+  }
+  return d;
+}
+function tipoMovDeDescripcion(desc){
+  const d = String(desc||'').toUpperCase();
+  return TIPOS_MOV.find(tm=> d.startsWith(tm+' - ')) || '';
+}
+function setTipoMov(tm){
+  rpTipoMov = tm;
+  TIPOS_MOV.forEach(x=> document.getElementById('rp_tm_'+x).classList.toggle('active', x===tm));
+}
+function actualizarTipoMovUI(){
+  const c = parseFloat(document.getElementById('rp_cantidad').value);
+  document.getElementById('rp_tipoMovBox').classList.toggle('show', !isNaN(c) && c < 0);
+  setTipoMov(rpTipoMov);
+}
+
 function abrirModalRenglonPedido(){
   editingRenglonPedidoId = null;
+  rpTipoMov = 'DEVOLUCION';
   document.getElementById('modalTitlePedido').textContent = 'Agregar artículo';
   document.getElementById('btnEliminarRenglonPedido').style.display = 'none';
   articuloSeleccionado = null;
@@ -4344,6 +4383,7 @@ function abrirModalRenglonPedido(){
   document.getElementById('rp_cantidad').value = '';
   document.getElementById('rp_bonificacion').value = '';
   document.getElementById('rp_observacion').value = '';
+  actualizarTipoMovUI();
   document.getElementById('modalRenglonPedido').classList.add('show');
 }
 function cerrarModalRenglonPedido(){
@@ -4380,13 +4420,15 @@ function editarRenglonPedido(id){
   editingRenglonPedidoId = id;
   document.getElementById('modalTitlePedido').textContent = 'Editar artículo';
   document.getElementById('btnEliminarRenglonPedido').style.display = 'inline-flex';
-  articuloSeleccionado = {codigo:r.artCodigo, codigoAlt:r.artCodigoAlt, descripcion:r.artDescripcion};
+  rpTipoMov = r.tipoMov || tipoMovDeDescripcion(r.artDescripcion) || 'DEVOLUCION';
+  articuloSeleccionado = {codigo:r.artCodigo, codigoAlt:r.artCodigoAlt, descripcion:quitarPrefijoMov(r.artDescripcion)};
   const artActual = articulos.find(x=>String(x.codigo)===String(r.artCodigo));
   if(artActual) articuloSeleccionado.precio = artActual.precio;
   renderArticuloSelected();
   document.getElementById('rp_cantidad').value = r.cantidad || '';
   document.getElementById('rp_bonificacion').value = r.bonificacion || '';
   document.getElementById('rp_observacion').value = r.observacion || '';
+  actualizarTipoMovUI();
   document.getElementById('modalRenglonPedido').classList.add('show');
 }
 
@@ -4396,10 +4438,12 @@ function aceptarRenglonPedido(){
     return;
   }
   const cantidad = parseFloat(document.getElementById('rp_cantidad').value);
-  if(isNaN(cantidad) || cantidad <= 0){
-    toast('Ingresá una cantidad válida');
+  if(isNaN(cantidad) || cantidad === 0){
+    toast('Ingresá una cantidad válida (negativa para devolución o cambio)');
     return;
   }
+  const tipoMov = cantidad < 0 ? rpTipoMov : '';
+  const descBase = quitarPrefijoMov(articuloSeleccionado.descripcion);
   let bonificacion = parseFloat(document.getElementById('rp_bonificacion').value);
   if(isNaN(bonificacion)) bonificacion = 0;
   if(bonificacion < 0 || bonificacion > 100){
@@ -4410,7 +4454,8 @@ function aceptarRenglonPedido(){
   const data = {
     artCodigo: articuloSeleccionado.codigo,
     artCodigoAlt: articuloSeleccionado.codigoAlt || '',
-    artDescripcion: articuloSeleccionado.descripcion,
+    artDescripcion: tipoMov ? (tipoMov + ' - ' + descBase) : descBase,
+    tipoMov: tipoMov,
     cantidad: cantidad,
     bonificacion: bonificacion,
     observacion: document.getElementById('rp_observacion').value.trim()
