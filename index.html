@@ -163,6 +163,13 @@
   .rowline.rl-dev{border-color:#e3a3a3; background:#fdf3f3;}
   .rowline.rl-dev .rl-importe{color:#b3261e;}
   .tag-dev{display:inline-block; font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:20px; background:#b3261e; color:#fff; margin-right:4px; vertical-align:middle;}
+  .cant-signo-wrap{display:flex; gap:6px; align-items:stretch;}
+  .row3 > .field-cant{flex:1.6;}
+  .cant-signo-wrap input{flex:1; min-width:0;}
+  .field .cant-signo-wrap input[type=number]{padding:12px 8px; text-align:center;}
+  .btn-signo{flex:0 0 auto; width:38px; border:1.5px solid var(--border); border-radius:10px; background:var(--white); font-size:20px; font-weight:700; color:var(--ink-soft); padding:0; cursor:pointer; touch-action:manipulation;}
+  .btn-signo.neg{background:#b3261e; border-color:#b3261e; color:#fff;}
+  .field input#rp_cantidad.cant-neg{color:#b3261e; font-weight:700; border-color:#e3a3a3; background:#fdf3f3;}
   .rp-tipo-mov{display:none; gap:8px; margin-top:-4px;}
   .rp-tipo-mov.show{display:flex;}
   .rp-tipo-mov button{flex:1; padding:9px; border-radius:10px; border:1.5px solid #e3a3a3; background:#fff; color:#b3261e; font-weight:700; font-size:14px;}
@@ -1505,9 +1512,12 @@
     </div>
 
     <div class="row3">
-      <div class="field">
+      <div class="field field-cant">
         <label>Cantidad</label>
-        <input type="number" id="rp_cantidad" inputmode="decimal" step="1" placeholder="0" oninput="actualizarTipoMovUI()">
+        <div class="cant-signo-wrap">
+          <button type="button" class="btn-signo" id="rp_btnSigno" onclick="toggleSignoCantidad()" title="Cambiar signo (devolución / cambio)">±</button>
+          <input type="number" id="rp_cantidad" inputmode="decimal" step="1" placeholder="0" oninput="actualizarTipoMovUI()">
+        </div>
       </div>
       <div class="field">
         <label>Bonificación %</label>
@@ -4369,8 +4379,24 @@ function setTipoMov(tm){
 }
 function actualizarTipoMovUI(){
   const c = parseFloat(document.getElementById('rp_cantidad').value);
-  document.getElementById('rp_tipoMovBox').classList.toggle('show', !isNaN(c) && c < 0);
+  const neg = !isNaN(c) && c < 0;
+  document.getElementById('rp_tipoMovBox').classList.toggle('show', neg);
+  document.getElementById('rp_cantidad').classList.toggle('cant-neg', neg);
+  document.getElementById('rp_btnSigno').classList.toggle('neg', neg);
   setTipoMov(rpTipoMov);
+}
+/* Boton ± : invierte el signo de la cantidad. Sirve en celulares cuyo
+   teclado numerico no muestra el signo menos. */
+function toggleSignoCantidad(){
+  const inp = document.getElementById('rp_cantidad');
+  const v = parseFloat(inp.value);
+  if(isNaN(v) || v === 0){
+    toast('Primero ingresá la cantidad y después tocá ±');
+    inp.focus();
+    return;
+  }
+  inp.value = -v;
+  actualizarTipoMovUI();
 }
 
 function abrirModalRenglonPedido(){
