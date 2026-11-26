@@ -3201,6 +3201,13 @@ function codigoRenglonMostrar(r){
   if(codigoArticuloPref === 'alfanumerico' && r.artCodigoAlt) return r.artCodigoAlt;
   return r.artCodigo || '';
 }
+/* Orden de los renglones de un pedido: primero los articulos comunes
+   (cantidad positiva) y al final las devoluciones / cambios (cantidad
+   negativa). Dentro de cada grupo se respeta el orden de carga. */
+function renglonesOrdenados(p){
+  const r = p.renglones || [];
+  return r.filter(x=>!(Number(x.cantidad)<0)).concat(r.filter(x=>Number(x.cantidad)<0));
+}
 function totalPlanilla(p){
   return p.renglones.reduce((s,r)=> s + (Number(r.importe)||0), 0);
 }
@@ -4252,7 +4259,8 @@ function renderRenglonesPedido(){
     list.innerHTML = `<div class="empty-state" style="padding:30px 10px;">Sin artículos cargados todavía.</div>`;
   }else{
     // mas recientes arriba, los primeros cargados van quedando mas abajo
-    list.innerHTML = [...p.renglones].reverse().map(r=>{
+    // las devoluciones/cambios (negativos) siempre quedan al final
+    list.innerHTML = [...p.renglones.filter(x=>!(Number(x.cantidad)<0))].reverse().concat([...p.renglones.filter(x=>Number(x.cantidad)<0)].reverse()).map(r=>{
       const artActual = articulos.find(x=>String(x.codigo)===String(r.artCodigo));
       const precio = artActual ? artActual.precio : '';
       const precioTxt = (precio!=='' && precio!=null) ? fmtMoney(precio) : '';
@@ -4755,7 +4763,7 @@ function exportarPedidosCSV(){
       ''
     ].join(';'));
 
-    p.renglones.forEach((r, idx)=>{
+    renglonesOrdenados(p).forEach((r, idx)=>{
       filasR.push([
         numeroNum,
         idx+1,
@@ -5174,7 +5182,7 @@ function fmtFechaDeuda(fecha){
 }
 function buildPedidoPrintHTML(p, blockClass, sinEmpresa, plano){
   blockClass = blockClass || 'ps-block';
-  const filas = p.renglones.map(r=>`
+  const filas = renglonesOrdenados(p).map(r=>`
     <tr>
       <td>${escapeHtml(r.cantidad)}</td>
       <td>${escapeHtml(codigoRenglonMostrar(r))}</td>
@@ -5296,7 +5304,7 @@ async function exportarPedidosSeleccionadosExcel(){
     const cli = clientes.find(c=> c.codigo === p.clienteCodigo);
     const cliLocalidad = cli ? (cli.localidad||'') : '';
     const cliCPostal = cli ? (cli.codigoPostal||'') : '';
-    const renglones = p.renglones || [];
+    const renglones = renglonesOrdenados(p);
     if(renglones.length === 0){
       filas.push([puntoVenta, p.numero||'', fmtFechaCorta(p.fecha), p.clienteCodigo||'', p.clienteNombre||'', cliLocalidad, cliCPostal, vendCodigo||'', vendNombre, transporteTexto, '', '', '(sin artículos)', '', '']);
       return;
